@@ -1,0 +1,47 @@
+<resources>
+    <string name="app_name">ProfileChanger</string>
+    <string name="location_base_profiler">Location base Profiler</string>
+    <string name="time_base_profiler">Time base Profiler</string>
+    <string name="rate">Rate</string>
+    <string name="settings">Settings</string>
+    <string name="Profiles">Profiles</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="ringtone">Ringtone</string>
+    <string name="media">Media</string>
+    <string name="notification">Notification</string>
+    <string name="system">System</string>
+    <string name="set">Set</string>
+    <string name="save">Save</string>
+    <string name="un_titled">un_titled</string>
+    <string name="ringing">Ringing</string>
+    <string name="silent">Silent</string>
+    <string name="vibrate">Vibrate</string>
+    <string name="add_new">Add new</string>
+    <string name="update">Update</string>
+    <string name="general">General</string>
+    <string name="loud">Loud</string>
+    <string name="touch_sound">Touch Sound</string>
+    <string name="lock_screen">Lock Screen</string>
+    <string name="dial_pad_sound">Dial pad sound</string>
+    <string name="medium">Medium</string>
+    <string name="low">Low</string>
+    <string name="start_time">Start time</string>
+    <string name="end_time">End time</string>
+    <string name="end_profiler">End profiler</string>
+    <string name="start_profiler">Start profiler</string>
+    <string name="repeat">Repeat</string>
+    <string name="fr">Fr</string>
+    <string name="th">Th</string>
+    <string name="we">We</string>
+    <string name="tu">Tu</string>
+    <string name="mo">Mo</string>
+    <string name="su">Su</string>
+    <string name="sa">Sa</string>
+    <string name="cancel">cancel</string>
+    <string name="no_profiler">No Profiler</string>
+
+
+</resources>
