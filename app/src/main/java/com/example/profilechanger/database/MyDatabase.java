@@ -19,8 +19,7 @@ public class MyDatabase extends SQLiteOpenHelper {
     private static final String LOCATION_TABLE = "LOCATION_TABLE";
     private static final String LOCATION_ID = "LOCATION_ID";
     private static final String LOCATION_TITLE = "LOCATION_TITLE";
-    private static final String LOCATION_PROFILE_TITLE = "LOCATION_PROFILE_TITLE";
-    private static final String LATITUDE = "LATITUDE";
+     private static final String LATITUDE = "LATITUDE";
     private static final String LONGITUDE = "LONGITUDE";
     private static final String RADIUS = "RADIUS";
     private static final String GEO_FENCE_TYPE = "GEO_FENCE_TYPE";
@@ -34,9 +33,10 @@ public class MyDatabase extends SQLiteOpenHelper {
     private static final String TIME_TABLE = "TIME_TABLE";
     private static final String TIME_ID = "TIME_ID";
     private static final String TIME_TITLE = "TIME_TITLE";
-    private static final String TIME_PROFILE_TITLE = "TIME_PROFILE_TITLE";
-    private static final String TIME_START_TIME = "TIME_EXPIRATION_TIME";
-    private static final String TIME_END_TIME = "TIME_EXPIRATION_TIME";
+    private static final String TIME_PROFILE_TITLE_START = "TIME_PROFILE_TITLE_START";
+    private static final String TIME_PROFILE_TITLE_END = "TIME_PROFILE_TITLE_END";
+    private static final String TIME_START_TIME = "TIME_START_TIME";
+    private static final String TIME_END_TIME = "TIME_END_TIME";
     private static final String TIME_STATE = "TIME_STATE";
     private static final String TIME_DATE = "TIME_DATE";
     private static final String TIME_REPEAT = "TIME_REPEAT";
@@ -74,8 +74,7 @@ public class MyDatabase extends SQLiteOpenHelper {
 
         db.execSQL("create table " + LOCATION_TABLE + "(LOCATION_ID INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "LOCATION_TITLE TEXT" +
-                ",LOCATION_PROFILE_TITLE TEXT" +
-                ",LATITUDE TEXT" +
+                 ",LATITUDE TEXT" +
                 ",LONGITUDE TEXT" +
                 ",RADIUS TEXT" +
                 ",GEO_FENCE_TYPE TEXT" +
@@ -87,7 +86,8 @@ public class MyDatabase extends SQLiteOpenHelper {
 
         db.execSQL("create table " + TIME_TABLE + "(TIME_ID INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "TIME_TITLE TEXT" +
-                ",TIME_PROFILE_TITLE TEXT" +
+                ",TIME_PROFILE_TITLE_START TEXT" +
+                ",TIME_PROFILE_TITLE_END TEXT" +
                 ",TIME_START_TIME TEXT" +
                 ",TIME_END_TIME TEXT" +
                 ",TIME_STATE TEXT" +
@@ -141,16 +141,23 @@ public class MyDatabase extends SQLiteOpenHelper {
                 new String[]{id});
     }
 
+    public Cursor getPerDay()
+    {
+        SQLiteDatabase databaseWritable = getWritableDatabase();
+        return databaseWritable.rawQuery("select * from " + PER_DAY_TABLE, null,
+                null);
+
+    }
+
     //location base table functions
-    public long insert(String location_title, String profileTitle, String latitude,
+    public long insert(String location_title , String latitude,
                        String longitude, String radius, String geoFenceType,
                        String expirationTime, String state, String date,
                        String enter_profile_id,String exit_profile_id) {
         SQLiteDatabase database = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(LOCATION_TITLE, location_title);
-        values.put(LOCATION_PROFILE_TITLE, profileTitle);
-        values.put(LATITUDE, latitude);
+         values.put(LATITUDE, latitude);
         values.put(LONGITUDE, longitude);
         values.put(RADIUS, radius);
         values.put(GEO_FENCE_TYPE, geoFenceType);
@@ -162,13 +169,12 @@ public class MyDatabase extends SQLiteOpenHelper {
         return database.insert(LOCATION_TABLE, null, values);
     }
 
-    public long updateLocation(String id, String location_title, String profileTitle, String state,
+    public long updateLocation(String id, String location_title , String state,
                                String enter_profile_id,String exit_profile_id) {
         SQLiteDatabase database = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(LOCATION_TITLE, location_title);
-        values.put(LOCATION_PROFILE_TITLE, profileTitle);
-        values.put(LOCATION_STATE, state);
+         values.put(LOCATION_STATE, state);
         values.put(LOCATION_PROFILE_ENTER, enter_profile_id);
         values.put(LOCATION_PROFILE_EXIT, exit_profile_id);
         return database.update(LOCATION_TABLE, values, MyDatabase.LOCATION_ID + "=?",
@@ -177,8 +183,9 @@ public class MyDatabase extends SQLiteOpenHelper {
 
     public Cursor retrieveLocation(String id) {
         SQLiteDatabase databaseWritable = getWritableDatabase();
-        return databaseWritable.rawQuery("select * from " + LOCATION_TABLE +
-                " WHERE " + MyDatabase.LOCATION_ID + " LIKE " + " ? ", new String[]{id});
+        return databaseWritable.rawQuery( "SELECT * FROM " + LOCATION_TABLE +
+                        " WHERE LOCATION_ID LIKE '" + id + "'", null );
+
 
     }
 
@@ -201,13 +208,15 @@ public class MyDatabase extends SQLiteOpenHelper {
 
     //time base table functions
 
-    public long insertTimeTable(String time_title, String profileTitle, String startTime,
-                       String endTime, String state, String date, String repeat,
-                       String days, String start_profile_id,String end_profile_id) {
+    public long insertTimeTable(String time_title, String profileTitleStart, String profileTitleEnd,
+                                String startTime, String endTime, String state, String date,
+                                String repeat, String days, String start_profile_id,
+                                String end_profile_id) {
         SQLiteDatabase database = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(TIME_TITLE, time_title);
-        values.put(TIME_PROFILE_TITLE, profileTitle);
+        values.put(TIME_PROFILE_TITLE_START, profileTitleStart);
+        values.put(TIME_PROFILE_TITLE_END, profileTitleEnd);
         values.put(TIME_START_TIME, startTime);
         values.put(TIME_END_TIME, endTime);
         values.put(TIME_STATE, state);
@@ -220,14 +229,16 @@ public class MyDatabase extends SQLiteOpenHelper {
         return database.insert(TIME_TABLE, null, values);
     }
 
-    public long updateTimeTable(String id, String time_title, String profileTitle,
-                                String startTime, String endTime, String state,
-                                String date, String repeat, String days, String start_profile_id,
-                                String end_profile_id) {
+    public long updateTimeTable(String id, String time_title, String profileTitleStart,
+                                String profileTitleEnd, String startTime, String endTime,
+                                String state, String date, String repeat, String days,
+                                String start_profile_id, String end_profile_id)
+    {
         SQLiteDatabase database = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(TIME_TITLE, time_title);
-        values.put(TIME_PROFILE_TITLE, profileTitle);
+        values.put(TIME_PROFILE_TITLE_START, profileTitleStart);
+        values.put(TIME_PROFILE_TITLE_END, profileTitleEnd);
         values.put(TIME_START_TIME, startTime);
         values.put(TIME_END_TIME, endTime);
         values.put(TIME_STATE, state);
@@ -244,8 +255,8 @@ public class MyDatabase extends SQLiteOpenHelper {
 
     public Cursor retrieveTimeTable(String id) {
         SQLiteDatabase databaseWritable = getWritableDatabase();
-        return databaseWritable.rawQuery("select * from " + TIME_TABLE +
-                " WHERE " + MyDatabase.TIME_ID + " LIKE " + " ? ", new String[]{id});
+          String selectQuery = "SELECT  * FROM " + TIME_TABLE + " WHERE TIME_ID  LIKE '" + id+"'";
+        return databaseWritable.rawQuery( selectQuery, null );
 
     }
 
@@ -310,8 +321,8 @@ public class MyDatabase extends SQLiteOpenHelper {
 
     public Cursor retrieveProfile(String id) {
         SQLiteDatabase databaseWritable = getWritableDatabase();
-        return databaseWritable.rawQuery("select * from " + PROFILE_TABLE +
-                " WHERE " + MyDatabase.PROFILE_P_KEY + " LIKE " + " ? ", new String[]{id});
+        return databaseWritable.rawQuery( "SELECT * FROM " + PROFILE_TABLE +
+                " WHERE PROFILE_P_KEY LIKE '" + id + "'", null );
 
     }
 

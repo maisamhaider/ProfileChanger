@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:id="@+id/settingsNotification_LL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/selectableItemBackground"
+        android:orientation="vertical">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|center"
+            android:layout_margin="10dp"
+            android:text="@string/notification_sounds" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/notiName_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="@string/sound_name" />
+    </LinearLayout>
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/settingVibrate_mSwitch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text="@string/vibrate" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text="@string/theme" />
+
+    <RadioGroup
+        android:id="@+id/radioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp">
+
+        <com.google.android.material.radiobutton.MaterialRadioButton
+            android:id="@+id/dayTheme_mRb"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/day" />
+
+        <com.google.android.material.radiobutton.MaterialRadioButton
+            android:id="@+id/nightTheme_mRb"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/night" />
+
+        <com.google.android.material.radiobutton.MaterialRadioButton
+            android:id="@+id/autoTheme_mRb"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/auto_change" />
+    </RadioGroup>
+
+
+</LinearLayout>

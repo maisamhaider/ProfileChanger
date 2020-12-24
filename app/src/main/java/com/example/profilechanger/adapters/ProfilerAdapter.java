@@ -57,7 +57,7 @@ public class ProfilerAdapter extends RecyclerView.Adapter<ProfilerAdapter.Profil
     public void onBindViewHolder(@NonNull ProfilerViewHolder holder, int position) {
         profilerModel = modelArrayList.get(position);
         id = modelArrayList.get(position).getId();
-        String title = modelArrayList.get(position).getId();
+        String title = modelArrayList.get(position).getName();
 
         holder.profilerTitle_tv.setText(title);
         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
@@ -79,7 +79,6 @@ public class ProfilerAdapter extends RecyclerView.Adapter<ProfilerAdapter.Profil
                 } else {
                     editIntent(MyAnnotations.LOCATION_PROFILER_ID, id, MyAnnotations.IS_UPDATE,
                             true, false);
-
                 }
             }
         });

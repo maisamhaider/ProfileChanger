@@ -1,6 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">ProfileChanger</string>
-    <string name="location_profiler">Location  Profiler</string>
     <string name="location_base_profiler">Location base Profiler</string>
     <string name="time_base_profiler">Time base Profiler</string>
     <string name="rate">Rate</string>
@@ -34,13 +34,13 @@
     <string name="end_profiler">End profiler</string>
     <string name="start_profiler">Start profiler</string>
     <string name="repeat">Repeat</string>
-    <string name="fri">Fri</string>
-    <string name="thu">Thu</string>
-    <string name="wed">Wed</string>
-    <string name="tue">Tue</string>
-    <string name="mon">Mon</string>
-    <string name="sun">Sun</string>
-    <string name="sat">Sat</string>
+    <string name="fri">Fr</string>
+    <string name="thu">Th</string>
+    <string name="wed">We</string>
+    <string name="tue">Tu</string>
+    <string name="mon">Mo</string>
+    <string name="sun">Su</string>
+    <string name="sat">Sa</string>
     <string name="cancel">cancel</string>
     <string name="no_profiler">No Profiler</string>
     <string name="N_A">N/A</string>
@@ -48,30 +48,4 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="all_days">All days</string>
-    <string name="un_done">Un Done</string>
-    <string name="notification_sounds">Notification Sounds</string>
-    <string name="sound_name">sound name</string>
-    <string name="theme">Theme</string>
-    <string name="day">Day</string>
-    <string name="night">Night</string>
-    <string name="auto_change">Auto Change</string>
-    <string name="marks_limit">Marks Limit:</string>
-    <string name="circle_size">Circle Size:</string>
-    <string name="walk">60x60 (m)</string>
-    <string name="car">250x250 (m)</string>
-    <string name="bus">200X200 (m)</string>
-    <string name="cycle">100x100 (m)</string>
-    <string name="dismiss">Dismiss</string>
-    <string name="done">Done</string>
-    <string name="on_exit">On Exit</string>
-    <string name="on_entered">On Entered</string>
-    <string name="geofence_type">Geofence type:</string>
-    <string name="expiration_time">Expiration time:</string>
-    <string name="enter">Enter</string>
-    <string name="never">Never</string>
-    <string name="location">Location</string>
-    <string name="you_need_to_allow_location">you need to allow location.</string>
-    <string name="Profiler_not_inserted">Profiler not inserted</string>
-    <string name="please_fill_all_fields">Please fill all fields</string>
-
 </resources>

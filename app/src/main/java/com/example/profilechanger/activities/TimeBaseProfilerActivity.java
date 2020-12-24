@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 
 import com.example.profilechanger.R;
 import com.example.profilechanger.adapters.ProfilerAdapter;
+import com.example.profilechanger.annotations.MyAnnotations;
 import com.example.profilechanger.database.MyDatabase;
 import com.example.profilechanger.models.ProfilerModel;
 
@@ -23,29 +25,24 @@ public class TimeBaseProfilerActivity extends AppCompatActivity {
     private MyDatabase database;
     private RecyclerView timeBaseProfiler_rv;
     private ArrayList<ProfilerModel> list;
-
+    TextView noData_tv;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_time_base_profiler);
         database = new MyDatabase(this);
         timeBaseProfiler_rv = findViewById(R.id.timeBaseProfiler_rv);
-        TextView noData_tv= findViewById(R.id.noData_mTv);
+         noData_tv= findViewById(R.id.noData_mTv);
         Button addNew_mBtn = findViewById(R.id.addNew_mBtn);
-        addDataInList();
-        load();
-        if (list.isEmpty())
-        {
-            noData_tv.setVisibility(View.VISIBLE);
-        }
-        else
-        {
-            noData_tv.setVisibility(View.GONE);
 
-        }
         addNew_mBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                 startActivity(new Intent(TimeBaseProfilerActivity.this,
+                        TimeBaseProfilerEditActivity.class).putExtra(MyAnnotations.IS_UPDATE,
+                        false)
+                );
 
             }
         });
@@ -55,6 +52,7 @@ public class TimeBaseProfilerActivity extends AppCompatActivity {
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(RecyclerView.VERTICAL);
+        int size = list.size();
         ProfilerAdapter adapter = new ProfilerAdapter(this, list, true,database);
         timeBaseProfiler_rv.setAdapter(adapter);
         timeBaseProfiler_rv.setLayoutManager(layoutManager);
@@ -82,6 +80,15 @@ public class TimeBaseProfilerActivity extends AppCompatActivity {
         super.onResume();
         addDataInList();
         load();
+        if (list.isEmpty())
+        {
+            noData_tv.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            noData_tv.setVisibility(View.GONE);
+
+        }
     }
 
 

@@ -1,0 +1,241 @@
+package com.example.profilechanger.broadcasts;
+
+import android.app.AlarmManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
+
+import com.example.profilechanger.annotations.MyAnnotations;
+import com.example.profilechanger.annotations.NoAnnotation;
+import com.example.profilechanger.database.MyDatabase;
+import com.example.profilechanger.notification.NotificationHelper;
+import com.example.profilechanger.utils.AlarmClass;
+import com.example.profilechanger.utils.SoundProfileActions;
+import com.example.profilechanger.utils.TimeUtil;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
+
+public class AlarmReceiver extends BroadcastReceiver {
+
+
+    Context mContext;
+    private NotificationHelper notificationHelper;
+    private SoundProfileActions actions;
+    private String time_profile_start;
+    private String time_profile_end;
+
+    private String time_profile_start_id;
+    private String time_profile_end_id;
+    private AlarmClass alarmClass;
+    String title;
+    private TimeUtil timeUtil;
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        mContext = context;
+        notificationHelper = new NotificationHelper(context);
+        alarmClass = new AlarmClass(context);
+        timeUtil = new TimeUtil(context);
+
+        title = intent.getStringExtra(MyAnnotations.PROFILER_TITLE);
+        int id = intent.getIntExtra(MyAnnotations.PROFILER_POSITION, 0);
+        boolean repeat = intent.getBooleanExtra(MyAnnotations.IS_REPEAT, false);
+        long triggerTime = intent.getLongExtra(MyAnnotations.TRIGGER_TIME, 0);
+        notificationHelper.sendHighPriorityNotification(title, "Profile is triggered");
+
+        if (id - 10000 > -1) {
+            //mean this is end profile
+            if (repeat) {
+                if (isToday(String.valueOf(id - 10000))) {
+                    endProfile(String.valueOf(id - 10000));
+                }
+
+            } else {
+
+                endProfile(String.valueOf(id - 10000));
+            }
+        } else {
+            //mean this is start profile
+            if (repeat) {
+                if (isToday(String.valueOf(id - 1000))) {
+                    startProfile(String.valueOf(id - 1000));
+                }
+
+            } else {
+
+                startProfile(String.valueOf(id - 1000));
+            }
+        }
+
+    }
+
+    public void startProfile(String id) {
+        MyDatabase database = new MyDatabase(mContext);
+        actions = new SoundProfileActions(mContext);
+        Cursor cursor = database.retrieveTimeTable(id);
+        while (cursor.moveToNext()) {
+            time_profile_start_id = cursor.getString(10);
+            String isRepeat = cursor.getString(8);
+
+            if (isRepeat.matches(MyAnnotations.ON)) {
+                String endTime = cursor.getString(5);
+                long triggerTime = timeUtil.getMillisFromFormattedDate(
+                        timeUtil.getCurrentFormattedDate() + " "
+                                + endTime,
+                        MyAnnotations.DEFAULT_FORMAT);
+                String d = timeUtil.getFormattedDateAndTime(triggerTime);
+
+                alarmClass.setOneAlarm(title, triggerTime,
+                        Integer.parseInt(id) + 10000, true);
+            }
+        }
+
+
+        Cursor startCursor = database.retrieveProfile(time_profile_start_id);
+        while (startCursor.moveToNext()) {
+            String ringerMode = startCursor.getString(2);
+            int ringerLevel = Integer.parseInt(startCursor.getString(3));
+            int mediaLevel = Integer.parseInt(startCursor.getString(4));
+            int notificationLevel = Integer.parseInt(startCursor.getString(5));
+            int systemLevel = Integer.parseInt(startCursor.getString(6));
+            String vibrate = startCursor.getString(7);
+            String touchSound = startCursor.getString(8);
+            String lockScreenSound = startCursor.getString(9);
+            String dialPedSound = startCursor.getString(10);
+
+            actions.setRingerMode(ringerMode);
+            actions.setVolume(MyAnnotations.STREAM_RING, ringerLevel);
+            actions.setVolume(MyAnnotations.STREAM_MUSIC, mediaLevel);
+            actions.setVolume(MyAnnotations.STREAM_NOTIFICATION, notificationLevel);
+            actions.setVolume(MyAnnotations.STREAM_SYSTEM, systemLevel);
+
+            if (vibrate.matches(MyAnnotations.ON)) {
+                actions.setVibration(1);
+            } else {
+                actions.setVibration(0);
+            }
+
+            if (touchSound.matches(MyAnnotations.ON)) {
+                actions.setTouchSound(1);
+            } else {
+                actions.setTouchSound(0);
+            }
+//             if (lockScreenSound.matches(MyAnnotations.ON)) {
+//                actions.setLockScreenSound(1);
+//            } else {
+//                actions.setLockScreenSound(0);
+//            }
+            if (dialPedSound.matches(MyAnnotations.ON)) {
+                actions.setDialingPadTone(1);
+            } else {
+                actions.setDialingPadTone(0);
+            }
+        }
+
+    }
+
+    public void endProfile(String id) {
+        MyDatabase database = new MyDatabase(mContext);
+        actions = new SoundProfileActions(mContext);
+        Cursor cursor = database.retrieveTimeTable(id);
+        while (cursor.moveToNext()) {
+            time_profile_end_id = cursor.getString(11);
+
+            String isRepeat = cursor.getString(8);
+
+            if (isRepeat.matches(MyAnnotations.ON)) {
+                if (isTomorrowContain(id)) {
+                    String startTime = cursor.getString(5);
+                    //set start Alarm
+                    long triggerTime = timeUtil.getMillisFromFormattedDate(
+                            timeUtil.getCurrentFormattedDate() + " "
+                                    + startTime,
+                            MyAnnotations.DEFAULT_FORMAT);
+
+                    long triggerTime1 =
+                            timeUtil.getMilliDateAndTime(triggerTime +
+                                    NoAnnotation.HOUR_IN_MILLISECONDS * 24);
+
+
+                    String wq = timeUtil.getFormattedDateAndTime(triggerTime1 );
+                    alarmClass.setOneAlarm(title, triggerTime1,
+                            Integer.parseInt(id) + 1000, true);
+                }
+            }
+        }
+
+        Cursor startCursor = database.retrieveProfile(time_profile_end_id);
+        while (startCursor.moveToNext()) {
+            String ringerMode = startCursor.getString(2);
+            int ringerLevel = Integer.parseInt(startCursor.getString(3));
+            int mediaLevel = Integer.parseInt(startCursor.getString(4));
+            int notificationLevel = Integer.parseInt(startCursor.getString(5));
+            int systemLevel = Integer.parseInt(startCursor.getString(6));
+            String vibrate = startCursor.getString(7);
+            String touchSound = startCursor.getString(8);
+            String lockScreenSound = startCursor.getString(9);
+            String dialPedSound = startCursor.getString(10);
+
+            actions.setRingerMode(ringerMode);
+            actions.setVolume(MyAnnotations.STREAM_RING, ringerLevel);
+            actions.setVolume(MyAnnotations.STREAM_MUSIC, mediaLevel);
+            actions.setVolume(MyAnnotations.STREAM_NOTIFICATION, notificationLevel);
+            actions.setVolume(MyAnnotations.STREAM_SYSTEM, systemLevel);
+
+            if (vibrate.matches(MyAnnotations.ON)) {
+                actions.setVibration(1);
+            } else {
+                actions.setVibration(0);
+            }
+
+            if (touchSound.matches(MyAnnotations.ON)) {
+                actions.setTouchSound(1);
+            } else {
+                actions.setTouchSound(0);
+            }
+//            if (lockScreenSound.matches(MyAnnotations.ON)) {
+//                actions.setLockScreenSound(1);
+//            } else {
+//                actions.setLockScreenSound(0);
+//            }
+            if (dialPedSound.matches(MyAnnotations.ON)) {
+                actions.setDialingPadTone(1);
+            } else {
+                actions.setDialingPadTone(0);
+            }
+
+
+        }
+
+    }
+
+    public boolean isToday(String id) {
+        MyDatabase database = new MyDatabase(mContext);
+        Cursor cursor = database.retrieveTimeTable(id);
+        while (cursor.moveToNext()) {
+            String days = cursor.getString(9);
+            if (days.contains(new TimeUtil(mContext).getToday())) {
+                return true;
+            }
+        }
+        return false;
+
+    }
+
+    public boolean isTomorrowContain(String id) {
+        MyDatabase database = new MyDatabase(mContext);
+        Cursor cursor = database.retrieveTimeTable(id);
+        while (cursor.moveToNext()) {
+            String days = cursor.getString(9);
+            if (days.contains(new TimeUtil(mContext).getTomorrowDay())) {
+                return true;
+            }
+        }
+        return false;
+
+    }
+
+}

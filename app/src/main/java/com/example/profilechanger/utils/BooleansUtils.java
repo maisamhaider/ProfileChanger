@@ -21,4 +21,10 @@ public class BooleansUtils extends ContextWrapper {
 
         return wifiManager.isWifiEnabled();
     }
+    public void setWifiOnOff(boolean trueFalse) {
+
+        wifiManager.setWifiEnabled(trueFalse);
+
+    }
+
 }

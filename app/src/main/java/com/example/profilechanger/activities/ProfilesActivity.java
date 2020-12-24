@@ -71,7 +71,8 @@ public class ProfilesActivity extends AppCompatActivity {
                 list.add(profilesModel);
             }
         }
-        ProfilesAdapter profilesAdapter = new ProfilesAdapter(this, list,database);
+        ProfilesAdapter profilesAdapter = new ProfilesAdapter(this, list,database,
+                false);
         recyclerView.setAdapter(profilesAdapter);
         profilesAdapter.notifyDataSetChanged();
 

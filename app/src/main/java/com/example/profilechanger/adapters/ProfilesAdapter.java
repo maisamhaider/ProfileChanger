@@ -19,6 +19,7 @@ import com.example.profilechanger.activities.OpenProfileActivity;
 import com.example.profilechanger.annotations.MyAnnotations;
 import com.example.profilechanger.database.MyDatabase;
 import com.example.profilechanger.interfaces.ClickListener;
+import com.example.profilechanger.interfaces.SendDataWithKey;
 import com.example.profilechanger.models.ProfilesModel;
 import com.example.profilechanger.utils.PopUpWindow;
 
@@ -27,20 +28,30 @@ import java.util.ArrayList;
 public class ProfilesAdapter extends RecyclerView.Adapter<ProfilesAdapter.ProfileItemHolder>
         implements ClickListener {
 
-    private Context context;
-    private ArrayList<ProfilesModel> profilesModelArrayList;
-    private PopUpWindow popUpWindow;
-    private String id;
-    private MyDatabase myDatabase;
+    private final Context context;
+    private final ArrayList<ProfilesModel> profilesModelArrayList;
+    private final PopUpWindow popUpWindow;
+
+    private final MyDatabase myDatabase;
     private ProfilesModel profilesModel;
+    private final boolean isProfilerNeed;
+    private SendDataWithKey sendDataWithKey;
+    private String profile;
+    String pos;
 
     public ProfilesAdapter(Context context,
                            ArrayList<ProfilesModel> profilesModelArrayList,
-                           MyDatabase myDatabase) {
+                           MyDatabase myDatabase, boolean isProfilerNeed) {
         this.context = context;
         this.profilesModelArrayList = profilesModelArrayList;
         this.myDatabase = myDatabase;
+        this.isProfilerNeed = isProfilerNeed;
         popUpWindow = new PopUpWindow(context, this);
+    }
+
+    public void setSendDataWithKey(SendDataWithKey sendDataWithKey, String profile) {
+        this.sendDataWithKey = sendDataWithKey;
+        this.profile = profile;
     }
 
     @NonNull
@@ -55,21 +66,31 @@ public class ProfilesAdapter extends RecyclerView.Adapter<ProfilesAdapter.Profil
     public void onBindViewHolder(@NonNull ProfileItemHolder holder, int position) {
         profilesModel = profilesModelArrayList.get(position);
         String title = profilesModelArrayList.get(position).getPROFILE_TITLE();
-        id = profilesModelArrayList.get(position).getId();
+        String    id = profilesModelArrayList.get(position).getId();
         holder.profileName_tv.setText(title);
 
         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                PopupWindow popupWindow = popUpWindow.popupWindowUpDel();
-                popupWindow.showAsDropDown(v, Gravity.END, 0);
+                if (!isProfilerNeed) {
+                    pos  = profilesModelArrayList.get(position).getId();
+                    PopupWindow popupWindow = popUpWindow.popupWindowUpDel();
+                    popupWindow.showAsDropDown(v, Gravity.END, 0);
+                }
                 return true;
             }
         });
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                editIntent(id);
+                if (isProfilerNeed) {
+                    pos  = profilesModelArrayList.get(position).getId();
+
+                    sendDataWithKey.data(profile,pos,title);
+                } else {
+                    pos  = profilesModelArrayList.get(position).getId();
+                    editIntent(pos);
+                }
             }
         });
 
@@ -83,11 +104,11 @@ public class ProfilesAdapter extends RecyclerView.Adapter<ProfilesAdapter.Profil
     @Override
     public void click(String button) {
         if (button.matches(MyAnnotations.edit)) {
-            editIntent(id);
+            editIntent(pos);
         } else if (button.matches(MyAnnotations.delete)) {
 
-            if (!isProfileEnabled1(id) || !isProfileEnabled2(id)) {
-                myDatabase.deleteProfile(id);
+            if (!isProfileEnabled1(pos) || !isProfileEnabled2(pos)) {
+                myDatabase.deleteProfile(pos);
                 profilesModelArrayList.remove(profilesModel);
                 notifyDataSetChanged();
 
@@ -95,8 +116,6 @@ public class ProfilesAdapter extends RecyclerView.Adapter<ProfilesAdapter.Profil
                 Toast.makeText(context, "This profile is set with profiler",
                         Toast.LENGTH_SHORT).show();
             }
-
-
         }
 
 

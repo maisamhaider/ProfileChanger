@@ -26,31 +26,31 @@ public class SoundProfileActions {
         this.context = context;
     }
 
+//
+//    public void setRingerMode(String whatToSet) {
+//
+//        am = (AudioManager) context.getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+//        //For Normal mode
+//        if (whatToSet.matches(MyAnnotations.RINGER_MODE_NORMAL)) {
+//
+//            am.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+//
+//        } else
+//            //For Silent mode
+//            if (whatToSet.matches(MyAnnotations.RINGER_MODE_SILENT)) {
+//
+////             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+////                    am.adjustVolume(AudioManager.ADJUST_MUTE, AudioManager.FLAG_SHOW_UI);
+////                } else {
+//                am.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+////                }
+//            } else
+//                //For Vibrate mode
+//                am.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+//
+//    }
 
     public void setRingerMode(String whatToSet) {
-
-        am = (AudioManager) context.getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
-        //For Normal mode
-        if (whatToSet.matches(MyAnnotations.RINGER_MODE_NORMAL)) {
-
-            am.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-
-        } else
-            //For Silent mode
-            if (whatToSet.matches(MyAnnotations.RINGER_MODE_SILENT)) {
-
-//             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//                    am.adjustVolume(AudioManager.ADJUST_MUTE, AudioManager.FLAG_SHOW_UI);
-//                } else {
-                am.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-//                }
-            } else
-                //For Vibrate mode
-                am.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
-
-    }
-
-    public void setRingerMode(String whatToSet, boolean isSecondType) {
 
         am = (AudioManager) context.getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
         //For Normal mode
@@ -63,6 +63,8 @@ public class SoundProfileActions {
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     am.adjustVolume(AudioManager.ADJUST_MUTE, AudioManager.FLAG_SHOW_UI);
+                    am.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+
                 } else {
                     am.setRingerMode(AudioManager.RINGER_MODE_SILENT);
 
@@ -112,16 +114,15 @@ public class SoundProfileActions {
 
     }
 
-    public void setLockScreenSound(int onOff) {
+/*    public void setLockScreenSound(int onOff) {
 
         Settings.System.putInt(context.getContentResolver(),
-                "lockscreen_sounds_enabled", onOff);
-    }
+                Settings, onOff);
+    }*/
 
     public void setVibration(int onOff) {
         Settings.System.putInt(context.getContentResolver(),
                 Settings.System.VIBRATE_ON, onOff);
-
     }
 
 

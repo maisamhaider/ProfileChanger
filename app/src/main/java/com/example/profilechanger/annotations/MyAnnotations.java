@@ -22,13 +22,21 @@ public @interface MyAnnotations {
     String LOCATION_PROFILER_ID = "LOCATION_PROFILER_ID";
     String IS_UPDATE = "IS_UPDATE";
 
-    String SA = "Sa";
-    String SU = "Su";
-    String MO = "Mo";
-    String TU = "Tu";
-    String WE = "We";
-    String TH = "Th";
-    String FR = "Fr";
+
+    String SAT = "Sat";
+    String SUN = "Sun";
+    String MON = "Mon";
+    String TUS = "Tue";
+    String WED = "Wed";
+    String THU = "Thu";
+    String FRI = "Fri";
+
+    String START_PROFILE_ID = "START_PROFILE_ID";
+    String END_PROFILE_ID = "END_PROFILE_ID";
+
+    String DEFAULT_DATE_FORMAT = "dd:MM:yyyy";
+    String DEFAULT_TIME_FORMAT = "h:mm a";
+    String DEFAULT_FORMAT = DEFAULT_DATE_FORMAT +" "+ DEFAULT_TIME_FORMAT;
 
     String ONE = "1";
     String ZERO = "0";
@@ -44,6 +52,7 @@ public @interface MyAnnotations {
     String ON = "ON";
     String OFF = "OFF";
     String ENTER = "ENTER";
+    String NEVER = "Never";
     String EXIT = "EXIT";
     String BOTH = "BOTH";
     String DO_NOT_DISTURB_MESSAGE = "If you want to use this feature you need allow the permission";
@@ -72,4 +81,17 @@ public @interface MyAnnotations {
     String done = "done";
     String next = "next";
     String PRE_PROFILES_LOADED = "PRE_PROFILES_LOADED";
+    String PROFILER_TITLE = "PROFILER_TITLE";
+    String PROFILER_POSITION = "PROFILER_POSITION";
+    String IS_REPEAT = "IS_REPEAT";
+    String TRIGGER_TIME = "TRIGGER_TIME";
+    String NOTIFICATION_SOUND_NAME = "NOTIFICATION_SOUND_NAME";
+    String NOTIFICATION_SOUND_PATH = "NOTIFICATION_SOUND_PATH";
+    String NOTIFICATION_VIBRATE = "NOTIFICATION_VIBRATE";
+
+    String THEME = "THEME";
+    String DAY = "DAY";
+    String NIGHT = "NIGHT";
+    String AUTO_CHANGE = "AUTO_CHANGE";
+    String N_A = "N_A";
 }

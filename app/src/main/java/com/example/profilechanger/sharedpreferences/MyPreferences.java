@@ -23,6 +23,9 @@ public class MyPreferences {
     public void setBoolean(String key, boolean data) {
         editor.putBoolean(key, data).commit();
     }
+    public void setInt(String key, int data) {
+        editor.putInt(key, data).commit();
+    }
     public String getString(String key,String defaultData)
     {
         return sharedPreferences.getString(key,defaultData);
@@ -39,4 +42,9 @@ public class MyPreferences {
     {
         return  sharedPreferences.getLong(key,defaultVal);
     }
+    public int getInt(String key,int defaultVal)
+    {
+        return  sharedPreferences.getInt(key,defaultVal);
+    }
+
 }
