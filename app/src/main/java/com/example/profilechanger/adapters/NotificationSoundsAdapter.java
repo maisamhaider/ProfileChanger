@@ -54,9 +54,8 @@ public class NotificationSoundsAdapter extends
     @Override
     public void onBindViewHolder(@NonNull final NotificationSoundViewHolder holder,
                                  final int position) {
-        holder.notification_sound_holder_Tv.setText(names.get(position));
 
-
+        holder.notification_sound_select_cb.setText(names.get(position));
         holder.notification_sound_select_cb.setChecked(paths.get(position)
                 .matches(sharedPreferences.getString(MyAnnotations.NOTIFICATION_SOUND_PATH,
                         paths.get(0))));
@@ -93,15 +92,11 @@ public class NotificationSoundsAdapter extends
     public class NotificationSoundViewHolder extends RecyclerView.ViewHolder {
 
         CheckBox notification_sound_select_cb;
-        TextView notification_sound_holder_Tv, hidden_notification_sound_holder_Tv;
-        LinearLayout notificationItemLL;
+         LinearLayout notificationItemLL;
 
         public NotificationSoundViewHolder(@NonNull View itemView) {
             super(itemView);
             notification_sound_select_cb = itemView.findViewById(R.id.notification_sound_select_cb);
-            notification_sound_holder_Tv = itemView.findViewById(R.id.notification_sound_holder_Tv);
-            hidden_notification_sound_holder_Tv =
-                    itemView.findViewById(R.id.hidden_notification_sound_holder_Tv);
             notificationItemLL = itemView.findViewById(R.id.notificationItemLL);
         }
     }

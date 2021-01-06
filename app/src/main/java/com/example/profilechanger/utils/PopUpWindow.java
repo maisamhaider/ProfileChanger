@@ -22,7 +22,7 @@ public class PopUpWindow extends ContextWrapper {
     Context context;
     ClickListener clickListener;
 
-    public PopUpWindow(Context base,ClickListener clickListener) {
+    public PopUpWindow(Context base, ClickListener clickListener) {
         super(base);
         this.context = base;
         this.clickListener = clickListener;
@@ -30,7 +30,7 @@ public class PopUpWindow extends ContextWrapper {
     }
 
     public PopupWindow popupWindowUpDel() {
-        PopupWindow  circleSizePopupMenu = new PopupWindow(context);
+        PopupWindow circleSizePopupMenu = new PopupWindow(context);
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.pop_up_up_del_layout, null);
 
@@ -38,6 +38,42 @@ public class PopUpWindow extends ContextWrapper {
         ConstraintLayout delete_cl = view.findViewById(R.id.delete_cl);
 
 
+        circleSizePopupMenu.setFocusable(true);
+        circleSizePopupMenu.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
+        circleSizePopupMenu.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
+        circleSizePopupMenu.setContentView(view);
+        circleSizePopupMenu.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        circleSizePopupMenu.setWindowLayoutMode(ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        edit_cl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clickListener.click(MyAnnotations.edit);
+                circleSizePopupMenu.dismiss();
+            }
+        });
+        delete_cl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clickListener.click(MyAnnotations.delete);
+                circleSizePopupMenu.dismiss();
+
+            }
+        });
+
+        return circleSizePopupMenu;
+    }
+
+    public PopupWindow popupWindowDel() {
+        PopupWindow circleSizePopupMenu = new PopupWindow(context);
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View view = inflater.inflate(R.layout.pop_up_up_del_layout, null);
+
+        ConstraintLayout edit_cl = view.findViewById(R.id.edit_cl);
+        ConstraintLayout delete_cl = view.findViewById(R.id.delete_cl);
+
+        edit_cl.setVisibility(View.GONE);
         circleSizePopupMenu.setFocusable(true);
         circleSizePopupMenu.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
         circleSizePopupMenu.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);

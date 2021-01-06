@@ -50,15 +50,13 @@ public class Permissions {
         String[] manifestPermissionArray = new String[]{
                 Manifest.permission.ACCESS_FINE_LOCATION
                 , Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.MODIFY_AUDIO_SETTINGS,
-                Manifest.permission.ACCESS_NOTIFICATION_POLICY};
+                Manifest.permission.MODIFY_AUDIO_SETTINGS,};
 
         String[] QArray = new String[]{
                 Manifest.permission.ACCESS_FINE_LOCATION
                 , Manifest.permission.ACCESS_COARSE_LOCATION,
                   Manifest.permission.MODIFY_AUDIO_SETTINGS,
-                Manifest.permission.ACCESS_NOTIFICATION_POLICY,
-                Manifest.permission.ACCESS_BACKGROUND_LOCATION};
+                 Manifest.permission.ACCESS_BACKGROUND_LOCATION};
 
 
         //if device is android 10 or higher we need to take background location permissions
@@ -73,7 +71,7 @@ public class Permissions {
             if (QAndAbove) {
                 return true;
             } else {
-                ActivityCompat.requestPermissions(((MainActivity)context),
+                ActivityCompat.requestPermissions(((Activity)context),
                         QArray, PermissionCodes.REQ_CODE);
                 return false;
             }
@@ -81,7 +79,7 @@ public class Permissions {
         else if (belowQ){
             return true;
         } else
-            ActivityCompat.requestPermissions(((MainActivity)context),
+            ActivityCompat.requestPermissions(((Activity)context),
                     manifestPermissionArray,PermissionCodes.REQ_CODE);
         return false;
 
@@ -97,7 +95,7 @@ public class Permissions {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     ActivityCompat.requestPermissions((Activity) context, new String[]
                             {Manifest.permission.ACCESS_BACKGROUND_LOCATION},
-                            PermissionCodes.BACKGROUND_REQ_CODE);
+                            PermissionCodes.REQ_CODE);
                     dialog.dismiss();
                 }
 

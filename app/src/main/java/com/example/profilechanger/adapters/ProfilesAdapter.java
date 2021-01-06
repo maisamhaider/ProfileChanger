@@ -12,6 +12,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.profilechanger.R;
@@ -21,6 +23,7 @@ import com.example.profilechanger.database.MyDatabase;
 import com.example.profilechanger.interfaces.ClickListener;
 import com.example.profilechanger.interfaces.SendDataWithKey;
 import com.example.profilechanger.models.ProfilesModel;
+import com.example.profilechanger.sharedpreferences.MyPreferences;
 import com.example.profilechanger.utils.PopUpWindow;
 
 import java.util.ArrayList;
@@ -38,15 +41,19 @@ public class ProfilesAdapter extends RecyclerView.Adapter<ProfilesAdapter.Profil
     private SendDataWithKey sendDataWithKey;
     private String profile;
     String pos;
+    MyPreferences p;
+    boolean dialog = false;
 
     public ProfilesAdapter(Context context,
                            ArrayList<ProfilesModel> profilesModelArrayList,
-                           MyDatabase myDatabase, boolean isProfilerNeed) {
+                           MyDatabase myDatabase, boolean isProfilerNeed, boolean dialog) {
         this.context = context;
         this.profilesModelArrayList = profilesModelArrayList;
         this.myDatabase = myDatabase;
         this.isProfilerNeed = isProfilerNeed;
         popUpWindow = new PopUpWindow(context, this);
+        p = new MyPreferences(context);
+        this.dialog = dialog;
     }
 
     public void setSendDataWithKey(SendDataWithKey sendDataWithKey, String profile) {
@@ -57,8 +64,15 @@ public class ProfilesAdapter extends RecyclerView.Adapter<ProfilesAdapter.Profil
     @NonNull
     @Override
     public ProfileItemHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.profile_rv_items_layout, parent, false);
+        View view;
+        if (dialog) {
+            view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.profile_rv_items_2_layout, parent, false);
+
+        } else {
+            view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.profile_rv_items_1_layout, parent, false);
+        }
         return new ProfileItemHolder(view);
     }
 
@@ -66,14 +80,28 @@ public class ProfilesAdapter extends RecyclerView.Adapter<ProfilesAdapter.Profil
     public void onBindViewHolder(@NonNull ProfileItemHolder holder, int position) {
         profilesModel = profilesModelArrayList.get(position);
         String title = profilesModelArrayList.get(position).getPROFILE_TITLE();
-        String    id = profilesModelArrayList.get(position).getId();
+        String id = profilesModelArrayList.get(position).getId();
         holder.profileName_tv.setText(title);
+        if (!dialog) {
+            if (p.getBoolean(MyAnnotations.IS_LIGHT_THEME, false)) {
+                holder.cv.setCardBackgroundColor(ContextCompat.getColor(context,
+                        R.color.white));
+                holder.profileName_tv.setTextColor(ContextCompat.getColor(context,
+                        R.color.colorTextOne));
+            } else {
+                holder.cv.setCardBackgroundColor(ContextCompat.getColor(context,
+                        R.color.colorPrimaryVariantLight));
+                holder.profileName_tv.setTextColor(ContextCompat.getColor(context,
+                        R.color.white));
+            }
+
+        }
 
         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 if (!isProfilerNeed) {
-                    pos  = profilesModelArrayList.get(position).getId();
+                    pos = profilesModelArrayList.get(position).getId();
                     PopupWindow popupWindow = popUpWindow.popupWindowUpDel();
                     popupWindow.showAsDropDown(v, Gravity.END, 0);
                 }
@@ -84,11 +112,11 @@ public class ProfilesAdapter extends RecyclerView.Adapter<ProfilesAdapter.Profil
             @Override
             public void onClick(View v) {
                 if (isProfilerNeed) {
-                    pos  = profilesModelArrayList.get(position).getId();
+                    pos = profilesModelArrayList.get(position).getId();
 
-                    sendDataWithKey.data(profile,pos,title);
+                    sendDataWithKey.data(profile, pos, title);
                 } else {
-                    pos  = profilesModelArrayList.get(position).getId();
+                    pos = profilesModelArrayList.get(position).getId();
                     editIntent(pos);
                 }
             }
@@ -160,11 +188,15 @@ public class ProfilesAdapter extends RecyclerView.Adapter<ProfilesAdapter.Profil
     }
 
     class ProfileItemHolder extends RecyclerView.ViewHolder {
+        CardView cv;
         TextView profileName_tv;
 
         public ProfileItemHolder(@NonNull View itemView) {
             super(itemView);
             profileName_tv = itemView.findViewById(R.id.profileName_tv);
+            if (!dialog) {
+                cv = itemView.findViewById(R.id.cv);
+            }
 
         }
     }

@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.profilechanger">
-
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but you must specify either coarse or fine
@@ -20,6 +19,7 @@
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
 
     <application
+        android:name=".utils.ApplicationLevel"
         android:allowBackup="true"
         android:configChanges="keyboardHidden|orientation|screenSize"
         android:icon="@mipmap/ic_launcher"
@@ -27,7 +27,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ProfileChanger">
-
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -39,21 +38,19 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
-
-        <activity android:name=".activities.LocationBaseEditActivity" />
-        <activity android:name=".activities.LocationBaseProfilerActivity" />
-        <activity android:name=".activities.TimeBaseProfilerActivity" />
-        <activity android:name=".activities.TimeBaseProfilerEditActivity" />
-        <activity android:name=".activities.OpenProfileActivity" />
-        <activity android:name=".activities.ProfilesActivity" />
-        <activity android:name=".activities.SettingsActivity" />
-        <activity android:name=".activities.MainActivity">
+        <activity android:name=".activities.MySplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".activities.LocationBaseEditActivity" />
+        <activity android:name=".activities.TimeBaseProfilerEditActivity" />
+        <activity android:name=".activities.OpenProfileActivity" />
+        <activity android:name=".activities.ProfilesActivity" />
+        <activity android:name=".activities.SettingsActivity" />
+        <activity android:name=".activities.MainActivity"/>
 
         <receiver
             android:name=".broadcasts.GeoFenceReceiver"
@@ -72,6 +69,24 @@
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
         </receiver>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
+
+<!--        <meta-data-->
+<!--            android:name="com.google.android.gms.ads.APPLICATION_ID"-->
+<!--            android:value="@string/app_id" />-->
+
+                        <meta-data
+                            android:name="com.google.android.gms.ads.AD_MANAGER_APP"
+                            android:value="true" />
+
+
+
+        <activity
+            android:name="com.google.android.gms.ads.AdActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
     </application>
 
 </manifest>

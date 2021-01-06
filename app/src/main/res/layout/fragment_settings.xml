@@ -1,69 +1,175 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/profileHeader_cl"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@drawable/header_two"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/profileBack_iv"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.08"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_back" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/materialTextView5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/settings"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
     <LinearLayout
-        android:id="@+id/settingsNotification_LL"
+        android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?android:attr/selectableItemBackground"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline5"
+        app:layout_constraintVertical_bias="0.0">
 
-        <com.google.android.material.textview.MaterialTextView
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/settingsNotification_cl"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="start|center"
-            android:layout_margin="10dp"
-            android:text="@string/notification_sounds" />
+            android:background="?android:attr/selectableItemBackground"
+            android:orientation="vertical"
+            android:padding="16dp">
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/notiName_tv"
-            android:layout_width="wrap_content"
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/materialTextView6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start|center"
+                android:text="@string/notification_sounds"
+                android:textColor="?attr/textWhiteGray"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/notiName_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="@string/sound_name"
+                android:textColor="?attr/textWhiteGray"
+                app:layout_constraintStart_toStartOf="@+id/materialTextView6"
+                app:layout_constraintTop_toBottomOf="@+id/materialTextView6" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:tint="?attr/textWhiteGray"
+                 app:srcCompat="@drawable/ic_next_arrow_2"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?attr/textWhiteGray" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/settingVibrate_mSwitch"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:text="@string/sound_name" />
+            android:layout_marginTop="10dp"
+            android:padding="16dp"
+            android:text="@string/vibrate"
+            android:textColor="?attr/textWhiteGray"
+            android:textStyle="bold" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?attr/textWhiteGray" />
+
+
+        <RadioGroup
+            android:id="@+id/radioGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/theme"
+                android:textColor="?attr/textWhiteGray"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/dayTheme_mRb"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/day"
+                android:layoutDirection="rtl"
+                android:textColor="?attr/textWhiteGray" />
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/nightTheme_mRb"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/night"
+                android:layoutDirection="rtl"
+                android:textColor="?attr/textWhiteGray" />
+
+<!--            <com.google.android.material.radiobutton.MaterialRadioButton-->
+<!--                android:id="@+id/autoTheme_mRb"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="@string/auto_change"-->
+<!--                android:layoutDirection="rtl"-->
+<!--                android:textColor="?attr/textWhiteGray" />-->
+        </RadioGroup>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?attr/textWhiteGray" />
+
     </LinearLayout>
 
-    <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/settingVibrate_mSwitch"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="@string/vibrate" />
-
-    <com.google.android.material.textview.MaterialTextView
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="@string/theme" />
-
-    <RadioGroup
-        android:id="@+id/radioGroup"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="10dp">
-
-        <com.google.android.material.radiobutton.MaterialRadioButton
-            android:id="@+id/dayTheme_mRb"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/day" />
-
-        <com.google.android.material.radiobutton.MaterialRadioButton
-            android:id="@+id/nightTheme_mRb"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/night" />
-
-        <com.google.android.material.radiobutton.MaterialRadioButton
-            android:id="@+id/autoTheme_mRb"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/auto_change" />
-    </RadioGroup>
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.13" />
 
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,21 +7,14 @@
     android:layout_margin="10dp"
     app:cardCornerRadius="8dp">
 
-    <LinearLayout
-        android:layout_width="wrap_content"
 
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+    <NumberPicker
 
-        <NumberPicker
-            android:id="@+id/geo_fenceType_np"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="5dp" />
-    </LinearLayout>
+        android:id="@+id/geo_fenceType_np"
+        android:layout_width="120dp"
+        android:layout_height="100dp"
+        android:background="?attr/blueWhite" />
+
 
 </androidx.cardview.widget.CardView>
 

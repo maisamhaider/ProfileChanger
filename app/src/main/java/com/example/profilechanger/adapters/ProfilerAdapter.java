@@ -8,21 +8,29 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.profilechanger.R;
 import com.example.profilechanger.activities.LocationBaseEditActivity;
-import com.example.profilechanger.activities.LocationBaseProfilerActivity;
 import com.example.profilechanger.activities.TimeBaseProfilerEditActivity;
 import com.example.profilechanger.annotations.MyAnnotations;
 import com.example.profilechanger.database.MyDatabase;
 import com.example.profilechanger.interfaces.ClickListener;
 import com.example.profilechanger.models.ProfilerModel;
+import com.example.profilechanger.sharedpreferences.MyPreferences;
+import com.example.profilechanger.utils.AlarmClass;
 import com.example.profilechanger.utils.PopUpWindow;
+import com.google.android.gms.location.GeofencingClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ProfilerAdapter extends RecyclerView.Adapter<ProfilerAdapter.ProfilerViewHolder>
         implements ClickListener {
@@ -34,6 +42,7 @@ public class ProfilerAdapter extends RecyclerView.Adapter<ProfilerAdapter.Profil
     private MyDatabase database;
     private ProfilerModel profilerModel;
     private String id;
+    private MyPreferences preferences;
 
     public ProfilerAdapter(Context context, ArrayList<ProfilerModel> modelArrayList,
                            boolean isTimeBased, MyDatabase database) {
@@ -42,6 +51,7 @@ public class ProfilerAdapter extends RecyclerView.Adapter<ProfilerAdapter.Profil
         this.isTimeBased = isTimeBased;
         this.database = database;
         popUpWindow = new PopUpWindow(context, this);
+        preferences = new MyPreferences(context);
     }
 
     @NonNull
@@ -59,13 +69,27 @@ public class ProfilerAdapter extends RecyclerView.Adapter<ProfilerAdapter.Profil
         id = modelArrayList.get(position).getId();
         String title = modelArrayList.get(position).getName();
 
+        if (preferences.getBoolean(MyAnnotations.IS_LIGHT_THEME, false)) {
+            holder.profilerTitle_tv.setBackground(ContextCompat
+                    .getDrawable(context, R.drawable.ic_button_1_light));
+        } else {
+            holder.profilerTitle_tv.setBackground(ContextCompat
+                    .getDrawable(context, R.drawable.ic_button_2_dark));
+        }
         holder.profilerTitle_tv.setText(title);
         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
+                PopupWindow popupWindow;
+                if (isTimeBased) {
+                    popupWindow = popUpWindow.popupWindowUpDel();
 
-                PopupWindow popupWindow = popUpWindow.popupWindowUpDel();
+                } else {
+                    popupWindow = popUpWindow.popupWindowDel();
+                }
                 popupWindow.showAsDropDown(v, Gravity.END, 0);
+
+
                 return true;
             }
         });
@@ -77,8 +101,8 @@ public class ProfilerAdapter extends RecyclerView.Adapter<ProfilerAdapter.Profil
                     editIntent(MyAnnotations.TIME_PROFILER_ID, id, MyAnnotations.IS_UPDATE,
                             true, true);
                 } else {
-                    editIntent(MyAnnotations.LOCATION_PROFILER_ID, id, MyAnnotations.IS_UPDATE,
-                            true, false);
+//                    editIntent(MyAnnotations.LOCATION_PROFILER_ID, id, MyAnnotations.IS_UPDATE,
+//                            true, false);
                 }
             }
         });
@@ -114,9 +138,13 @@ public class ProfilerAdapter extends RecyclerView.Adapter<ProfilerAdapter.Profil
 
         if (isTimeBased) {
             database.deleteTimeTable(id);
+            database.deleteTimeTable(id);
+            AlarmClass alarmClass = new AlarmClass(context);
+            alarmClass.deleteRepeatAlarm(Integer.parseInt(id) + 1000);
+            alarmClass.deleteRepeatAlarm(Integer.parseInt(id) + 10000);
 
         } else {
-            database.deleteLocation(id);
+            deleteData(id);
         }
         modelArrayList.remove(profilerModel);
         notifyDataSetChanged();
@@ -139,6 +167,24 @@ public class ProfilerAdapter extends RecyclerView.Adapter<ProfilerAdapter.Profil
         intent.putExtra(key, id);
         intent.putExtra(isUpdate, isUpdateValue);
         context.startActivity(intent);
+    }
+
+    public void deleteData(String id) {
+        GeofencingClient geofencingClient = LocationServices.getGeofencingClient(context);
+        List<String> idList = new ArrayList<>();
+        idList.add(id);
+        database.deleteLocation(id);
+
+        geofencingClient.removeGeofences(idList).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+            }
+        });
     }
 
     class ProfilerViewHolder extends RecyclerView.ViewHolder {

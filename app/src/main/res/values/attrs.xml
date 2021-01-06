@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="blueWhite" format="reference|color" />
+    <attr name="textBlueWhite" format="reference|color" />
+     <attr name="textWhite" format="reference|color" />
+    <attr name="textWhiteGray" format="reference|color" />
+    <attr name="textUnSelected" format="reference|color" />
+    <attr name="dialogBg" format="reference|color" />
+
+</resources>

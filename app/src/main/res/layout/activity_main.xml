@@ -1,30 +1,290 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.motion.widget.MotionLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/motionLayout"
+    app:layoutDescription="@xml/activity_main_scene"
     tools:context=".activities.MainActivity">
 
-    <include
-        android:id="@+id/main_activity_buttons_view"
-        layout="@layout/main_activity_buttons_layout"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/mainHeaderIv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
 
-    <FrameLayout
-        android:id="@+id/fragmentsContainer"
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/materialTextView4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:text="@string/app_name"
+            android:textColor="@color/white"
+            android:textSize="18dp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@+id/guideline3"
+            app:layout_constraintStart_toStartOf="@+id/guideline2"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/mainTabLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="7dp"
+            android:background="@android:color/transparent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/guideline3"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/guideline2"
+            app:tabIndicatorColor="@android:color/transparent"
+            app:tabSelectedTextColor="@color/white"
+            app:tabTextColor="#80FFFFFF" />
+
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.18" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.82" />
+
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/addNewProfile_mIv"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            app:layout_constraintBottom_toTopOf="@+id/mainTabLayout"
+            app:layout_constraintEnd_toStartOf="@+id/guideline3"
+            app:layout_constraintStart_toStartOf="@+id/guideline2"
+            app:layout_constraintTop_toBottomOf="@+id/materialTextView4"
+            app:srcCompat="@drawable/ic_add_porile" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/mainViewPager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline">
+
+    </androidx.viewpager.widget.ViewPager>
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.3" />
+
+
+    <View
+        android:id="@+id/bgView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:focusable="false" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/arrow_right"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:scaleType="fitXY"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_next_arrow" />
+
+    <View
+        android:id="@+id/people_pad"
+        android:layout_width="300dp"
+        android:layout_height="500dp"
+         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/settingsIv"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginStart="8dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toTopOf="@id/moreAppsIv"
+        app:layout_constraintEnd_toStartOf="@id/rateUsIv"
+        app:layout_constraintStart_toStartOf="@id/people_pad"
+        app:layout_constraintTop_toTopOf="@id/people_pad"
+        app:srcCompat="@drawable/ic_settings" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/settingsTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:text="@string/settings"
+        android:textColor="?attr/textWhite"
+        app:layout_constraintBottom_toTopOf="@+id/moreAppsIv"
+        app:layout_constraintEnd_toEndOf="@+id/settingsIv"
+        app:layout_constraintStart_toStartOf="@+id/settingsIv"
+        app:layout_constraintTop_toBottomOf="@+id/settingsIv"
         app:layout_constraintVertical_bias="0.0" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/rateUsIv"
+        android:layout_width="65dp"
+        android:layout_height="63dp"
+        android:layout_marginEnd="8dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toTopOf="@id/shareIv"
+        app:layout_constraintEnd_toEndOf="@id/people_pad"
+        app:layout_constraintStart_toEndOf="@id/settingsIv"
+        app:layout_constraintTop_toTopOf="@id/people_pad"
+        app:srcCompat="@drawable/ic_rate_us" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/rateUsTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:text="@string/rate_us"
+        android:textColor="?attr/textWhite"
+        app:layout_constraintBottom_toTopOf="@+id/shareIv"
+        app:layout_constraintEnd_toEndOf="@+id/rateUsIv"
+        app:layout_constraintStart_toStartOf="@+id/rateUsIv"
+        app:layout_constraintTop_toBottomOf="@+id/rateUsIv"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/moreAppsIv"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginStart="8dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toTopOf="@id/infoIv"
+        app:layout_constraintEnd_toStartOf="@id/shareIv"
+        app:layout_constraintStart_toStartOf="@id/people_pad"
+        app:layout_constraintTop_toBottomOf="@id/settingsIv"
+        app:srcCompat="@drawable/ic_more_app" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/moreAppsTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:text="@string/more_apps"
+        android:textColor="?attr/textWhite"
+        app:layout_constraintBottom_toTopOf="@+id/infoIv"
+        app:layout_constraintEnd_toEndOf="@+id/moreAppsIv"
+        app:layout_constraintStart_toStartOf="@+id/moreAppsIv"
+        app:layout_constraintTop_toBottomOf="@+id/moreAppsIv"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/shareIv"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginEnd="8dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toTopOf="@id/helpIv"
+        app:layout_constraintEnd_toEndOf="@id/people_pad"
+        app:layout_constraintStart_toEndOf="@id/moreAppsIv"
+        app:layout_constraintTop_toBottomOf="@id/rateUsIv"
+        app:srcCompat="@drawable/ic_share" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/shareTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:text="@string/share"
+        android:textColor="?attr/textWhite"
+        app:layout_constraintBottom_toTopOf="@+id/helpIv"
+        app:layout_constraintEnd_toEndOf="@+id/shareIv"
+        app:layout_constraintStart_toStartOf="@+id/shareIv"
+        app:layout_constraintTop_toBottomOf="@+id/shareIv"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/infoIv"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginStart="8dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toBottomOf="@+id/people_pad"
+        app:layout_constraintEnd_toStartOf="@id/helpIv"
+        app:layout_constraintStart_toStartOf="@id/people_pad"
+        app:layout_constraintTop_toBottomOf="@id/moreAppsIv"
+        app:srcCompat="@drawable/ic_i" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/infoTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:text="@string/Info"
+        android:textColor="?attr/textWhite"
+        app:layout_constraintBottom_toBottomOf="@+id/people_pad"
+        app:layout_constraintEnd_toEndOf="@+id/infoIv"
+        app:layout_constraintStart_toStartOf="@+id/infoIv"
+        app:layout_constraintTop_toBottomOf="@+id/infoIv"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/helpIv"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginEnd="8dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toBottomOf="@+id/people_pad"
+        app:layout_constraintEnd_toEndOf="@id/people_pad"
+        app:layout_constraintStart_toEndOf="@id/infoIv"
+        app:layout_constraintTop_toBottomOf="@id/shareIv"
+        app:srcCompat="@drawable/ic_help" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/helpTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:text="@string/help"
+        android:textColor="?attr/textWhite"
+        app:layout_constraintBottom_toBottomOf="@+id/people_pad"
+        app:layout_constraintEnd_toEndOf="@+id/helpIv"
+        app:layout_constraintStart_toStartOf="@+id/helpIv"
+        app:layout_constraintTop_toBottomOf="@+id/helpIv"
+        app:layout_constraintVertical_bias="0.0" />
+
+
+</androidx.constraintlayout.motion.widget.MotionLayout>

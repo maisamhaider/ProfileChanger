@@ -41,10 +41,7 @@ public @interface MyAnnotations {
     String ONE = "1";
     String ZERO = "0";
 
-    int STREAM_MUSIC = AudioManager.STREAM_MUSIC;
-    int STREAM_SYSTEM = AudioManager.STREAM_SYSTEM;
-    int STREAM_NOTIFICATION = AudioManager.STREAM_NOTIFICATION;
-    int STREAM_RING = AudioManager.STREAM_RING;
+
 
     String UN_DONE = "UN_DONE";
     String DONE = "DONE";
@@ -63,10 +60,10 @@ public @interface MyAnnotations {
 
     String MY_PREFERENCES = "MY_PREFERENCES";
 
-    String BY_WALK = "60x60 (m)";
-    String BY_CYCLE = "100x100 (m)";
-    String BY_BUS = "200x200 (m)";
-    String BY_CAR = "250x250 (m)";
+    String BY_WALK = "100x100 (m)";
+    String BY_CYCLE = "150x150 (m)";
+    String BY_BUS = "250x250 (m)";
+    String BY_CAR = "300x300 (m)";
 
     String CHANNEL_ID = "CHANNEL_ID";
     String CHANNEL_NAME = R.string.app_name + "channel";
@@ -94,4 +91,6 @@ public @interface MyAnnotations {
     String NIGHT = "NIGHT";
     String AUTO_CHANGE = "AUTO_CHANGE";
     String N_A = "N_A";
+    String IS_LIGHT_THEME = "IS_LIGHT_THEME";
+    String IS_APP_FIRST_TIME = "IS_APP_FIRST_TIME";
 }

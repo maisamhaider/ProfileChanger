@@ -1,17 +1,29 @@
 package com.example.profilechanger.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 
+import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.NumberPicker;
+import android.widget.PopupWindow;
 import android.widget.SeekBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.profilechanger.R;
@@ -21,29 +33,30 @@ import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import java.util.ArrayList;
 
-public class OpenProfileActivity extends AppCompatActivity {
+public class OpenProfileActivity extends BaseActivity {
 
     SeekBar ringtone_sb, media_sb, notification_sb, system_sb;
-    SwitchMaterial vibrate_mSwitch, touchSound_mSwitch, lockScreen_mSwitch, dialPadSound_mSwitch;
+    SwitchMaterial vibrate_mSwitch, touchSound_mSwitch, dialPadSound_mSwitch;
     String profileTitle,
             ringerMode;
     String ringtoneLevel, mediaLevel, notificationLevel,
-            systemLevel, vibrate, touchSound,
-            lockScreenSound, dialPadSound;
+            systemLevel, vibrate, touchSound, dialPadSound;
+
     EditText title_mEt;
     Button saveProfile_mBtn, delete_mBtn;
-    Spinner spinner;
     MyDatabase database;
+    TextView geoType_tv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_open_profile);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
         database = new MyDatabase(this);
         String id = getIntent().getStringExtra(MyAnnotations.PROFILE_ID);
         boolean isNew = getIntent().getBooleanExtra(MyAnnotations.PROFILE_NEW, false);
         title_mEt = findViewById(R.id.title_mEt);
-        spinner = findViewById(R.id.ringerMode_spinner);
+        CardView geoType_cv = findViewById(R.id.geoType_cv);
 
         ringtone_sb = findViewById(R.id.ringtone_sb);
         media_sb = findViewById(R.id.media_sb);
@@ -52,75 +65,37 @@ public class OpenProfileActivity extends AppCompatActivity {
 
         vibrate_mSwitch = findViewById(R.id.vibrate_mSwitch);
         touchSound_mSwitch = findViewById(R.id.touchSound_mSwitch);
-        lockScreen_mSwitch = findViewById(R.id.lockScreen_mSwitch);
         dialPadSound_mSwitch = findViewById(R.id.dialPadSound_mSwitch);
 
         saveProfile_mBtn = findViewById(R.id.saveProfile_mBtn);
         delete_mBtn = findViewById(R.id.delete_mBtn);
 
+        geoType_tv = findViewById(R.id.geoType_tv);
+
         seekBars();
         switches();
 
-        //spinner
-        ArrayList<String> options = new ArrayList<>();
-        options.add(getResources().getString(R.string.ringing));
-        options.add(getResources().getString(R.string.silent));
-        options.add(getResources().getString(R.string.vibrate));
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, options);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-
-
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        geoType_cv.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (position == 0) {
-                    if (ringtone_sb.getProgress() == 0) {
-                        ringtone_sb.setProgress(50);
-                    }
-                    if (notification_sb.getProgress() == 0) {
-                        notification_sb.setProgress(50);
-                    }
-                    if (system_sb.getProgress() == 0) {
-                        system_sb.setProgress(50);
-                    }
-
-
-                } else if (position == 1) {
-
-                    ringtone_sb.setProgress(0);
-                    notification_sb.setProgress(0);
-                    system_sb.setProgress(0);
-
-                } else {
-
-                    ringtone_sb.setProgress(0);
-                    notification_sb.setProgress(0);
-                    system_sb.setProgress(0);
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
+            public void onClick(View v) {
+                PopupWindow popupWindow = geoFencePopupMenu();
+                popupWindow.showAsDropDown(geoType_cv,0,0);
             }
         });
+
 
         if (isNew) {
             // for new profile every thing will be default
             saveProfile_mBtn.setText(getResources().getString(R.string.save));
             title_mEt.setText(getResources().getString(R.string.un_titled));
-            spinner.setSelection(0);
-
+            geoType_tv.setText(R.string.ringing);
             ringtone_sb.setProgress(50);
             media_sb.setProgress(50);
             notification_sb.setProgress(50);
             system_sb.setProgress(50);
             vibrate_mSwitch.setChecked(true);
             touchSound_mSwitch.setChecked(true);
-            lockScreen_mSwitch.setChecked(true);
             dialPadSound_mSwitch.setChecked(true);
 
 
@@ -132,13 +107,13 @@ public class OpenProfileActivity extends AppCompatActivity {
             title_mEt.setText(profileTitle);
 
             if (ringerMode.matches(MyAnnotations.RINGER_MODE_NORMAL)) {
-                spinner.setSelection(0);
+                geoType_tv.setText(R.string.ringing);
 
             } else if (ringerMode.matches(MyAnnotations.RINGER_MODE_SILENT)) {
-                spinner.setSelection(1);
+                geoType_tv.setText(R.string.silent);
 
             } else if (ringerMode.matches(MyAnnotations.RINGER_MODE_VIBRATE)) {
-                spinner.setSelection(2);
+                geoType_tv.setText(R.string.vibrate);
             }
 
             ringtone_sb.setProgress(Integer.parseInt(ringtoneLevel));
@@ -148,21 +123,20 @@ public class OpenProfileActivity extends AppCompatActivity {
 
             vibrate_mSwitch.setChecked(vibrate.matches(MyAnnotations.ON));
             touchSound_mSwitch.setChecked(touchSound.matches(MyAnnotations.ON));
-            lockScreen_mSwitch.setChecked(lockScreenSound.matches(MyAnnotations.ON));
             dialPadSound_mSwitch.setChecked(dialPadSound.matches(MyAnnotations.ON));
 
         }
 
-        int position = spinner.getSelectedItemPosition();
+        String type = geoType_tv.getText().toString();
 
-        if (position == 0) {
+        if (type.matches("Ringing")) {
             ringerMode = MyAnnotations.RINGER_MODE_NORMAL;
 
-        } else if (position == 1) {
+        } else if (type.matches("Silent")) {
             ringerMode = MyAnnotations.RINGER_MODE_SILENT;
+
         } else {
             ringerMode = MyAnnotations.RINGER_MODE_VIBRATE;
-
         }
 
         if (vibrate_mSwitch.isChecked()) {
@@ -178,13 +152,7 @@ public class OpenProfileActivity extends AppCompatActivity {
             touchSound = MyAnnotations.OFF;
 
         }
-        if (lockScreen_mSwitch.isChecked()) {
-            lockScreenSound = MyAnnotations.ON;
 
-        } else {
-            lockScreenSound = MyAnnotations.OFF;
-
-        }
         if (dialPadSound_mSwitch.isChecked()) {
             dialPadSound = MyAnnotations.ON;
 
@@ -202,11 +170,11 @@ public class OpenProfileActivity extends AppCompatActivity {
                 //check if silent then vibration must be off
                 database.insertProfile(profileTitle, ringerMode, ringtoneLevel,
                         mediaLevel, notificationLevel, systemLevel, vibrate, touchSound,
-                        lockScreenSound, dialPadSound);
+                        dialPadSound);
             } else {
                 database.updateProfile(id, profileTitle, ringerMode, ringtoneLevel,
-                        mediaLevel, notificationLevel, systemLevel, vibrate, touchSound,
-                        lockScreenSound, dialPadSound);
+                        mediaLevel, notificationLevel, systemLevel, vibrate, touchSound
+                        , dialPadSound);
             }
             finish();
         });
@@ -254,19 +222,7 @@ public class OpenProfileActivity extends AppCompatActivity {
                 }
             }
         });
-        lockScreen_mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
-                if (isChecked) {
-                    lockScreenSound = MyAnnotations.ON;
-
-                } else {
-                    lockScreenSound = MyAnnotations.OFF;
-
-                }
-            }
-        });
         dialPadSound_mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -363,6 +319,72 @@ public class OpenProfileActivity extends AppCompatActivity {
 
     }
 
+    private PopupWindow geoFencePopupMenu() {
+        PopupWindow geoFencePopupMenu = new PopupWindow(this);
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View view = inflater.inflate(R.layout.ring_types_layout, null);
+        TextView ringing_tv = view.findViewById(R.id.ringing_tv);
+        TextView silent_tv = view.findViewById(R.id.silent_tv);
+        TextView vibrate_tv = view.findViewById(R.id.vibrate_tv);
+
+        geoFencePopupMenu.setFocusable(true);
+        geoFencePopupMenu.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
+        geoFencePopupMenu.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
+        geoFencePopupMenu.setContentView(view);
+        geoFencePopupMenu.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            geoFencePopupMenu.setElevation(5.0f);
+        }
+
+        geoFencePopupMenu.setWindowLayoutMode(ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        ringing_tv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (ringtone_sb.getProgress() == 0) {
+                    ringtone_sb.setProgress(50);
+                }
+                if (notification_sb.getProgress() == 0) {
+                    notification_sb.setProgress(50);
+                }
+                if (system_sb.getProgress() == 0) {
+                    system_sb.setProgress(50);
+                }
+                ringerMode = MyAnnotations.RINGER_MODE_NORMAL;
+                geoType_tv.setText(R.string.ringing);
+                geoFencePopupMenu.dismiss();
+            }
+        });
+        silent_tv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ringtone_sb.setProgress(0);
+                notification_sb.setProgress(0);
+                system_sb.setProgress(0);
+
+                ringerMode = MyAnnotations.RINGER_MODE_SILENT;
+                geoType_tv.setText(R.string.silent);
+                geoFencePopupMenu.dismiss();
+            }
+        });
+        vibrate_tv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ringtone_sb.setProgress(0);
+                notification_sb.setProgress(0);
+                system_sb.setProgress(0);
+
+                ringerMode = MyAnnotations.RINGER_MODE_VIBRATE;
+                geoType_tv.setText(R.string.vibrate);
+                geoFencePopupMenu.dismiss();
+
+            }
+        });
+
+        return geoFencePopupMenu;
+    }
+
+
     public void loadProfileFromDb(String id) {
         Cursor cursor = database.retrieveProfile(id);
         while (cursor.moveToNext()) {
@@ -375,8 +397,7 @@ public class OpenProfileActivity extends AppCompatActivity {
             systemLevel = cursor.getString(6);
             vibrate = cursor.getString(7);
             touchSound = cursor.getString(8);
-            lockScreenSound = cursor.getString(9);
-            dialPadSound = cursor.getString(10);
+            dialPadSound = cursor.getString(9);
 
         }
     }

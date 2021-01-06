@@ -93,8 +93,6 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
     private TimeUtil timeUtils;
     private TextView geoFencesLimitTv;
     private final long geoFencesLimit = 20;
-    AlertDialog.Builder builder1;
-    private MainActivity mainActivity;
     NotificationManager notificationManager;
     private AlertDialog dialog;
 
@@ -105,11 +103,10 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
     SearchView search_sv;
     TextView circle_tv, geoFenceType_tv, expirationTime_tv, onExitProfile_tv, onEnterProfile_tv;
     TextInputEditText input_et;
-    TextView ringMode_tv, exRingMode_tv;
     ImageView meters_iv;
     private float geofenceCircle = NoAnnotation.WALK;
     String geofenceType = MyAnnotations.ENTER;
-    String geoExpireTime = MyAnnotations.N_A;
+    String geoExpireTime = String.valueOf(NoAnnotation.HOUR_IN_MILLISECONDS);
     String profileStartId = MyAnnotations.N_A;
     String profileEndId = MyAnnotations.N_A;
 
@@ -121,6 +118,8 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
     LinearLayout onExit_ll;
     View help_map_layout;
     View view;
+    String id = "0";
+    boolean isUpdate = false;
     private OnMapReadyCallback callback = new OnMapReadyCallback() {
 
         /**
@@ -159,11 +158,11 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
             if (myDatabase.retrieveRowsAmountLocation() != 0) {
                 if (preferences.getBoolean(MyAnnotations.BOOT_COMPLETED, false)) {
                     //add geo_fences again if user want to re-add undone geo_fences
-                    onBootComplete(context, true);
+                    onBootComplete(context);
 
                 } else {
                     //just set mark and circle.do not add geo_fences
-                    setFromDbToGeoFenceAgain(false);
+                    setFromDbToGeoFenceAgain();
                 }
             }
             map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
@@ -181,7 +180,8 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
                 @Override
                 public boolean onMyLocationButtonClick() {
                     if (!isLocationEnabled(context)) {
-                        showDialog("Location", "To move on your current location you have to ON the device location.");
+                        showDialog("Location", "To move on your current location " +
+                                "you have to ON the device location.");
                     }
                     return false;
                 }
@@ -202,7 +202,6 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
         context = getContext();
 
         preferences = new MyPreferences(context);
-        mainActivity = ((MainActivity) context);
         permissions = new Permissions(context);
         actions = new SoundProfileActions(context);
         booleansUtils = new BooleansUtils(context);
@@ -218,7 +217,6 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
         //set value
         timeUtils = new TimeUtil();
         // check time if its 12am then change the time and renew the limit of geofences
-
         if (checkGeoFenceChangeDate()) {
             geoFencesLimitTv.setText(String.valueOf(geoFencesLimit));
         } else {
@@ -248,21 +246,24 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
                                 Address address = addressList.get(0);
 
                                 LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                                //                map.addMarker(new MarkerOptions().position(latLng).title(location));
+                                //                map.addMarker(new MarkerOptions()
+                                //                .position(latLng).title(location));
                                 map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
-//                Toast.makeText(getApplicationContext(), address.getLatitude() + " " +
-//                        address.getLongitude(), Toast.LENGTH_LONG).show();
+
                             } else {
-                                Toast.makeText(geoFence, "Not Found", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(geoFence, getString(R.string.not_found)
+                                        , Toast.LENGTH_SHORT).show();
                             }
 
                         }
 
                     } else {
-                        Toast.makeText(context, "Please type location name", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, getString(R.string.pleas_enter_title),
+                                Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(getContext(), "No Internet connection", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), getString(R.string.no_internet_conection),
+                            Toast.LENGTH_SHORT).show();
                 }
                 return false;
             }
@@ -272,6 +273,8 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
                 return false;
             }
         });
+
+
 
         return view;
 
@@ -430,15 +433,16 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
 //    }
 
 
-    private void onBootComplete(Context context, boolean bootCompleted) {
+    private void onBootComplete(Context context) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context)
-                .setTitle("Alert").setMessage("If you want to recover all old selected areas it will reduce the limit of marks")
+                .setTitle("Alert").setMessage("If you want to recover all old" +
+                        " selected areas it will reduce the limit of marks")
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //if user want to add all geo_fences again
-                        setFromDbToGeoFenceAgain(bootCompleted);
-                        myPreferences.setBoolean("IS_BOOT_COMPLETED", false);
+                        setFromDbOnBootComplete();
+                        myPreferences.setBoolean(MyAnnotations.BOOT_COMPLETED, false);
                         geoFencesLimitTv.setText(String.valueOf(geoFencesLimit - getGeoFenceLimit()));
 
                         dialog.dismiss();
@@ -454,7 +458,101 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
 
     }
 
-    private void setFromDbToGeoFenceAgain(boolean afterBooted) {
+    private void setFromDbToGeoFenceAgain() {
+        Cursor cursor = myDatabase.retrieveLocation();
+        while (cursor.moveToNext()) {
+            String id = cursor.getString(0);
+            String title = cursor.getString(1);
+            String latitude = cursor.getString(2);
+            String longitude = cursor.getString(3);
+            String radius = cursor.getString(4);
+            String expireFormatted = cursor.getString(6);
+            String expireTime = cursor.getString(7);
+            String state = cursor.getString(8);
+
+            long now = System.currentTimeMillis();
+            if (isLocationEnabled(getContext())) {
+                if (state.matches(MyAnnotations.UN_DONE)) {
+                    if (now < Long.parseLong(expireFormatted)) {
+                        LatLng location = new LatLng(Double.parseDouble(latitude),
+                                Double.parseDouble(longitude));
+                        //just add mark and circles
+                        addMarkAndMoveCamera(location, title);
+                        addCircleOfGeofence(location, Float.parseFloat(radius));
+                    } else {
+                        myDatabase.update(id, MyAnnotations.DONE);
+                    }
+                }
+            } else {
+                //ask to enable location if location is OFF
+                showDialog(getString(R.string.location),
+                        getString(R.string.you_need_to_allow_location));
+            }
+        }
+
+    }
+
+
+
+    private void setFromDbOnBootComplete() {
+        Cursor cursor = myDatabase.retrieveLocation();
+        long howManyAdded = 0;
+        while (cursor.moveToNext()) {
+            String id = cursor.getString(0);
+            String title = cursor.getString(1);
+            String latitude = cursor.getString(2);
+            String longitude = cursor.getString(3);
+            String radius = cursor.getString(4);
+            String type = cursor.getString(5);
+            String expireFormatted = cursor.getString(6);
+            String expireTime = cursor.getString(7);
+            String state = cursor.getString(8);
+            String date = cursor.getString(9);
+            String enterProfilerId = cursor.getString(10);
+            String exitProfileId = cursor.getString(11);
+            long now = timeUtils.getNowMillis();
+
+
+            if (isLocationEnabled(getContext())) {
+                if (state.matches(MyAnnotations.UN_DONE)) {
+                    if (now < Long.parseLong(expireFormatted)) {
+                        if (howManyAdded < geoFencesLimit) {
+                            //insert as new because we have limits of 100 geofences.
+                            long insert = myDatabase.insert(title, latitude, longitude, radius,
+                                    geofenceType, expireFormatted, expireTime, state, date,
+                                    enterProfilerId, exitProfileId);
+
+                            if (insert != -1) {
+                                LatLng latLng = new LatLng(Double.parseDouble(latitude),
+                                        Double.parseDouble(longitude));
+                                addGeofence((int) insert, title, latLng, Float.parseFloat(radius),
+                                        type, expireTime);
+                                howManyAdded++;
+                            } else {
+                                Toast.makeText(getContext(),
+                                        getString(R.string.Profiler_not_inserted),
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                            //done old geofence
+                            myDatabase.update(id, MyAnnotations.DONE);
+
+                        } else {
+                            Toast.makeText(getContext(), "Limit reached",
+                                    Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                    } else {
+                        //done old geofence
+                        myDatabase.update(id, MyAnnotations.DONE);
+                    }
+
+                }
+            } else {
+                //ask to enable location if location is OFF
+                showDialog(getString(R.string.location),
+                        getString(R.string.you_need_to_allow_location));
+            }
+        }
 
     }
 
@@ -468,6 +566,7 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
         circle_tv = view.findViewById(R.id.circle_tv);
 
         AlertDialog dialog = builder.create();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.show();
 
         input_et = view.findViewById(R.id.input_et);
@@ -529,11 +628,6 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
         });
 
 
-        // geofenceCircle done
-        // geotype done
-        // expireTime done
-        // start profile name and id done
-        // end profile name and id done
         positive_tv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -541,17 +635,21 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
                         + " " +
                         timeUtils.getCurrentFormattedTime();
                 String title = input_et.getText().toString();
+                long expirationEnd = System.currentTimeMillis()+Long.parseLong(geoExpireTime);
+
+
                 if (!ifOneFieldEmpty()) {
                     if (isLocationEnabled(getContext())) {
 
                         long insert = myDatabase.insert(title, String.valueOf(latLng.latitude)
                                 , String.valueOf(latLng.longitude), String.valueOf(geofenceCircle),
-                                geofenceType, geoExpireTime, MyAnnotations.UN_DONE, date,
-                                profileStartId, profileEndId);
+                                geofenceType, String.valueOf(expirationEnd) ,geoExpireTime,
+                                MyAnnotations.UN_DONE, date, profileStartId, profileEndId);
 
                         if (insert != -1) {
                             addGeofence((int) insert, title, latLng, geofenceCircle,
                                     geofenceType, geoExpireTime);
+                            dialog.dismiss();
                         } else {
                             Toast.makeText(getContext(),
                                     getString(R.string.Profiler_not_inserted),
@@ -709,8 +807,8 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
             public void onClick(View v) {
                 circle_tv.setText(MyAnnotations.BY_WALK);
                 geofenceCircle = NoAnnotation.WALK;
-                meters_iv.setImageDrawable(ResourcesCompat.getDrawable(getResources(),
-                        R.drawable.ic_launcher_background, null));
+//                meters_iv.setImageDrawable(ResourcesCompat.getDrawable(getResources(),
+//                        R.drawable.ic_launcher_background, null));
                 circleSizePopupMenu.dismiss();
             }
         });
@@ -719,8 +817,8 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
             public void onClick(View v) {
                 circle_tv.setText(MyAnnotations.BY_CYCLE);
                 geofenceCircle = NoAnnotation.CYCLE;
-                meters_iv.setImageDrawable(ResourcesCompat.getDrawable(getResources(),
-                        R.drawable.ic_launcher_background, null));
+//                meters_iv.setImageDrawable(ResourcesCompat.getDrawable(getResources(),
+//                        R.drawable.ic_launcher_background, null));
                 circleSizePopupMenu.dismiss();
 
             }
@@ -730,8 +828,8 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
             public void onClick(View v) {
                 circle_tv.setText(MyAnnotations.BY_BUS);
                 geofenceCircle = NoAnnotation.BUS;
-                meters_iv.setImageDrawable(ResourcesCompat.getDrawable(getResources(),
-                        R.drawable.ic_launcher_background, null));
+//                meters_iv.setImageDrawable(ResourcesCompat.getDrawable(getResources(),
+//                        R.drawable.ic_launcher_background, null));
                 circleSizePopupMenu.dismiss();
 
             }
@@ -741,8 +839,8 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
             public void onClick(View v) {
                 circle_tv.setText(MyAnnotations.BY_CAR);
                 geofenceCircle = NoAnnotation.CAR;
-                meters_iv.setImageDrawable(ResourcesCompat.getDrawable(getResources(),
-                        R.drawable.ic_launcher_background, null));
+//                meters_iv.setImageDrawable(ResourcesCompat.getDrawable(getResources(),
+//                        R.drawable.ic_launcher_background, null));
                 circleSizePopupMenu.dismiss();
 
             }
@@ -843,16 +941,13 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
         numberPicker.setMaxValue(3);
         numberPicker.setMinValue(1);
 
-        numberPicker.setMaxValue(25);
+        numberPicker.setMaxValue(24);
         numberPicker.setMinValue(1);
-        String[] values = new String[25];
+        String[] values = new String[24];
         for (int i = 0; i < values.length; i++) {
             if (i == 0) {
 
                 values[i] = i + 1 + " hr";
-            } else if (i == 24) {
-                values[i] = getResources().getString(R.string.never);
-
             } else {
                 values[i] = i + 1 + " hrs";
             }
@@ -877,32 +972,19 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
             @Override
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
                 int s = picker.getValue();
-                if (s == 24) {
-                    expirationTime_tv.setText(MyAnnotations.NEVER);
-                    geoExpireTime = MyAnnotations.NEVER;
-                } else if (s == 1) {
-                    geoExpireTime = String.valueOf(picker.getValue() *
-                            NoAnnotation.HOUR_IN_MILLISECONDS);
+                geoExpireTime = String.valueOf(picker.getValue() *
+                        NoAnnotation.HOUR_IN_MILLISECONDS);
+                if (s == 1) {
                     expirationTime_tv.setText(s + " hr");
 
                 } else {
-                    geoExpireTime = String.valueOf(picker.getValue() *
-                            NoAnnotation.HOUR_IN_MILLISECONDS);
                     expirationTime_tv.setText(s + " hrs");
                 }
             }
         });
 
-        int s = numberPicker.getValue();
-        if (s == 24) {
-            geoExpireTime = MyAnnotations.NEVER;
-        } else if (s == 1) {
-            geoExpireTime = String.valueOf(numberPicker.getValue() *
-                    NoAnnotation.HOUR_IN_MILLISECONDS);
-        } else {
-            geoExpireTime = String.valueOf(numberPicker.getValue() *
-                    NoAnnotation.HOUR_IN_MILLISECONDS);
-        }
+        geoExpireTime = String.valueOf(numberPicker.getValue() *
+                NoAnnotation.HOUR_IN_MILLISECONDS);
 
 
         return geoFencePopupMenu;
@@ -911,7 +993,7 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
 
     public void setNumberPickerTextColor(NumberPicker numberPicker) {
         //change color of of number picker
-        int color = Color.parseColor("#ffffff");
+        int color = R.attr.textWhiteGray;
 
         final int count = numberPicker.getChildCount();
         for (int i = 0; i < count; i++) {
@@ -959,13 +1041,14 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
             }
         }
         ProfilesAdapter profilesAdapter = new ProfilesAdapter(getContext(), list, myDatabase,
-                true);
+                true, true);
         recyclerView.setAdapter(profilesAdapter);
         profilesAdapter.notifyDataSetChanged();
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext())
                 .setView(view).setCancelable(true);
         profilesAdapter.setSendDataWithKey(this, profile);
         dialog = builder.create();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.show();
 
 

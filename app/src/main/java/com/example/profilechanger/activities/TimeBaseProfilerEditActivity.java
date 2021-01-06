@@ -4,16 +4,23 @@ import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
+import android.content.res.ColorStateList;
+import android.content.res.Configuration;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -21,6 +28,8 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -37,14 +46,15 @@ import com.example.profilechanger.utils.TimeUtil;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class TimeBaseProfilerEditActivity extends AppCompatActivity implements SendDataWithKey,
+public class TimeBaseProfilerEditActivity extends BaseActivity implements SendDataWithKey,
         View.OnClickListener {
 
     private EditText timeBaseProfiler_mEt;
-    private TextView startTime_mtv;
+    private TextView startDate_mtv;
     private TextView startProfile_mtv;
     private TextView endTime_mtv;
     private TextView endProfile_mtv;
+
     private String profilerTitle, startDate, startTime, endDate,
             endTime, state = MyAnnotations.UN_DONE, date, repeat = MyAnnotations.OFF,
             days = "", profileStartId,
@@ -53,7 +63,7 @@ public class TimeBaseProfilerEditActivity extends AppCompatActivity implements S
     private CheckBox sa_mCb, su_mCb, mo_mCb, tu_mCb, we_mCb, th_mCb, fr_mCb, allDays_mCb;
     private String profileStartTitle, profileEndTitle;
     private final Calendar calendar = Calendar.getInstance();
-    private boolean isStartTime_mtv = false;
+    private boolean isstartDate_mtv = false;
     private long startDateAndTime = 0;
     private long endDateAndTime = 0;
     private long startTimeLong = 0;
@@ -70,6 +80,8 @@ public class TimeBaseProfilerEditActivity extends AppCompatActivity implements S
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.time_base_profiler_dialog_layout);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
+
         database = new MyDatabase(this);
         timeUtil = new TimeUtil(this);
         alarmClass = new AlarmClass(this);
@@ -79,11 +91,18 @@ public class TimeBaseProfilerEditActivity extends AppCompatActivity implements S
         timeBaseProfiler_mEt = findViewById(R.id.timeBaseProfiler_mEt);
         Button save_mBtn = findViewById(R.id.save_mBtn);
         Button delete_mBtn = findViewById(R.id.delete_mBtn);
-        startTime_mtv = findViewById(R.id.startTime_mtv);
+        ConstraintLayout startDate_cl, endDate_cl, startProfile_cl, endProfile_cl;
+
+
+        startDate_cl = findViewById(R.id.startDate_cl);
+        endDate_cl = findViewById(R.id.endDate_cl);
+        startProfile_cl = findViewById(R.id.startProfile_cl);
+        endProfile_cl = findViewById(R.id.endProfile_cl);
+
+        startDate_mtv = findViewById(R.id.startDate_mtv);
         startProfile_mtv = findViewById(R.id.startProfiler_mtv);
         endTime_mtv = findViewById(R.id.endTime_mtv);
         endProfile_mtv = findViewById(R.id.endProfiler_mtv);
-        TextView state_mtTv = findViewById(R.id.state_mtTv);
         TextView date_mTv = findViewById(R.id.date_mTv);
 
         sa_mCb = findViewById(R.id.sa_mCb);
@@ -113,13 +132,35 @@ public class TimeBaseProfilerEditActivity extends AppCompatActivity implements S
         fr_mCb.setOnClickListener(this);
         allDays_mCb.setOnClickListener(this);
 
-        startProfile_mtv.setOnClickListener(new View.OnClickListener() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            switch (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) {
+                case Configuration.UI_MODE_NIGHT_YES:
+                    checkBoxesDarkLight(true);
+                    break;
+                case Configuration.UI_MODE_NIGHT_NO:
+                    checkBoxesDarkLight(false);
+
+                    break;
+            }
+        } else {
+            checkBoxesDarkLight(!preferences.getBoolean(MyAnnotations.IS_LIGHT_THEME, true));
+        }
+
+        findViewById(R.id.prrBack_iv).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+
+        startProfile_cl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 profileDialog(MyAnnotations.START_PROFILE_ID);
             }
         });
-        endProfile_mtv.setOnClickListener(new View.OnClickListener() {
+        endProfile_cl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 profileDialog(MyAnnotations.END_PROFILE_ID);
@@ -132,24 +173,24 @@ public class TimeBaseProfilerEditActivity extends AppCompatActivity implements S
         TimePickerDialog tP = new TimePickerDialog(TimeBaseProfilerEditActivity.this,
                 timePicker, hour, minutes, false);
 
-        startTime_mtv.setOnClickListener(new View.OnClickListener() {
+        startDate_cl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 tP.show();
-                isStartTime_mtv = true;
+                isstartDate_mtv = true;
             }
         });
-        endTime_mtv.setOnClickListener(new View.OnClickListener() {
+        endDate_cl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 tP.show();
-                isStartTime_mtv = false;
+                isstartDate_mtv = false;
             }
         });
         tP.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
-                if (isStartTime_mtv) {
+                if (isstartDate_mtv) {
                     startTime = timeUtil.getFormattedTimeJust(System.currentTimeMillis());
                 } else {
                     endTime = timeUtil.getFormattedTimeJust(System.currentTimeMillis() +
@@ -200,12 +241,11 @@ public class TimeBaseProfilerEditActivity extends AppCompatActivity implements S
         }
 
 
-        startTime_mtv.setText(startDate);
+        startDate_mtv.setText(startDate);
         endTime_mtv.setText(endDate);
 
         startProfile_mtv.setText(profileStartTitle);
         endProfile_mtv.setText(profileEndTitle);
-        state_mtTv.setText(state);
         date_mTv.setText(date);
 
 //        startProfile_mtv.setText(profileStartId);
@@ -217,10 +257,10 @@ public class TimeBaseProfilerEditActivity extends AppCompatActivity implements S
                 profilerTitle = timeBaseProfiler_mEt.getText().toString();
                 profileStartTitle = startProfile_mtv.getText().toString();
                 profileEndTitle = endProfile_mtv.getText().toString();
-                startDate = startTime_mtv.getText().toString();
+                startDate = startDate_mtv.getText().toString();
                 endDate = endTime_mtv.getText().toString();
 
-                startTime = startTime_mtv.getText().toString();
+                startTime = startDate_mtv.getText().toString();
                 endTime = endTime_mtv.getText().toString();
                 if (isUpdate) {
                     if (repeat.matches(MyAnnotations.OFF)) {
@@ -277,7 +317,7 @@ public class TimeBaseProfilerEditActivity extends AppCompatActivity implements S
                                         MyAnnotations.DEFAULT_FORMAT);
 
                                 alarmClass.setOneAlarm(profilerTitle, triggerTime1,
-                                        (int) isInsert + 1000,false);
+                                        (int) isInsert + 1000, false);
                                 finish();
                             } else {
                                 Toast.makeText(TimeBaseProfilerEditActivity.this,
@@ -300,7 +340,6 @@ public class TimeBaseProfilerEditActivity extends AppCompatActivity implements S
 
                                 alarmClass.setOneAlarm(profilerTitle, triggerTime1,
                                         (int) isInsert + 1000, true);
-
 
 
                                 finish();
@@ -338,7 +377,7 @@ public class TimeBaseProfilerEditActivity extends AppCompatActivity implements S
         dP.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
-                if (isStartTime_mtv) {
+                if (isstartDate_mtv) {
                     if (startTime.isEmpty()) {
                         startDate = timeUtil.getFormattedDate(calendar.getTimeInMillis()) +
                                 " " + timeUtil.getCurrentFormattedTime();
@@ -346,7 +385,7 @@ public class TimeBaseProfilerEditActivity extends AppCompatActivity implements S
                         startDate = timeUtil.getFormattedDate(calendar.getTimeInMillis()) + " "
                                 + startTime;
                     }
-                    startTime_mtv.setText(startDate);
+                    startDate_mtv.setText(startDate);
                     startDateAndTime = timeUtil.getMillisFromFormattedDate(startDate,
                             MyAnnotations.DEFAULT_FORMAT);
 
@@ -373,12 +412,12 @@ public class TimeBaseProfilerEditActivity extends AppCompatActivity implements S
                     if (startDateAndTime >= endDateAndTime) {
                         startDate = timeUtil.getFormattedDateAndTime(endDateAndTime -
                                 NoAnnotation.HOUR_IN_MILLISECONDS);
-                        startTime_mtv.setText(startDate);
+                        startDate_mtv.setText(startDate);
                     }
 
                 }
 
-                isStartTime_mtv = false;
+                isstartDate_mtv = false;
 
             }
         });
@@ -393,7 +432,7 @@ public class TimeBaseProfilerEditActivity extends AppCompatActivity implements S
                     calendar.set(Calendar.MONTH, month);
                     calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
-                    if (isStartTime_mtv) {
+                    if (isstartDate_mtv) {
                         //
                         if (startTime.isEmpty()) {
                             startDate = timeUtil.getFormattedDate(calendar.getTimeInMillis()) +
@@ -402,7 +441,7 @@ public class TimeBaseProfilerEditActivity extends AppCompatActivity implements S
                             startDate = timeUtil.getFormattedDate(calendar.getTimeInMillis()) + " "
                                     + startTime;
                         }
-                        startTime_mtv.setText(startDate);
+                        startDate_mtv.setText(startDate);
                         startDateAndTime = timeUtil.getMillisFromFormattedDate(startDate,
                                 MyAnnotations.DEFAULT_FORMAT);
 
@@ -429,7 +468,7 @@ public class TimeBaseProfilerEditActivity extends AppCompatActivity implements S
                         if (startDateAndTime >= endDateAndTime) {
                             startDate = timeUtil.getFormattedDateAndTime(endDateAndTime -
                                     NoAnnotation.HOUR_IN_MILLISECONDS);
-                            startTime_mtv.setText(startDate);
+                            startDate_mtv.setText(startDate);
                         }
 
                     }
@@ -437,6 +476,47 @@ public class TimeBaseProfilerEditActivity extends AppCompatActivity implements S
 
                 }
             };
+
+    public void checkBoxesDarkLight(boolean dark) {
+        if (dark) {
+            sa_mCb.setButtonTintList(ColorStateList.valueOf(ContextCompat.getColor(this,
+                    R.color.white)));
+            su_mCb.setButtonTintList(ColorStateList.valueOf(ContextCompat.getColor(this,
+                    R.color.white)));
+            mo_mCb.setButtonTintList(ColorStateList.valueOf(ContextCompat.getColor(this,
+                    R.color.white)));
+            tu_mCb.setButtonTintList(ColorStateList.valueOf(ContextCompat.getColor(this,
+                    R.color.white)));
+            we_mCb.setButtonTintList(ColorStateList.valueOf(ContextCompat.getColor(this,
+                    R.color.white)));
+            th_mCb.setButtonTintList(ColorStateList.valueOf(ContextCompat.getColor(this,
+                    R.color.white)));
+            fr_mCb.setButtonTintList(ColorStateList.valueOf(ContextCompat.getColor(this,
+                    R.color.white)));
+            allDays_mCb.setButtonTintList(ColorStateList.valueOf(ContextCompat.getColor(this,
+                    R.color.white)));
+        } else {
+
+
+            sa_mCb.setButtonTintList(ColorStateList.valueOf(ContextCompat.getColor(this,
+                    R.color.colorPrimaryVariantLight)));
+            su_mCb.setButtonTintList(ColorStateList.valueOf(ContextCompat.getColor(this,
+                    R.color.colorPrimaryVariantLight)));
+            mo_mCb.setButtonTintList(ColorStateList.valueOf(ContextCompat.getColor(this,
+                    R.color.colorPrimaryVariantLight)));
+            tu_mCb.setButtonTintList(ColorStateList.valueOf(ContextCompat.getColor(this,
+                    R.color.colorPrimaryVariantLight)));
+            we_mCb.setButtonTintList(ColorStateList.valueOf(ContextCompat.getColor(this,
+                    R.color.colorPrimaryVariantLight)));
+            th_mCb.setButtonTintList(ColorStateList.valueOf(ContextCompat.getColor(this,
+                    R.color.colorPrimaryVariantLight)));
+            fr_mCb.setButtonTintList(ColorStateList.valueOf(ContextCompat.getColor(this,
+                    R.color.colorPrimaryVariantLight)));
+            allDays_mCb.setButtonTintList(ColorStateList.valueOf(ContextCompat.getColor(this,
+                    R.color.colorPrimaryVariantLight)));
+        }
+    }
+
     private TimePickerDialog.OnTimeSetListener timePicker =
             new TimePickerDialog.OnTimeSetListener() {
                 @Override
@@ -446,9 +526,9 @@ public class TimeBaseProfilerEditActivity extends AppCompatActivity implements S
                     calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
                     calendar.set(Calendar.MINUTE, minute);
 
-                    if (isStartTime_mtv) {
+                    if (isstartDate_mtv) {
                         startTime = timeUtil.getFormattedTimeJust(calendar.getTimeInMillis());
-                        startTime_mtv.setText(startTime);
+                        startDate_mtv.setText(startTime);
                         startTimeLong = timeUtil.getMillisFromFormattedDate(startTime,
                                 MyAnnotations.DEFAULT_TIME_FORMAT);
                     } else {
@@ -463,7 +543,7 @@ public class TimeBaseProfilerEditActivity extends AppCompatActivity implements S
 
                         dP.show();
                     } else {
-                        if (isStartTime_mtv) {
+                        if (isstartDate_mtv) {
                             if (startDateAndTime >= endDateAndTime) {
                                 endTime = timeUtil.getFormattedTimeJust(startDateAndTime +
                                         NoAnnotation.HOUR_IN_MILLISECONDS);
@@ -474,7 +554,7 @@ public class TimeBaseProfilerEditActivity extends AppCompatActivity implements S
                             if (startTimeLong >= endTimeLong) {
                                 startTime = timeUtil.getFormattedTimeJust(endTimeLong -
                                         NoAnnotation.HOUR_IN_MILLISECONDS);
-                                startTime_mtv.setText(startTime);
+                                startDate_mtv.setText(startTime);
                             }
 
                         }
@@ -525,13 +605,14 @@ public class TimeBaseProfilerEditActivity extends AppCompatActivity implements S
             }
         }
         ProfilesAdapter profilesAdapter = new ProfilesAdapter(this, list, database,
-                true);
+                true, true);
         recyclerView.setAdapter(profilesAdapter);
         profilesAdapter.notifyDataSetChanged();
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setView(view).setCancelable(true);
         profilesAdapter.setSendDataWithKey(this, profile);
         dialog = builder.create();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.show();
 
 
@@ -564,8 +645,8 @@ public class TimeBaseProfilerEditActivity extends AppCompatActivity implements S
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 database.deleteTimeTable(id);
-                                alarmClass.deleteRepeatAlarm(Integer.parseInt(id)+1000);
-                                alarmClass.deleteRepeatAlarm(Integer.parseInt(id)+10000);
+                                alarmClass.deleteRepeatAlarm(Integer.parseInt(id) + 1000);
+                                alarmClass.deleteRepeatAlarm(Integer.parseInt(id) + 10000);
                                 finish();
                             }
                         })
@@ -698,7 +779,7 @@ public class TimeBaseProfilerEditActivity extends AppCompatActivity implements S
                 startTime = timeUtil.getFormattedTimeJust(System.currentTimeMillis());
                 endTime = timeUtil.getFormattedTimeJust(System.currentTimeMillis() +
                         NoAnnotation.HOUR_IN_MILLISECONDS);
-                startTime_mtv.setText(startTime);
+                startDate_mtv.setText(startTime);
                 endTime_mtv.setText(endTime);
             }
         } else {
@@ -706,7 +787,7 @@ public class TimeBaseProfilerEditActivity extends AppCompatActivity implements S
             startDate = timeUtil.getFormattedDateAndTime(System.currentTimeMillis());
             endDate = timeUtil.getFormattedDateAndTime(System.currentTimeMillis() +
                     NoAnnotation.HOUR_IN_MILLISECONDS);
-            startTime_mtv.setText(startDate);
+            startDate_mtv.setText(startDate);
             endTime_mtv.setText(endDate);
 
         }
@@ -776,13 +857,14 @@ public class TimeBaseProfilerEditActivity extends AppCompatActivity implements S
 
     public boolean isOneFieldRemains() {
         return timeBaseProfiler_mEt.getText().length() <= 0 ||
-                startTime_mtv.getText().length() <= 0 ||
+                startDate_mtv.getText().length() <= 0 ||
                 startProfile_mtv.getText().length() <= 0 ||
                 endTime_mtv.getText().length() <= 0 ||
                 endProfile_mtv.getText().length() <= 0;
 
     }
-   /* public int lastItemId()
+
+    /* public int lastItemId()
     {
 
     }*/

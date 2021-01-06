@@ -7,7 +7,10 @@ import android.content.Intent;
 import android.media.AudioManager;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.example.profilechanger.annotations.MyAnnotations;
@@ -19,6 +22,7 @@ public class SoundProfileActions {
 
     public SoundProfileActions(Context context) {
         this.context = context;
+        am = (AudioManager) context.getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
 
     }
 
@@ -51,8 +55,6 @@ public class SoundProfileActions {
 //    }
 
     public void setRingerMode(String whatToSet) {
-
-        am = (AudioManager) context.getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
         //For Normal mode
         if (whatToSet.matches(MyAnnotations.RINGER_MODE_NORMAL)) {
             am.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
@@ -62,22 +64,20 @@ public class SoundProfileActions {
             if (whatToSet.matches(MyAnnotations.RINGER_MODE_SILENT)) {
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    am.adjustVolume(AudioManager.ADJUST_MUTE, AudioManager.FLAG_SHOW_UI);
-                    am.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-
-                } else {
-                    am.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+                    am.adjustVolume(AudioManager.ADJUST_MUTE, 0);
 
                 }
+                am.setRingerMode(AudioManager.RINGER_MODE_SILENT);
             } else
                 //For Vibrate mode
                 am.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
 
     }
 
-    public void setVolume(int volumeOf, int volume) {
+    public void setVolume( int stream, int volume) {
 
-        am.setStreamVolume(volumeOf, volume, 0);
+        am.setStreamVolume(stream, (int) ((int)volume*(0.15f)), AudioManager.FLAG_SHOW_UI);
+
     }
 
     public boolean getDialingPadTone() {
@@ -91,10 +91,6 @@ public class SoundProfileActions {
 
     }
 
-    public boolean getLockScreenSound() {
-        return Settings.System.getInt(context.getContentResolver(),
-                "lockscreen_sounds_enabled", 1) != 0;
-    }
 
     public boolean getVibration() {
         return Settings.System.getInt(context.getContentResolver(),
@@ -114,11 +110,6 @@ public class SoundProfileActions {
 
     }
 
-/*    public void setLockScreenSound(int onOff) {
-
-        Settings.System.putInt(context.getContentResolver(),
-                Settings, onOff);
-    }*/
 
     public void setVibration(int onOff) {
         Settings.System.putInt(context.getContentResolver(),

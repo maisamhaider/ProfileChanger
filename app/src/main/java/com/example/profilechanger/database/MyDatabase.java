@@ -19,10 +19,11 @@ public class MyDatabase extends SQLiteOpenHelper {
     private static final String LOCATION_TABLE = "LOCATION_TABLE";
     private static final String LOCATION_ID = "LOCATION_ID";
     private static final String LOCATION_TITLE = "LOCATION_TITLE";
-     private static final String LATITUDE = "LATITUDE";
+    private static final String LATITUDE = "LATITUDE";
     private static final String LONGITUDE = "LONGITUDE";
     private static final String RADIUS = "RADIUS";
     private static final String GEO_FENCE_TYPE = "GEO_FENCE_TYPE";
+    private static final String FORMATTED_EXPIRATION_TIME = "FORMATTED_EXPIRATION_TIME";
     private static final String EXPIRATION_TIME = "EXPIRATION_TIME";
     private static final String LOCATION_STATE = "LOCATION_STATE";
     private static final String LOCATION_DATE = "LOCATION_DATE";
@@ -55,7 +56,6 @@ public class MyDatabase extends SQLiteOpenHelper {
     private static final String SYSTEM_LEVEL = "SYSTEM_LEVEL";
     private static final String VIBRATE = "VIBRATE";
     private static final String TOUCH_SOUND = "TOUCH_SOUND";
-    private static final String LOCK_SCREEN_SOUND = "LOCK_SCREEN_SOUND";
     private static final String DIAL_PAD_SOUND = "DIAL_PAD_SOUND";
 
 
@@ -74,10 +74,11 @@ public class MyDatabase extends SQLiteOpenHelper {
 
         db.execSQL("create table " + LOCATION_TABLE + "(LOCATION_ID INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "LOCATION_TITLE TEXT" +
-                 ",LATITUDE TEXT" +
+                ",LATITUDE TEXT" +
                 ",LONGITUDE TEXT" +
                 ",RADIUS TEXT" +
                 ",GEO_FENCE_TYPE TEXT" +
+                ",FORMATTED_EXPIRATION_TIME TEXT" +
                 ",EXPIRATION_TIME TEXT" +
                 ",LOCATION_STATE TEXT" +
                 ",LOCATION_DATE TEXT" +
@@ -106,7 +107,6 @@ public class MyDatabase extends SQLiteOpenHelper {
                 ",SYSTEM_LEVEL TEXT" +
                 ",VIBRATE TEXT" +
                 ",TOUCH_SOUND TEXT" +
-                ",LOCK_SCREEN_SOUND TEXT" +
                 ",DIAL_PAD_SOUND)");
 
         db.execSQL("create table " + PER_DAY_TABLE + "(PRIMARY_ID INTEGER PRIMARY KEY," +
@@ -141,8 +141,7 @@ public class MyDatabase extends SQLiteOpenHelper {
                 new String[]{id});
     }
 
-    public Cursor getPerDay()
-    {
+    public Cursor getPerDay() {
         SQLiteDatabase databaseWritable = getWritableDatabase();
         return databaseWritable.rawQuery("select * from " + PER_DAY_TABLE, null,
                 null);
@@ -150,17 +149,18 @@ public class MyDatabase extends SQLiteOpenHelper {
     }
 
     //location base table functions
-    public long insert(String location_title , String latitude,
+    public long insert(String location_title, String latitude,
                        String longitude, String radius, String geoFenceType,
-                       String expirationTime, String state, String date,
-                       String enter_profile_id,String exit_profile_id) {
+                       String expireFormatted, String expirationTime, String state, String date,
+                       String enter_profile_id, String exit_profile_id) {
         SQLiteDatabase database = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(LOCATION_TITLE, location_title);
-         values.put(LATITUDE, latitude);
+        values.put(LATITUDE, latitude);
         values.put(LONGITUDE, longitude);
         values.put(RADIUS, radius);
         values.put(GEO_FENCE_TYPE, geoFenceType);
+        values.put(FORMATTED_EXPIRATION_TIME, expireFormatted);
         values.put(EXPIRATION_TIME, expirationTime);
         values.put(LOCATION_STATE, state);
         values.put(LOCATION_DATE, date);
@@ -169,12 +169,20 @@ public class MyDatabase extends SQLiteOpenHelper {
         return database.insert(LOCATION_TABLE, null, values);
     }
 
-    public long updateLocation(String id, String location_title , String state,
-                               String enter_profile_id,String exit_profile_id) {
+    public int update(String id, String stats) {
+        SQLiteDatabase database = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(LOCATION_STATE, stats);
+        return database.update(LOCATION_TABLE, values, MyDatabase.LOCATION_ID + "=?",
+                new String[]{id});
+    }
+
+    public long updateLocation(String id, String location_title, String state,
+                               String enter_profile_id, String exit_profile_id) {
         SQLiteDatabase database = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(LOCATION_TITLE, location_title);
-         values.put(LOCATION_STATE, state);
+        values.put(LOCATION_STATE, state);
         values.put(LOCATION_PROFILE_ENTER, enter_profile_id);
         values.put(LOCATION_PROFILE_EXIT, exit_profile_id);
         return database.update(LOCATION_TABLE, values, MyDatabase.LOCATION_ID + "=?",
@@ -183,8 +191,8 @@ public class MyDatabase extends SQLiteOpenHelper {
 
     public Cursor retrieveLocation(String id) {
         SQLiteDatabase databaseWritable = getWritableDatabase();
-        return databaseWritable.rawQuery( "SELECT * FROM " + LOCATION_TABLE +
-                        " WHERE LOCATION_ID LIKE '" + id + "'", null );
+        return databaseWritable.rawQuery("SELECT * FROM " + LOCATION_TABLE +
+                " WHERE LOCATION_ID LIKE '" + id + "'", null);
 
 
     }
@@ -232,8 +240,7 @@ public class MyDatabase extends SQLiteOpenHelper {
     public long updateTimeTable(String id, String time_title, String profileTitleStart,
                                 String profileTitleEnd, String startTime, String endTime,
                                 String state, String date, String repeat, String days,
-                                String start_profile_id, String end_profile_id)
-    {
+                                String start_profile_id, String end_profile_id) {
         SQLiteDatabase database = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(TIME_TITLE, time_title);
@@ -255,8 +262,8 @@ public class MyDatabase extends SQLiteOpenHelper {
 
     public Cursor retrieveTimeTable(String id) {
         SQLiteDatabase databaseWritable = getWritableDatabase();
-          String selectQuery = "SELECT  * FROM " + TIME_TABLE + " WHERE TIME_ID  LIKE '" + id+"'";
-        return databaseWritable.rawQuery( selectQuery, null );
+        String selectQuery = "SELECT  * FROM " + TIME_TABLE + " WHERE TIME_ID  LIKE '" + id + "'";
+        return databaseWritable.rawQuery(selectQuery, null);
 
     }
 
@@ -281,7 +288,7 @@ public class MyDatabase extends SQLiteOpenHelper {
     //profile table functions
     public long insertProfile(String profile_title, String ringerMode, String ringerLevel,
                               String mediaLevel, String notificationLevel, String systemLevel
-            , String vibrate, String touchSound, String LockScreenSound, String dialPedSound) {
+            , String vibrate, String touchSound, String dialPedSound) {
         SQLiteDatabase database = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(PROFILE_TITLE, profile_title);
@@ -292,7 +299,6 @@ public class MyDatabase extends SQLiteOpenHelper {
         values.put(SYSTEM_LEVEL, systemLevel);
         values.put(VIBRATE, vibrate);
         values.put(TOUCH_SOUND, touchSound);
-        values.put(LOCK_SCREEN_SOUND, LockScreenSound);
         values.put(DIAL_PAD_SOUND, dialPedSound);
 
         return database.insert(PROFILE_TABLE, null, values);
@@ -300,7 +306,7 @@ public class MyDatabase extends SQLiteOpenHelper {
 
     public long updateProfile(String id, String profile_title, String ringerMode, String ringerLevel,
                               String mediaLevel, String notificationLevel, String systemLevel
-            , String vibrate, String touchSound, String LockScreenSound, String dialPedSound) {
+            , String vibrate, String touchSound, String dialPedSound) {
         SQLiteDatabase database = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(PROFILE_TITLE, profile_title);
@@ -310,7 +316,6 @@ public class MyDatabase extends SQLiteOpenHelper {
         values.put(NOTIFICATION_LEVEL, notificationLevel);
         values.put(SYSTEM_LEVEL, systemLevel);
         values.put(DIAL_PAD_SOUND, dialPedSound);
-        values.put(LOCK_SCREEN_SOUND, LockScreenSound);
         values.put(TOUCH_SOUND, touchSound);
         values.put(VIBRATE, vibrate);
 
@@ -321,8 +326,8 @@ public class MyDatabase extends SQLiteOpenHelper {
 
     public Cursor retrieveProfile(String id) {
         SQLiteDatabase databaseWritable = getWritableDatabase();
-        return databaseWritable.rawQuery( "SELECT * FROM " + PROFILE_TABLE +
-                " WHERE PROFILE_P_KEY LIKE '" + id + "'", null );
+        return databaseWritable.rawQuery("SELECT * FROM " + PROFILE_TABLE +
+                " WHERE PROFILE_P_KEY LIKE '" + id + "'", null);
 
     }
 

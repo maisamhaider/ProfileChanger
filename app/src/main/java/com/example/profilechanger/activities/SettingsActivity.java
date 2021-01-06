@@ -1,5 +1,15 @@
+
 package com.example.profilechanger.activities;
 
+import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +21,8 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,15 +33,18 @@ import com.example.profilechanger.annotations.MyAnnotations;
 import com.example.profilechanger.interfaces.SendDataWithKey;
 import com.example.profilechanger.sharedpreferences.MyPreferences;
 import com.example.profilechanger.notification.NotificationSounds;
+import com.example.profilechanger.utils.TimeUtil;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
+import java.util.Calendar;
 
-public class SettingsActivity extends AppCompatActivity implements SendDataWithKey {
+
+public class SettingsActivity extends BaseActivity implements SendDataWithKey {
 
     private NotificationSounds notificationSounds;
     private MyPreferences preferences;
     private TextView notiName_tv;
-
+    private boolean firstRun = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -40,31 +55,82 @@ public class SettingsActivity extends AppCompatActivity implements SendDataWithK
         notiName_tv = findViewById(R.id.notiName_tv);
 
 
-        LinearLayout settingsNotification_LL = findViewById(R.id.settingsNotification_LL);
+        ConstraintLayout settingsNotification_cl = findViewById(R.id.settingsNotification_cl);
         SwitchMaterial settingVibrate_mSwitch = findViewById(R.id.settingVibrate_mSwitch);
         RadioGroup radioGroup = findViewById(R.id.radioGroup);
         RadioButton dayTheme_mRb = findViewById(R.id.dayTheme_mRb);
         RadioButton nightTheme_mRb = findViewById(R.id.nightTheme_mRb);
-        RadioButton autoTheme_mRb = findViewById(R.id.autoTheme_mRb);
+//        RadioButton autoTheme_mRb = findViewById(R.id.autoTheme_mRb);
 
+        findViewById(R.id.profileBack_iv).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @SuppressLint("NonConstantResourceId")
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == 0) {
-                    preferences.setDataString(MyAnnotations.THEME, MyAnnotations.DAY);
+                if (firstRun) {
+                    switch (checkedId) {
+                        case R.id.dayTheme_mRb:
+                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                                setTheme(R.style.Theme_ProfileChanger);
+                            }
+                            preferences.setDataString(MyAnnotations.THEME, MyAnnotations.DAY);
+                            preferences.setBoolean(MyAnnotations.IS_LIGHT_THEME, true);
 
-                } else if (checkedId == 1) {
-                    preferences.setDataString(MyAnnotations.THEME, MyAnnotations.NIGHT);
+                            break;
+                        case R.id.nightTheme_mRb:
+                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                                setTheme(R.style.Theme_ProfileChanger_dark);
+                            }
+                            preferences.setDataString(MyAnnotations.THEME, MyAnnotations.NIGHT);
+                            preferences.setBoolean(MyAnnotations.IS_LIGHT_THEME, false);
 
-                } else if (checkedId == 2) {
-                    preferences.setDataString(MyAnnotations.THEME, MyAnnotations.AUTO_CHANGE);
-
+                            break;
+//                        case R.id.autoTheme_mRb:
+//                            preferences.setDataString(MyAnnotations.THEME, MyAnnotations.AUTO_CHANGE);
+//                            TimeUtil timeUtil = new TimeUtil(SettingsActivity.this);
+//                            long pm7 = timeUtil.getMillisFromFormattedDate(
+//                                    timeUtil.getTimePlusHours(19)
+//                                    , MyAnnotations.DEFAULT_TIME_FORMAT);
+//                            long am7 = timeUtil.getMillisFromFormattedDate(
+//                                    timeUtil.getTimePlusHours(7)
+//                                    , MyAnnotations.DEFAULT_TIME_FORMAT);
+//
+//                            long current = timeUtil.getMillisFromFormattedDate(
+//                                    timeUtil.getCurrentFormattedTime(),
+//                                    MyAnnotations.DEFAULT_TIME_FORMAT);
+//
+//                            if (current > am7 && current < pm7) {
+//                                //day
+//                                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+//                                    setTheme(R.style.Theme_ProfileChanger);
+//                                } else {
+//                                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+//                                }
+//                                preferences.setBoolean(MyAnnotations.IS_LIGHT_THEME, true);
+//
+//                            } else {//night
+//                                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+//                                    setTheme(R.style.Theme_ProfileChanger_dark);
+//                                } else {
+//                                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+//                                }
+//                                preferences.setBoolean(MyAnnotations.IS_LIGHT_THEME, false);
+//                            }
+//
+//                            break;
+                    }
+                    recreate();
                 }
             }
         });
 
-        settingsNotification_LL.setOnClickListener(new View.OnClickListener() {
+        settingsNotification_cl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 notificationSoundsFun();
@@ -85,10 +151,10 @@ public class SettingsActivity extends AppCompatActivity implements SendDataWithK
         } else if (theme.matches(MyAnnotations.NIGHT)) {
             nightTheme_mRb.setChecked(true);
 
-        } else {
-            autoTheme_mRb.setChecked(true);
-
         }
+
+        firstRun = true;
+
 
         settingVibrate_mSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,21 +163,26 @@ public class SettingsActivity extends AppCompatActivity implements SendDataWithK
                     preferences.setBoolean(MyAnnotations.NOTIFICATION_VIBRATE, false);
                     settingVibrate_mSwitch.setChecked(false);
                     isVibrate[0] = false;
-
                 } else {
                     preferences.setBoolean(MyAnnotations.NOTIFICATION_VIBRATE, true);
                     settingVibrate_mSwitch.setChecked(true);
                     isVibrate[0] = true;
-
                 }
-
-
             }
         });
 
 
     }
 
+    public long get12AmMillis() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.AM, 1);
+        calendar.add(Calendar.DATE, 1);
+        return calendar.getTimeInMillis();
+    }
 
     private void notificationSoundsFun() {
 
@@ -121,27 +192,11 @@ public class SettingsActivity extends AppCompatActivity implements SendDataWithK
         builder.setCancelable(true).setView(view);
 
         final AlertDialog dialog = builder.create();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.show();
-
 
         RecyclerView notificationSoundRecyclerView =
                 view.findViewById(R.id.notificationSoundRecyclerView);
-
-        TextView notification_sound_cancelBtn = view.findViewById(R.id.cancelTv);
-
-        notification_sound_cancelBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
-
-        notification_sound_cancelBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);

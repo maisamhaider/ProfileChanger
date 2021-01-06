@@ -7,8 +7,7 @@
     <string name="settings">Settings</string>
     <string name="Profiles">Profiles</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="edit">Edit</string>
+     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
     <string name="ringtone">Ringtone</string>
     <string name="media">Media</string>
