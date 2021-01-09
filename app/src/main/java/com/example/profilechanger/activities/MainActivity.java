@@ -10,7 +10,6 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -21,12 +20,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,6 +41,8 @@ public class MainActivity extends BaseActivity {
     NotificationManager mNotificationManager;
     MyPreferences preferences;
     MyDatabase database;
+    ViewPager viewPager;
+    AlertDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,43 +54,37 @@ public class MainActivity extends BaseActivity {
         MainFragmentsAdapter adapter =
                 new MainFragmentsAdapter(MainActivity.this
                         , getSupportFragmentManager(), 1);
-        ViewPager viewPager = findViewById(R.id.mainViewPager);
+        viewPager = findViewById(R.id.mainViewPager);
         TabLayout tabLayout = findViewById(R.id.mainTabLayout);
 
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
         ImageView mainHeaderIv = findViewById(R.id.mainHeaderIv);
-        View people_pad = findViewById(R.id.people_pad);
-
+        View people_pad = findViewById(R.id.menu_view);
+        mNotificationManager = (NotificationManager)
+                getSystemService(Context.NOTIFICATION_SERVICE);
 
 //        permissions.permission();
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
             if (!Settings.System.canWrite(this)) {
-                permissions.openAndroidPermissionsMenu(MainActivity.this);
-            } else {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle(getString(R.string.permission))
                         .setMessage(getString(R.string.write_settings_alert_text))
                         .setPositiveButton(getString(R.string.allow),
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        permissions.openAndroidPermissionsMenu(MainActivity.this);
-                                        dialog.dismiss();
-                                    }
+                                (dialog, which) -> {
+                                    permissions.openAndroidPermissionsMenu(MainActivity.this);
+                                    dialog.dismiss();
                                 }).setNegativeButton(R.string.decline,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                finish();
-                            }
-                        });
-                AlertDialog dialog = builder.create();
+                        (dialog, which) -> finish());
+                dialog = builder.create();
                 dialog.show();
+            } else {
+                if (!mNotificationManager.isNotificationPolicyAccessGranted()) {
+
+                    permissions.doNoDisturbPermissionDialog();
+                }
             }
         }
-        mNotificationManager = (NotificationManager)
-                getSystemService(Context.NOTIFICATION_SERVICE);
 
 
         if (!preferences.getBoolean(MyAnnotations.PRE_PROFILES_LOADED, false)) {
@@ -115,65 +106,29 @@ public class MainActivity extends BaseActivity {
 
         }
 
-
         ImageView addNewProfile_mIv = findViewById(R.id.addNewProfile_mIv);
 
-        addNewProfile_mIv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                intent(new ProfilesActivity());
-            }
-        });
+        addNewProfile_mIv.setOnClickListener(v -> Load_withAds(MainActivity.this, new ProfilesActivity()));
 
 
-        findViewById(R.id.settingsIv).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MotionLayout motionLayout = findViewById(R.id.motionLayout);
-//
-//                motionLayout.setTransition(motionLayout.getCurrentState(), R.id.base_state);
-                motionLayout.transitionToEnd();
-                intent(new SettingsActivity());
+        findViewById(R.id.settingsIv).setOnClickListener(v -> {
+            MotionLayout motionLayout = findViewById(R.id.motionLayout);
+            motionLayout.transitionToEnd();
+            Load_withAds(MainActivity.this, new SettingsActivity());
+        });
+        findViewById(R.id.rateUsIv).setOnClickListener(v -> {
+            Toast.makeText(MainActivity.this, "rateUsIv", Toast.LENGTH_SHORT).show();
+            rateUs();
 
-            }
         });
-        findViewById(R.id.rateUsIv).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "rateUsIv", Toast.LENGTH_SHORT).show();
-                rateUs();
-
-            }
-        });
-        findViewById(R.id.moreAppsIv).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "moreAppsIv", Toast.LENGTH_SHORT).show();
-
-            }
-        });
-        findViewById(R.id.shareIv).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "shareIv", Toast.LENGTH_SHORT).show();
-                shareUs();
-            }
-        });
-        findViewById(R.id.infoIv).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog();
-            }
-        });
-        findViewById(R.id.helpIv).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "Help", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-
+        findViewById(R.id.moreAppsIv).setOnClickListener(v -> Toast.makeText(
+                MainActivity.this, "moreAppsIv", Toast.LENGTH_SHORT).show());
+        findViewById(R.id.shareIv).setOnClickListener(v -> shareUs());
+        findViewById(R.id.infoIv).setOnClickListener(v -> dialog());
+        findViewById(R.id.helpIv).setOnClickListener(v ->
+                Toast.makeText(MainActivity.this, "Help", Toast.LENGTH_SHORT).show());
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
@@ -250,12 +205,24 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        if (dialog != null) {
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+                dialog = null;
+            }
+        }
+    }
+
+    @Override
     public void onBackPressed() {
         exit();
     }
 
     public void dialog() {
-        View view = getLayoutInflater().inflate(R.layout.about_dialog_layout, null, false);
+        View view = getLayoutInflater().inflate(R.layout.about_dialog_layout, null,
+                false);
         TextView aboutUsCloseApp_tv = view.findViewById(R.id.aboutUsCloseApp_tv);
         android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
         builder.setCancelable(true).setView(view);
@@ -265,12 +232,9 @@ public class MainActivity extends BaseActivity {
         dialog.show();
         TextView version_tv = view.findViewById(R.id.appVersion_tv);
 
-        aboutUsCloseApp_tv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (dialog.isShowing()) {
-                    dialog.cancel();
-                }
+        aboutUsCloseApp_tv.setOnClickListener(v -> {
+            if (dialog.isShowing()) {
+                dialog.cancel();
             }
         });
 
@@ -318,26 +282,13 @@ public class MainActivity extends BaseActivity {
             alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             alertDialog.show();
 
-            yes_cl.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    alertDialog.cancel();
-                    MainActivity.this.finishAffinity();
-                }
+            yes_cl.setOnClickListener(view -> {
+                alertDialog.cancel();
+                MainActivity.this.finishAffinity();
             });
 
-            no_cl.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    alertDialog.dismiss();
-                }
-            });
-            rateUs_cl.setOnClickListener(new View.OnClickListener() {
-                                             @Override
-                                             public void onClick(View view) {
-                                                 MainActivity.this.rateUs();
-                                             }
-                                         }
+            no_cl.setOnClickListener(view -> alertDialog.dismiss());
+            rateUs_cl.setOnClickListener(view -> MainActivity.this.rateUs()
             );
 
         } catch (Exception a) {

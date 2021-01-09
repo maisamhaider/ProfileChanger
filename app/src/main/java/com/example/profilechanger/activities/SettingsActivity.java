@@ -34,6 +34,7 @@ import com.example.profilechanger.interfaces.SendDataWithKey;
 import com.example.profilechanger.sharedpreferences.MyPreferences;
 import com.example.profilechanger.notification.NotificationSounds;
 import com.example.profilechanger.utils.TimeUtil;
+import com.google.android.gms.ads.AdView;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import java.util.Calendar;
@@ -46,6 +47,7 @@ public class SettingsActivity extends BaseActivity implements SendDataWithKey {
     private TextView notiName_tv;
     private boolean firstRun = false;
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,35 +64,31 @@ public class SettingsActivity extends BaseActivity implements SendDataWithKey {
         RadioButton nightTheme_mRb = findViewById(R.id.nightTheme_mRb);
 //        RadioButton autoTheme_mRb = findViewById(R.id.autoTheme_mRb);
 
-        findViewById(R.id.profileBack_iv).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        findViewById(R.id.profileBack_iv).setOnClickListener(v -> onBackPressed());
+        AdView adView = findViewById(R.id.adView);
+        adView(adView);
 
-        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @SuppressLint("NonConstantResourceId")
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (firstRun) {
-                    switch (checkedId) {
-                        case R.id.dayTheme_mRb:
-                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-                                setTheme(R.style.Theme_ProfileChanger);
-                            }
-                            preferences.setDataString(MyAnnotations.THEME, MyAnnotations.DAY);
-                            preferences.setBoolean(MyAnnotations.IS_LIGHT_THEME, true);
+        radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            if (firstRun) {
+                switch (checkedId) {
+                    case R.id.dayTheme_mRb:
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                            setTheme(R.style.Theme_ProfileChanger);
+                        }
+                        preferences.setDataString(MyAnnotations.THEME, MyAnnotations.DAY);
+                        preferences.setBoolean(MyAnnotations.IS_LIGHT_THEME, true);
+                        preferences.setBoolean(MyAnnotations.IS_THEME_CHANGE, true);
 
-                            break;
-                        case R.id.nightTheme_mRb:
-                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-                                setTheme(R.style.Theme_ProfileChanger_dark);
-                            }
-                            preferences.setDataString(MyAnnotations.THEME, MyAnnotations.NIGHT);
-                            preferences.setBoolean(MyAnnotations.IS_LIGHT_THEME, false);
+                        break;
+                    case R.id.nightTheme_mRb:
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                            setTheme(R.style.Theme_ProfileChanger_dark);
+                        }
 
-                            break;
+                        preferences.setDataString(MyAnnotations.THEME, MyAnnotations.NIGHT);
+                        preferences.setBoolean(MyAnnotations.IS_LIGHT_THEME, false);
+                        preferences.setBoolean(MyAnnotations.IS_THEME_CHANGE, true);
+                        break;
 //                        case R.id.autoTheme_mRb:
 //                            preferences.setDataString(MyAnnotations.THEME, MyAnnotations.AUTO_CHANGE);
 //                            TimeUtil timeUtil = new TimeUtil(SettingsActivity.this);
@@ -124,18 +122,12 @@ public class SettingsActivity extends BaseActivity implements SendDataWithKey {
 //                            }
 //
 //                            break;
-                    }
-                    recreate();
                 }
+                recreate();
             }
         });
 
-        settingsNotification_cl.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                notificationSoundsFun();
-            }
-        });
+        settingsNotification_cl.setOnClickListener(v -> notificationSoundsFun());
 
 
         String soundName = preferences.getString(MyAnnotations.NOTIFICATION_SOUND_NAME,
@@ -146,28 +138,31 @@ public class SettingsActivity extends BaseActivity implements SendDataWithKey {
 
         settingVibrate_mSwitch.setChecked(isVibrate[0]);
         notiName_tv.setText(soundName);
-        if (theme.matches(MyAnnotations.DAY)) {
-            dayTheme_mRb.setChecked(true);
-        } else if (theme.matches(MyAnnotations.NIGHT)) {
-            nightTheme_mRb.setChecked(true);
 
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            if (theme.matches(MyAnnotations.DAY)) {
+                dayTheme_mRb.setChecked(true);
+            } else if (theme.matches(MyAnnotations.NIGHT)) {
+                nightTheme_mRb.setChecked(true);
+
+            }
+        } else {
+            radioGroup.setVisibility(View.GONE);
         }
+
 
         firstRun = true;
 
 
-        settingVibrate_mSwitch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isVibrate[0]) {
-                    preferences.setBoolean(MyAnnotations.NOTIFICATION_VIBRATE, false);
-                    settingVibrate_mSwitch.setChecked(false);
-                    isVibrate[0] = false;
-                } else {
-                    preferences.setBoolean(MyAnnotations.NOTIFICATION_VIBRATE, true);
-                    settingVibrate_mSwitch.setChecked(true);
-                    isVibrate[0] = true;
-                }
+        settingVibrate_mSwitch.setOnClickListener(v -> {
+            if (isVibrate[0]) {
+                preferences.setBoolean(MyAnnotations.NOTIFICATION_VIBRATE, false);
+                settingVibrate_mSwitch.setChecked(false);
+                isVibrate[0] = false;
+            } else {
+                preferences.setBoolean(MyAnnotations.NOTIFICATION_VIBRATE, true);
+                settingVibrate_mSwitch.setChecked(true);
+                isVibrate[0] = true;
             }
         });
 
@@ -218,6 +213,14 @@ public class SettingsActivity extends BaseActivity implements SendDataWithKey {
         preferences.setDataString(MyAnnotations.NOTIFICATION_SOUND_PATH, data);
         preferences.setDataString(MyAnnotations.NOTIFICATION_SOUND_NAME, title);
         notiName_tv.setText(title);
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(SettingsActivity.this, MainActivity.class));
+        finish();
 
     }
 }

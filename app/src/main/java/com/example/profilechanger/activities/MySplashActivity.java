@@ -66,10 +66,12 @@ public class MySplashActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             switch (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) {
                 case Configuration.UI_MODE_NIGHT_YES:
-                    backgroundIv.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_splash_light));
+                    backgroundIv.setImageDrawable(ContextCompat.getDrawable(this,
+                            R.drawable.ic_splash_dark));
                     break;
                 case Configuration.UI_MODE_NIGHT_NO:
-                    backgroundIv.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_splash_dark));
+                    backgroundIv.setImageDrawable(ContextCompat.getDrawable(this,
+                            R.drawable.ic_splash_light));
                     break;
             }
         } else {
@@ -81,7 +83,6 @@ public class MySplashActivity extends AppCompatActivity {
 
             }
         }
-
 
         Load_withAds();
     }

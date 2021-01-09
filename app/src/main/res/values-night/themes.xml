@@ -15,7 +15,6 @@
         <item name="dialogBg">@color/colorPrimaryVariantDark</item>
         <item name="android:textColorHint">#99FFFFFF</item>
 
-
         <!-- Secondary brand color. -->
         <!--        <item name="colorSecondary">@color/colorSecondary</item>-->
         <!--        <item name="colorSecondaryVariant">@color/colorSecondary</item>-->

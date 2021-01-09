@@ -45,7 +45,7 @@ public class NotificationHelper extends ContextWrapper {
                 MyAnnotations.CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH);
         notificationChannel.enableLights(true);
         notificationChannel.enableVibration(isVibrate);
-        notificationChannel.setSound(soundUri,null);
+        notificationChannel.setSound(soundUri, null);
         notificationChannel.setDescription("Chanel for " + context.getResources().getString(
                 R.string.app_name));
         notificationChannel.setLightColor(getResources().getColor(R.color.black));

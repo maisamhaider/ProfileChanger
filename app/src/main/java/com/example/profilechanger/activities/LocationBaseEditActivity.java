@@ -18,7 +18,7 @@ import com.example.profilechanger.fragments.MapsFragment;
 import com.example.profilechanger.interfaces.ClickListener;
 
 public class LocationBaseEditActivity extends BaseActivity  implements ClickListener {
-    BottomSheetFragmentMain bottomSheetFragmentMain;
+//    BottomSheetFragmentMain bottomSheetFragmentMain;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,7 +28,7 @@ public class LocationBaseEditActivity extends BaseActivity  implements ClickList
         String id = getIntent().getStringExtra(MyAnnotations.LOCATION_PROFILER_ID);
         boolean isUpdate = getIntent().getBooleanExtra(MyAnnotations.IS_UPDATE, false);
 
-        bottomSheetFragmentMain = new BottomSheetFragmentMain(this);
+//        bottomSheetFragmentMain = new BottomSheetFragmentMain(this);
         ConstraintLayout bottomSheetStartCl = findViewById(R.id.bottomSheetStart_cl);
 
         FragmentManager fm = getSupportFragmentManager();
@@ -47,7 +47,7 @@ public class LocationBaseEditActivity extends BaseActivity  implements ClickList
 //            bottomSheetStartCl.setVisibility(View.VISIBLE);
 //
 //        }
-
+//
 //        bottomSheetStartCl.performClick();
 //        bottomSheetStartCl.setOnTouchListener(new View.OnTouchListener() {
 //            @SuppressLint("ClickableViewAccessibility")

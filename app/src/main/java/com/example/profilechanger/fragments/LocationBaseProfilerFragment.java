@@ -15,10 +15,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.profilechanger.R;
+import com.example.profilechanger.activities.BaseActivity;
 import com.example.profilechanger.activities.LocationBaseEditActivity;
 import com.example.profilechanger.adapters.ProfilerAdapter;
 import com.example.profilechanger.database.MyDatabase;
 import com.example.profilechanger.models.ProfilerModel;
+import com.google.android.gms.ads.AdView;
 
 import java.util.ArrayList;
 
@@ -32,7 +34,7 @@ public class LocationBaseProfilerFragment extends Fragment {
     private MyDatabase database;
     private RecyclerView locationBaseProfiler_rv;
     private ArrayList<ProfilerModel> list;
-
+    TextView noData_tv;
     public LocationBaseProfilerFragment() {
         // Required empty public constructor
     }
@@ -55,8 +57,11 @@ public class LocationBaseProfilerFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_location_base_plofiler, container, false);
         database = new MyDatabase(getContext());
         locationBaseProfiler_rv = view.findViewById(R.id.locationBaseProfiler_rv);
-        TextView noData_tv = view.findViewById(R.id.noData_mTv);
+          noData_tv = view.findViewById(R.id.noData_mTv);
         ImageView addNew_mBtn = view.findViewById(R.id.addNewLocation_mBtn);
+
+        AdView adView = view.findViewById(R.id.adView);
+        ((BaseActivity) getContext()).adView(adView);
         addDataInList();
         load();
         if (list.isEmpty()) {
@@ -68,8 +73,12 @@ public class LocationBaseProfilerFragment extends Fragment {
         addNew_mBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getActivity(), LocationBaseEditActivity.class));
 
+
+                if (((BaseActivity) getContext())!=null) {
+                    ((BaseActivity) getContext()).startActivity(new Intent(getActivity(),
+                            LocationBaseEditActivity.class));
+                }
             }
         });
         return view;
@@ -106,5 +115,11 @@ public class LocationBaseProfilerFragment extends Fragment {
         super.onResume();
         addDataInList();
         load();
+        if (list.isEmpty()) {
+            noData_tv.setVisibility(View.VISIBLE);
+        } else {
+            noData_tv.setVisibility(View.GONE);
+
+        }
     }
 }

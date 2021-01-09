@@ -49,9 +49,9 @@
     <LinearLayout
         android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/adView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline5"
@@ -91,10 +91,10 @@
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:tint="?attr/textWhiteGray"
-                 app:srcCompat="@drawable/ic_next_arrow_2"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_next_arrow_2" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <View
@@ -136,25 +136,25 @@
                 android:id="@+id/dayTheme_mRb"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/day"
                 android:layoutDirection="rtl"
+                android:text="@string/day"
                 android:textColor="?attr/textWhiteGray" />
 
             <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/nightTheme_mRb"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/night"
                 android:layoutDirection="rtl"
+                android:text="@string/night"
                 android:textColor="?attr/textWhiteGray" />
 
-<!--            <com.google.android.material.radiobutton.MaterialRadioButton-->
-<!--                android:id="@+id/autoTheme_mRb"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="@string/auto_change"-->
-<!--                android:layoutDirection="rtl"-->
-<!--                android:textColor="?attr/textWhiteGray" />-->
+            <!--            <com.google.android.material.radiobutton.MaterialRadioButton-->
+            <!--                android:id="@+id/autoTheme_mRb"-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:text="@string/auto_change"-->
+            <!--                android:layoutDirection="rtl"-->
+            <!--                android:textColor="?attr/textWhiteGray" />-->
         </RadioGroup>
 
         <View
@@ -170,6 +170,14 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.13" />
-
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:adSize="BANNER"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:adUnitId="@string/banner"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

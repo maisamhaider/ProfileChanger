@@ -1,8 +1,14 @@
 package com.example.profilechanger.adapters;
 
+import android.app.AlertDialog;
+import android.app.NotificationManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.media.AudioManager;
+import android.os.Build;
+import android.provider.Settings;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,14 +23,17 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.profilechanger.R;
+import com.example.profilechanger.activities.MainActivity;
 import com.example.profilechanger.activities.OpenProfileActivity;
 import com.example.profilechanger.annotations.MyAnnotations;
 import com.example.profilechanger.database.MyDatabase;
 import com.example.profilechanger.interfaces.ClickListener;
 import com.example.profilechanger.interfaces.SendDataWithKey;
 import com.example.profilechanger.models.ProfilesModel;
+import com.example.profilechanger.permissions.Permissions;
 import com.example.profilechanger.sharedpreferences.MyPreferences;
 import com.example.profilechanger.utils.PopUpWindow;
+import com.example.profilechanger.utils.SoundProfileActions;
 
 import java.util.ArrayList;
 
@@ -34,7 +43,7 @@ public class ProfilesAdapter extends RecyclerView.Adapter<ProfilesAdapter.Profil
     private final Context context;
     private final ArrayList<ProfilesModel> profilesModelArrayList;
     private final PopUpWindow popUpWindow;
-
+    Permissions permissions;
     private final MyDatabase myDatabase;
     private ProfilesModel profilesModel;
     private final boolean isProfilerNeed;
@@ -54,6 +63,7 @@ public class ProfilesAdapter extends RecyclerView.Adapter<ProfilesAdapter.Profil
         popUpWindow = new PopUpWindow(context, this);
         p = new MyPreferences(context);
         this.dialog = dialog;
+        permissions = new Permissions(context);
     }
 
     public void setSendDataWithKey(SendDataWithKey sendDataWithKey, String profile) {
@@ -94,15 +104,13 @@ public class ProfilesAdapter extends RecyclerView.Adapter<ProfilesAdapter.Profil
                 holder.profileName_tv.setTextColor(ContextCompat.getColor(context,
                         R.color.white));
             }
-
         }
-
         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 if (!isProfilerNeed) {
                     pos = profilesModelArrayList.get(position).getId();
-                    PopupWindow popupWindow = popUpWindow.popupWindowUpDel();
+                    PopupWindow popupWindow = popUpWindow.popupWindowUpDel(5);
                     popupWindow.showAsDropDown(v, Gravity.END, 0);
                 }
                 return true;
@@ -121,7 +129,6 @@ public class ProfilesAdapter extends RecyclerView.Adapter<ProfilesAdapter.Profil
                 }
             }
         });
-
     }
 
     @Override
@@ -131,7 +138,62 @@ public class ProfilesAdapter extends RecyclerView.Adapter<ProfilesAdapter.Profil
 
     @Override
     public void click(String button) {
-        if (button.matches(MyAnnotations.edit)) {
+        if (button.matches(MyAnnotations.set)) {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                if (!Settings.System.canWrite(context)) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle(context.getString(R.string.permission))
+                            .setMessage(context.getString(R.string.write_settings_alert_text))
+                            .setPositiveButton(context.getString(R.string.allow),
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            permissions.openAndroidPermissionsMenu((MainActivity) context);
+                                            dialog.dismiss();
+                                        }
+                                    }).setNegativeButton(R.string.decline,
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+
+                } else {
+                    NotificationManager mNotificationManager = (NotificationManager)
+                            context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+                    if (mNotificationManager.isNotificationPolicyAccessGranted()) {
+                        startProfile(pos);
+                    } else {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                        builder.setTitle(context.getString(R.string.permission))
+                                .setMessage(context.getString(R.string.do_not_disturb_permission_text))
+                                .setPositiveButton(context.getString(R.string.allow),
+                                        new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                permissions.doNoDisturbPermissionDialog();
+                                                dialog.dismiss();
+                                            }
+                                        }).setNegativeButton(R.string.decline,
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
+                    }
+                }
+            } else {
+                startProfile(pos);
+
+            }
+        } else if (button.matches(MyAnnotations.edit)) {
             editIntent(pos);
         } else if (button.matches(MyAnnotations.delete)) {
 
@@ -187,6 +249,52 @@ public class ProfilesAdapter extends RecyclerView.Adapter<ProfilesAdapter.Profil
         context.startActivity(intent);
     }
 
+    public void startProfile(String id) {
+
+        MyDatabase database = new MyDatabase(context);
+        SoundProfileActions actions = new SoundProfileActions(context);
+
+        Cursor startCursor = database.retrieveProfile(id);
+        while (startCursor.moveToNext()) {
+            String ringerMode = startCursor.getString(2);
+            int ringerLevel = Integer.parseInt(startCursor.getString(3));
+            int mediaLevel = Integer.parseInt(startCursor.getString(4));
+            int notificationLevel = Integer.parseInt(startCursor.getString(5));
+            int systemLevel = Integer.parseInt(startCursor.getString(6));
+            String vibrate = startCursor.getString(7);
+            String touchSound = startCursor.getString(8);
+            String dialPedSound = startCursor.getString(9);
+
+            actions.setRingerMode(ringerMode);
+            actions.setVolume(AudioManager.STREAM_RING, ringerLevel);
+            actions.setVolume(AudioManager.STREAM_MUSIC, mediaLevel);
+            actions.setVolume(AudioManager.STREAM_NOTIFICATION, notificationLevel);
+            actions.setVolume(AudioManager.STREAM_SYSTEM, systemLevel);
+
+            if (ringerMode.matches(MyAnnotations.RINGER_MODE_SILENT)) {
+                actions.setVibration(0);
+
+            } else {
+                if (vibrate.matches(MyAnnotations.ON)) {
+                    actions.setVibration(1);
+                } else {
+                    actions.setVibration(0);
+                }
+            }
+            if (touchSound.matches(MyAnnotations.ON)) {
+                actions.setTouchSound(1);
+            } else {
+                actions.setTouchSound(0);
+            }
+            if (dialPedSound.matches(MyAnnotations.ON)) {
+                actions.setDialingPadTone(1);
+            } else {
+                actions.setDialingPadTone(0);
+            }
+        }
+
+    }
+
     class ProfileItemHolder extends RecyclerView.ViewHolder {
         CardView cv;
         TextView profileName_tv;
@@ -200,4 +308,5 @@ public class ProfilesAdapter extends RecyclerView.Adapter<ProfilesAdapter.Profil
 
         }
     }
+
 }

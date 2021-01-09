@@ -2,6 +2,8 @@ package com.example.profilechanger.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.os.Build;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -65,45 +68,59 @@ public class ProfilerAdapter extends RecyclerView.Adapter<ProfilerAdapter.Profil
 
     @Override
     public void onBindViewHolder(@NonNull ProfilerViewHolder holder, int position) {
-        profilerModel = modelArrayList.get(position);
-        id = modelArrayList.get(position).getId();
         String title = modelArrayList.get(position).getName();
 
-        if (preferences.getBoolean(MyAnnotations.IS_LIGHT_THEME, false)) {
-            holder.profilerTitle_tv.setBackground(ContextCompat
-                    .getDrawable(context, R.drawable.ic_button_1_light));
-        } else {
-            holder.profilerTitle_tv.setBackground(ContextCompat
-                    .getDrawable(context, R.drawable.ic_button_2_dark));
-        }
-        holder.profilerTitle_tv.setText(title);
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                PopupWindow popupWindow;
-                if (isTimeBased) {
-                    popupWindow = popUpWindow.popupWindowUpDel();
-
-                } else {
-                    popupWindow = popUpWindow.popupWindowDel();
-                }
-                popupWindow.showAsDropDown(v, Gravity.END, 0);
-
-
-                return true;
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            if (preferences.getBoolean(MyAnnotations.IS_LIGHT_THEME, false)) {
+                holder.profilerTitle_tv.setBackground(ContextCompat
+                        .getDrawable(context, R.drawable.ic_button_1_light));
+            } else {
+                holder.profilerTitle_tv.setBackground(ContextCompat
+                        .getDrawable(context, R.drawable.ic_button_2_dark));
             }
+        } else {
+
+            switch (context.getResources().getConfiguration().uiMode &
+                    Configuration.UI_MODE_NIGHT_MASK) {
+                case Configuration.UI_MODE_NIGHT_YES:
+                    holder.profilerTitle_tv.setBackground(ContextCompat
+                            .getDrawable(context, R.drawable.ic_button_2_dark));
+                    break;
+                case Configuration.UI_MODE_NIGHT_NO:
+                    holder.profilerTitle_tv.setBackground(ContextCompat
+                            .getDrawable(context, R.drawable.ic_button_1_light));
+                    break;
+
+
+            }
+        }
+
+        holder.profilerTitle_tv.setText(title);
+        holder.itemView.setOnLongClickListener(v -> {
+            PopupWindow popupWindow;
+            profilerModel = modelArrayList.get(position);
+            id = modelArrayList.get(position).getId();
+            if (isTimeBased) {
+                popupWindow = popUpWindow.popupWindowUpDel(4);
+
+            } else {
+                popupWindow = popUpWindow.popupWindowUpDel(2);
+            }
+            popupWindow.showAsDropDown(v, Gravity.END, 0);
+
+
+            return true;
         });
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isTimeBased) {
-                    editIntent(MyAnnotations.TIME_PROFILER_ID, id, MyAnnotations.IS_UPDATE,
-                            true, true);
-                } else {
+        holder.itemView.setOnClickListener(v -> {
+            if (isTimeBased) {
+                id = modelArrayList.get(position).getId();
+
+                editIntent(MyAnnotations.TIME_PROFILER_ID, id, MyAnnotations.IS_UPDATE,
+                        true, true);
+            } else {
 //                    editIntent(MyAnnotations.LOCATION_PROFILER_ID, id, MyAnnotations.IS_UPDATE,
 //                            true, false);
-                }
             }
         });
     }
@@ -116,7 +133,6 @@ public class ProfilerAdapter extends RecyclerView.Adapter<ProfilerAdapter.Profil
     @Override
     public void click(String button) {
         if (button.matches(MyAnnotations.edit)) {
-
             if (isTimeBased) {
                 editIntent(MyAnnotations.TIME_PROFILER_ID, id, MyAnnotations.IS_UPDATE,
                         true, true);
@@ -138,7 +154,6 @@ public class ProfilerAdapter extends RecyclerView.Adapter<ProfilerAdapter.Profil
 
         if (isTimeBased) {
             database.deleteTimeTable(id);
-            database.deleteTimeTable(id);
             AlarmClass alarmClass = new AlarmClass(context);
             alarmClass.deleteRepeatAlarm(Integer.parseInt(id) + 1000);
             alarmClass.deleteRepeatAlarm(Integer.parseInt(id) + 10000);
@@ -146,7 +161,9 @@ public class ProfilerAdapter extends RecyclerView.Adapter<ProfilerAdapter.Profil
         } else {
             deleteData(id);
         }
+        int s1 = modelArrayList.size();
         modelArrayList.remove(profilerModel);
+        int s2 = modelArrayList.size();
         notifyDataSetChanged();
 
 

@@ -15,11 +15,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.profilechanger.R;
+import com.example.profilechanger.activities.BaseActivity;
 import com.example.profilechanger.activities.TimeBaseProfilerEditActivity;
 import com.example.profilechanger.adapters.ProfilerAdapter;
 import com.example.profilechanger.annotations.MyAnnotations;
 import com.example.profilechanger.database.MyDatabase;
 import com.example.profilechanger.models.ProfilerModel;
+import com.google.android.gms.ads.AdView;
 
 import java.util.ArrayList;
 
@@ -62,6 +64,10 @@ public class TimeBaseProfilerFragment extends Fragment {
         noData_tv = view.findViewById(R.id.noData_mTv);
         ImageView addNew_mBtn = view.findViewById(R.id.addNew_mBtn);
 
+        AdView adView = view.findViewById(R.id.adView);
+        if (((BaseActivity) getContext())!=null) {
+            ((BaseActivity) getContext()).adView(adView);
+        }
         addNew_mBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

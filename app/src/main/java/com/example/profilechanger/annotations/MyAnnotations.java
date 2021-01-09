@@ -93,4 +93,6 @@ public @interface MyAnnotations {
     String N_A = "N_A";
     String IS_LIGHT_THEME = "IS_LIGHT_THEME";
     String IS_APP_FIRST_TIME = "IS_APP_FIRST_TIME";
+    String IS_THEME_CHANGE = "IS_THEME_CHANGE";
+    String set = "set";
 }

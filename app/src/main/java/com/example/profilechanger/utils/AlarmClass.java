@@ -14,7 +14,6 @@ public class AlarmClass extends ContextWrapper {
 
     public AlarmClass(Context base) {
         super(base);
-
     }
 
     public void setOneAlarm(String title, long reminderTime, int position,boolean isRepeat) {

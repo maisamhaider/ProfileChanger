@@ -63,10 +63,10 @@ public class SoundProfileActions {
             //For Silent mode
             if (whatToSet.matches(MyAnnotations.RINGER_MODE_SILENT)) {
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    am.adjustVolume(AudioManager.ADJUST_MUTE, 0);
-
-                }
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//                    am.adjustVolume(AudioManager.ADJUST_MUTE, 0);
+//
+//                }
                 am.setRingerMode(AudioManager.RINGER_MODE_SILENT);
             } else
                 //For Vibrate mode

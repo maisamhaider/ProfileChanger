@@ -31,6 +31,7 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -106,7 +107,7 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
     ImageView meters_iv;
     private float geofenceCircle = NoAnnotation.WALK;
     String geofenceType = MyAnnotations.ENTER;
-    String geoExpireTime = String.valueOf(NoAnnotation.HOUR_IN_MILLISECONDS);
+    String geoExpireTime = String.valueOf(DateUtils.HOUR_IN_MILLIS);
     String profileStartId = MyAnnotations.N_A;
     String profileEndId = MyAnnotations.N_A;
 
@@ -120,7 +121,7 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
     View view;
     String id = "0";
     boolean isUpdate = false;
-    private OnMapReadyCallback callback = new OnMapReadyCallback() {
+    private final OnMapReadyCallback callback = new OnMapReadyCallback() {
 
         /**
          * Manipulates the map once available.
@@ -273,7 +274,6 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
                 return false;
             }
         });
-
 
 
         return view;
@@ -493,7 +493,6 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
     }
 
 
-
     private void setFromDbOnBootComplete() {
         Cursor cursor = myDatabase.retrieveLocation();
         long howManyAdded = 0;
@@ -635,7 +634,7 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
                         + " " +
                         timeUtils.getCurrentFormattedTime();
                 String title = input_et.getText().toString();
-                long expirationEnd = System.currentTimeMillis()+Long.parseLong(geoExpireTime);
+                long expirationEnd = System.currentTimeMillis() + Long.parseLong(geoExpireTime);
 
 
                 if (!ifOneFieldEmpty()) {
@@ -643,7 +642,7 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
 
                         long insert = myDatabase.insert(title, String.valueOf(latLng.latitude)
                                 , String.valueOf(latLng.longitude), String.valueOf(geofenceCircle),
-                                geofenceType, String.valueOf(expirationEnd) ,geoExpireTime,
+                                geofenceType, String.valueOf(expirationEnd), geoExpireTime,
                                 MyAnnotations.UN_DONE, date, profileStartId, profileEndId);
 
                         if (insert != -1) {
@@ -973,7 +972,7 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
                 int s = picker.getValue();
                 geoExpireTime = String.valueOf(picker.getValue() *
-                        NoAnnotation.HOUR_IN_MILLISECONDS);
+                        DateUtils.HOUR_IN_MILLIS);
                 if (s == 1) {
                     expirationTime_tv.setText(s + " hr");
 
@@ -984,7 +983,7 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
         });
 
         geoExpireTime = String.valueOf(numberPicker.getValue() *
-                NoAnnotation.HOUR_IN_MILLISECONDS);
+                DateUtils.HOUR_IN_MILLIS);
 
 
         return geoFencePopupMenu;

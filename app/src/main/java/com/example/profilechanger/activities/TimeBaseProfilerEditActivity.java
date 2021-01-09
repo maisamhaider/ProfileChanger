@@ -1,5 +1,6 @@
 package com.example.profilechanger.activities;
 
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
@@ -13,6 +14,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -146,26 +148,11 @@ public class TimeBaseProfilerEditActivity extends BaseActivity implements SendDa
             checkBoxesDarkLight(!preferences.getBoolean(MyAnnotations.IS_LIGHT_THEME, true));
         }
 
-        findViewById(R.id.prrBack_iv).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        findViewById(R.id.prrBack_iv).setOnClickListener(v -> finish());
 
 
-        startProfile_cl.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                profileDialog(MyAnnotations.START_PROFILE_ID);
-            }
-        });
-        endProfile_cl.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                profileDialog(MyAnnotations.END_PROFILE_ID);
-            }
-        });
+        startProfile_cl.setOnClickListener(v -> profileDialog(MyAnnotations.START_PROFILE_ID));
+        endProfile_cl.setOnClickListener(v -> profileDialog(MyAnnotations.END_PROFILE_ID));
         Calendar calendar = Calendar.getInstance();
         final int hour = calendar.get(Calendar.HOUR_OF_DAY);
         final int minutes = calendar.get(Calendar.MINUTE);
@@ -173,29 +160,20 @@ public class TimeBaseProfilerEditActivity extends BaseActivity implements SendDa
         TimePickerDialog tP = new TimePickerDialog(TimeBaseProfilerEditActivity.this,
                 timePicker, hour, minutes, false);
 
-        startDate_cl.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                tP.show();
-                isstartDate_mtv = true;
-            }
+        startDate_cl.setOnClickListener(v -> {
+            tP.show();
+            isstartDate_mtv = true;
         });
-        endDate_cl.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                tP.show();
-                isstartDate_mtv = false;
-            }
+        endDate_cl.setOnClickListener(v -> {
+            tP.show();
+            isstartDate_mtv = false;
         });
-        tP.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                if (isstartDate_mtv) {
-                    startTime = timeUtil.getFormattedTimeJust(System.currentTimeMillis());
-                } else {
-                    endTime = timeUtil.getFormattedTimeJust(System.currentTimeMillis() +
-                            NoAnnotation.HOUR_IN_MILLISECONDS);
-                }
+        tP.setOnCancelListener(dialog -> {
+            if (isstartDate_mtv) {
+                startTime = timeUtil.getFormattedTimeJust(System.currentTimeMillis());
+            } else {
+                endTime = timeUtil.getFormattedTimeJust(System.currentTimeMillis() +
+                        DateUtils.HOUR_IN_MILLIS);
             }
         });
 
@@ -224,6 +202,7 @@ public class TimeBaseProfilerEditActivity extends BaseActivity implements SendDa
 
             }
 
+
         } else {
             save_mBtn.setText(getResources().getString(R.string.save));
             delete_mBtn.setText(getResources().getString(R.string.cancel));
@@ -231,7 +210,7 @@ public class TimeBaseProfilerEditActivity extends BaseActivity implements SendDa
             startDate = timeUtil.getFormattedDateAndTime(System.currentTimeMillis());
 
             endDate = timeUtil.getFormattedDateAndTime(System.currentTimeMillis() +
-                    NoAnnotation.HOUR_IN_MILLISECONDS);
+                    DateUtils.HOUR_IN_MILLIS);
             date_mTv.setText(timeUtil.getFormattedDateAndTime(System.currentTimeMillis()));
             profileStartTitle = getResources().getString(R.string.N_A);
             profileEndTitle = getResources().getString(R.string.N_A);
@@ -248,120 +227,111 @@ public class TimeBaseProfilerEditActivity extends BaseActivity implements SendDa
         endProfile_mtv.setText(profileEndTitle);
         date_mTv.setText(date);
 
-//        startProfile_mtv.setText(profileStartId);
-//        endProfile_mtv.setText(profileEndId);
 
-        save_mBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                profilerTitle = timeBaseProfiler_mEt.getText().toString();
-                profileStartTitle = startProfile_mtv.getText().toString();
-                profileEndTitle = endProfile_mtv.getText().toString();
-                startDate = startDate_mtv.getText().toString();
-                endDate = endTime_mtv.getText().toString();
+        save_mBtn.setOnClickListener(v -> {
+            profilerTitle = timeBaseProfiler_mEt.getText().toString();
+            profileStartTitle = startProfile_mtv.getText().toString();
+            profileEndTitle = endProfile_mtv.getText().toString();
+            startDate = startDate_mtv.getText().toString();
+            endDate = endTime_mtv.getText().toString();
 
-                startTime = startDate_mtv.getText().toString();
-                endTime = endTime_mtv.getText().toString();
-                if (isUpdate) {
+            startTime = startDate_mtv.getText().toString();
+            endTime = endTime_mtv.getText().toString();
+            if (isUpdate) {
+                if (repeat.matches(MyAnnotations.OFF)) {
+                    long isUpdate1 = database.updateTimeTable(id, profilerTitle, profileStartTitle,
+                            profileEndTitle, startDate, endDate, state, date, repeat, days,
+                            profileStartId, profileEndId);
+                    if (isUpdate1 != -1) {
+                        long triggerTime1 = timeUtil.getMillisFromFormattedDate(startDate,
+                                MyAnnotations.DEFAULT_FORMAT);
+                        alarmClass.setOneAlarm(profilerTitle, triggerTime1,
+                                Integer.parseInt(id) + 1000, false);
+
+                        long triggerTime2 = timeUtil.getMillisFromFormattedDate(endDate,
+                                MyAnnotations.DEFAULT_FORMAT);
+
+                        alarmClass.setOneAlarm(profilerTitle, triggerTime2,
+                                Integer.parseInt(id) + 10000, false);
+                        finish();
+                    }
+
+                } else {
+                    long isUpdate1 = database.updateTimeTable(id, profilerTitle,
+                            profileStartTitle, profileEndTitle, startTime, endTime, state,
+                            date, repeat, days, profileStartId, profileEndId);
+
+                    if (isUpdate1 != -1) {
+                        //set start Alarm
+                        long triggerTime1 = timeUtil.getMillisFromFormattedDate(startTime,
+                                MyAnnotations.DEFAULT_TIME_FORMAT);
+                        alarmClass.setOneAlarm(profilerTitle, triggerTime1,
+                                Integer.parseInt(id) + 1000, true);
+
+                        finish();
+                    }
+                }
+
+            } else {
+                if (isOneFieldRemains()) {
+                    Toast.makeText(TimeBaseProfilerEditActivity.this, "please fill " +
+                                    "empty field",
+                            Toast.LENGTH_SHORT).show();
+                } else {
                     if (repeat.matches(MyAnnotations.OFF)) {
-                        long isUpdate = database.updateTimeTable(id, profilerTitle, profileStartTitle,
-                                profileEndTitle, startDate, endDate, state, date, repeat, days,
-                                profileStartId, profileEndId);
-                        if (isUpdate != -1) {
+
+                        long isInsert = database.insertTimeTable(profilerTitle,
+                                profileStartTitle, profileEndTitle, startDate, endDate, state,
+                                date, repeat, days, profileStartId, profileEndId);
+                        if (isInsert != -1) {
+                            Toast.makeText(TimeBaseProfilerEditActivity.this,
+                                    "insert", Toast.LENGTH_SHORT).show();
+
+                            //set start Alarm
                             long triggerTime1 = timeUtil.getMillisFromFormattedDate(startDate,
                                     MyAnnotations.DEFAULT_FORMAT);
+
                             alarmClass.setOneAlarm(profilerTitle, triggerTime1,
-                                    Integer.parseInt(id) + 1000, false);
-
-                            long triggerTime2 = timeUtil.getMillisFromFormattedDate(endDate,
-                                    MyAnnotations.DEFAULT_FORMAT);
-
-                            alarmClass.setOneAlarm(profilerTitle, triggerTime2,
-                                    Integer.parseInt(id) + 10000, false);
+                                    (int) isInsert + 1000, false);
                             finish();
+                        } else {
+                            Toast.makeText(TimeBaseProfilerEditActivity.this,
+                                    "not insert", Toast.LENGTH_SHORT).show();
                         }
 
                     } else {
-                        long isUpdate = database.updateTimeTable(id, profilerTitle,
-                                profileStartTitle, profileEndTitle, startTime, endTime, state,
-                                date, repeat, days, profileStartId, profileEndId);
+                        long isInsert = database.insertTimeTable(profilerTitle, profileStartTitle,
+                                profileEndTitle, startTime, endTime, state, date, repeat, days,
+                                profileStartId, profileEndId);
+                        if (isInsert != -1) {
 
-                        if (isUpdate != -1) {
+                            alarmClass = new AlarmClass(TimeBaseProfilerEditActivity.this);
+                            Toast.makeText(TimeBaseProfilerEditActivity.this,
+                                    "insert", Toast.LENGTH_SHORT).show();
+
                             //set start Alarm
                             long triggerTime1 = timeUtil.getMillisFromFormattedDate(startTime,
                                     MyAnnotations.DEFAULT_TIME_FORMAT);
+
                             alarmClass.setOneAlarm(profilerTitle, triggerTime1,
-                                    Integer.parseInt(id) + 1000, true);
+                                    (int) isInsert + 1000, true);
+
 
                             finish();
-                        }
-                    }
-
-                } else {
-                    if (isOneFieldRemains()) {
-                        Toast.makeText(TimeBaseProfilerEditActivity.this, "please fill " +
-                                        "empty field",
-                                Toast.LENGTH_SHORT).show();
-                    } else {
-                        if (repeat.matches(MyAnnotations.OFF)) {
-
-                            long isInsert = database.insertTimeTable(profilerTitle,
-                                    profileStartTitle, profileEndTitle, startDate, endDate, state,
-                                    date, repeat, days, profileStartId, profileEndId);
-                            if (isInsert != -1) {
-                                Toast.makeText(TimeBaseProfilerEditActivity.this,
-                                        "insert", Toast.LENGTH_SHORT).show();
-
-                                //set start Alarm
-                                long triggerTime1 = timeUtil.getMillisFromFormattedDate(startDate,
-                                        MyAnnotations.DEFAULT_FORMAT);
-
-                                alarmClass.setOneAlarm(profilerTitle, triggerTime1,
-                                        (int) isInsert + 1000, false);
-                                finish();
-                            } else {
-                                Toast.makeText(TimeBaseProfilerEditActivity.this,
-                                        "not insert", Toast.LENGTH_SHORT).show();
-                            }
-
                         } else {
-                            long isInsert = database.insertTimeTable(profilerTitle, profileStartTitle,
-                                    profileEndTitle, startTime, endTime, state, date, repeat, days,
-                                    profileStartId, profileEndId);
-                            if (isInsert != -1) {
-
-                                alarmClass = new AlarmClass(TimeBaseProfilerEditActivity.this);
-                                Toast.makeText(TimeBaseProfilerEditActivity.this,
-                                        "insert", Toast.LENGTH_SHORT).show();
-
-                                //set start Alarm
-                                long triggerTime1 = timeUtil.getMillisFromFormattedDate(startTime,
-                                        MyAnnotations.DEFAULT_TIME_FORMAT);
-
-                                alarmClass.setOneAlarm(profilerTitle, triggerTime1,
-                                        (int) isInsert + 1000, true);
-
-
-                                finish();
-                            } else {
-                                Toast.makeText(TimeBaseProfilerEditActivity.this,
-                                        "not insert", Toast.LENGTH_SHORT).show();
-                            }
+                            Toast.makeText(TimeBaseProfilerEditActivity.this,
+                                    "not insert", Toast.LENGTH_SHORT).show();
                         }
                     }
                 }
-
             }
         });
-        delete_mBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isUpdate) {
-                    AlertDialog alertDialog = deleteDialog(id);
-                    alertDialog.show();
-                } else {
-                    finish();
-                }
+        delete_mBtn.setOnClickListener(v -> {
+            if (isUpdate) {
+                AlertDialog alertDialog = deleteDialog(id);
+                alertDialog.show();
+            } else {
+                finish();
             }
         });
 
@@ -374,54 +344,52 @@ public class TimeBaseProfilerEditActivity extends BaseActivity implements SendDa
                 datePicker, year, month, day);
         dP.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
 
-        dP.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                if (isstartDate_mtv) {
-                    if (startTime.isEmpty()) {
-                        startDate = timeUtil.getFormattedDate(calendar.getTimeInMillis()) +
-                                " " + timeUtil.getCurrentFormattedTime();
-                    } else {
-                        startDate = timeUtil.getFormattedDate(calendar.getTimeInMillis()) + " "
-                                + startTime;
-                    }
-                    startDate_mtv.setText(startDate);
-                    startDateAndTime = timeUtil.getMillisFromFormattedDate(startDate,
-                            MyAnnotations.DEFAULT_FORMAT);
-
-                    if (startDateAndTime >= endDateAndTime) {
-                        endDate = timeUtil.getFormattedDateAndTime(startDateAndTime +
-                                NoAnnotation.HOUR_IN_MILLISECONDS);
-                        endTime_mtv.setText(endDate);
-                    }
-
+        dP.setOnCancelListener(dialog -> {
+            if (isstartDate_mtv) {
+                if (startTime.isEmpty()) {
+                    startDate = timeUtil.getFormattedDate(calendar.getTimeInMillis()) +
+                            " " + timeUtil.getCurrentFormattedTime();
                 } else {
+                    startDate = timeUtil.getFormattedDate(calendar.getTimeInMillis()) + " "
+                            + startTime;
+                }
+                startDate_mtv.setText(startDate);
+                startDateAndTime = timeUtil.getMillisFromFormattedDate(startDate,
+                        MyAnnotations.DEFAULT_FORMAT);
 
-                    if (endTime.isEmpty()) {
-                        endDate = timeUtil.getFormattedDate(calendar.getTimeInMillis()) + " " +
-                                timeUtil.getCurrentFormattedTime();
-
-                    } else {
-                        endDate =
-                                timeUtil.getFormattedDate(calendar.getTimeInMillis()) + " " +
-                                        endTime;
-                    }
-                    endDateAndTime = timeUtil.getMillisFromFormattedDate(endDate,
-                            MyAnnotations.DEFAULT_FORMAT);
+                if (startDateAndTime >= endDateAndTime) {
+                    endDate = timeUtil.getFormattedDateAndTime(startDateAndTime +
+                            DateUtils.HOUR_IN_MILLIS);
                     endTime_mtv.setText(endDate);
-                    if (startDateAndTime >= endDateAndTime) {
-                        startDate = timeUtil.getFormattedDateAndTime(endDateAndTime -
-                                NoAnnotation.HOUR_IN_MILLISECONDS);
-                        startDate_mtv.setText(startDate);
-                    }
-
                 }
 
-                isstartDate_mtv = false;
+            } else {
+
+                if (endTime.isEmpty()) {
+                    endDate = timeUtil.getFormattedDate(calendar.getTimeInMillis()) + " " +
+                            timeUtil.getCurrentFormattedTime();
+
+                } else {
+                    endDate =
+                            timeUtil.getFormattedDate(calendar.getTimeInMillis()) + " " +
+                                    endTime;
+                }
+                endDateAndTime = timeUtil.getMillisFromFormattedDate(endDate,
+                        MyAnnotations.DEFAULT_FORMAT);
+                endTime_mtv.setText(endDate);
+                if (startDateAndTime >= endDateAndTime) {
+                    startDate = timeUtil.getFormattedDateAndTime(endDateAndTime -
+                            DateUtils.HOUR_IN_MILLIS);
+                    startDate_mtv.setText(startDate);
+                }
 
             }
+
+            isstartDate_mtv = false;
+
         });
     }
+
 
     private final DatePickerDialog.OnDateSetListener datePicker =
             new DatePickerDialog.OnDateSetListener() {
@@ -447,19 +415,15 @@ public class TimeBaseProfilerEditActivity extends BaseActivity implements SendDa
 
                         if (startDateAndTime >= endDateAndTime) {
                             endDate = timeUtil.getFormattedDateAndTime(startDateAndTime +
-                                    NoAnnotation.HOUR_IN_MILLISECONDS);
+                                    DateUtils.HOUR_IN_MILLIS);
                             endTime_mtv.setText(endDate);
                         }
-
-
                     } else {
                         if (endTime.isEmpty()) {
                             endDate = timeUtil.getFormattedDate(calendar.getTimeInMillis()) + " " +
                                     timeUtil.getCurrentFormattedTime();
-
                         } else {
-                            endDate =
-                                    timeUtil.getFormattedDate(calendar.getTimeInMillis()) + " " +
+                            endDate = timeUtil.getFormattedDate(calendar.getTimeInMillis()) + " " +
                                             endTime;
                         }
                         endDateAndTime = timeUtil.getMillisFromFormattedDate(endDate,
@@ -467,7 +431,7 @@ public class TimeBaseProfilerEditActivity extends BaseActivity implements SendDa
                         endTime_mtv.setText(endDate);
                         if (startDateAndTime >= endDateAndTime) {
                             startDate = timeUtil.getFormattedDateAndTime(endDateAndTime -
-                                    NoAnnotation.HOUR_IN_MILLISECONDS);
+                                    DateUtils.HOUR_IN_MILLIS);
                             startDate_mtv.setText(startDate);
                         }
 
@@ -497,7 +461,6 @@ public class TimeBaseProfilerEditActivity extends BaseActivity implements SendDa
                     R.color.white)));
         } else {
 
-
             sa_mCb.setButtonTintList(ColorStateList.valueOf(ContextCompat.getColor(this,
                     R.color.colorPrimaryVariantLight)));
             su_mCb.setButtonTintList(ColorStateList.valueOf(ContextCompat.getColor(this,
@@ -517,11 +480,10 @@ public class TimeBaseProfilerEditActivity extends BaseActivity implements SendDa
         }
     }
 
-    private TimePickerDialog.OnTimeSetListener timePicker =
+    private final TimePickerDialog.OnTimeSetListener timePicker =
             new TimePickerDialog.OnTimeSetListener() {
                 @Override
                 public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-
 
                     calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
                     calendar.set(Calendar.MINUTE, minute);
@@ -534,7 +496,7 @@ public class TimeBaseProfilerEditActivity extends BaseActivity implements SendDa
                     } else {
                         endTime = timeUtil.getFormattedTimeJust(calendar.getTimeInMillis());
                         endTime_mtv.setText(endTime);
-                        endTimeLong = timeUtil.getMillisFromFormattedDate(startTime,
+                        endTimeLong = timeUtil.getMillisFromFormattedDate(endTime,
                                 MyAnnotations.DEFAULT_TIME_FORMAT);
 
 
@@ -544,23 +506,23 @@ public class TimeBaseProfilerEditActivity extends BaseActivity implements SendDa
                         dP.show();
                     } else {
                         if (isstartDate_mtv) {
-                            if (startDateAndTime >= endDateAndTime) {
-                                endTime = timeUtil.getFormattedTimeJust(startDateAndTime +
-                                        NoAnnotation.HOUR_IN_MILLISECONDS);
+                            if (startTimeLong >= endTimeLong) {
+                                endTime = timeUtil.getFormattedTimeJust(startTimeLong +
+                                        DateUtils.MINUTE_IN_MILLIS*5);
+//
                                 endTime_mtv.setText(endTime);
                             }
 
-                        } else {
+                        } else
+                            {
                             if (startTimeLong >= endTimeLong) {
                                 startTime = timeUtil.getFormattedTimeJust(endTimeLong -
-                                        NoAnnotation.HOUR_IN_MILLISECONDS);
+                                        DateUtils.MINUTE_IN_MILLIS*5);
+//
                                 startDate_mtv.setText(startTime);
                             }
-
                         }
-
                     }
-
                 }
             };
 
@@ -641,26 +603,19 @@ public class TimeBaseProfilerEditActivity extends BaseActivity implements SendDa
                 .setMessage(getResources().
                         getString(R.string.delete_message))
                 .setPositiveButton(getResources().getString(R.string.yes),
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                database.deleteTimeTable(id);
-                                alarmClass.deleteRepeatAlarm(Integer.parseInt(id) + 1000);
-                                alarmClass.deleteRepeatAlarm(Integer.parseInt(id) + 10000);
-                                finish();
-                            }
+                        (dialog, which) -> {
+                            database.deleteTimeTable(id);
+                            alarmClass.deleteRepeatAlarm(Integer.parseInt(id) + 1000);
+                            alarmClass.deleteRepeatAlarm(Integer.parseInt(id) + 10000);
+                            finish();
                         })
                 .setNegativeButton(getResources().getString(R.string.no),
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        });
+                        (dialog, which) -> dialog.dismiss());
 
         return builder.create();
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(View buttonView) {
 
@@ -715,7 +670,6 @@ public class TimeBaseProfilerEditActivity extends BaseActivity implements SendDa
                     days = removeDays(days, tu);
                     if (!isAllCheckBoxChecked()) {
                         repeat = MyAnnotations.OFF;
-
                     }
                 }
                 break;
@@ -741,7 +695,6 @@ public class TimeBaseProfilerEditActivity extends BaseActivity implements SendDa
                     days = removeDays(days, th);
                     if (!isAllCheckBoxChecked()) {
                         repeat = MyAnnotations.OFF;
-
                     }
                 }
                 break;
@@ -755,9 +708,7 @@ public class TimeBaseProfilerEditActivity extends BaseActivity implements SendDa
                     days = removeDays(days, fr);
                     if (!isAllCheckBoxChecked()) {
                         repeat = MyAnnotations.OFF;
-
                     }
-
                 }
                 break;
             case R.id.allDays_mCb:
@@ -778,7 +729,7 @@ public class TimeBaseProfilerEditActivity extends BaseActivity implements SendDa
             if (isOutOfLimitEndDate() || isOutOfLimitStartDate()) {
                 startTime = timeUtil.getFormattedTimeJust(System.currentTimeMillis());
                 endTime = timeUtil.getFormattedTimeJust(System.currentTimeMillis() +
-                        NoAnnotation.HOUR_IN_MILLISECONDS);
+                        DateUtils.HOUR_IN_MILLIS);
                 startDate_mtv.setText(startTime);
                 endTime_mtv.setText(endTime);
             }
@@ -786,7 +737,7 @@ public class TimeBaseProfilerEditActivity extends BaseActivity implements SendDa
 
             startDate = timeUtil.getFormattedDateAndTime(System.currentTimeMillis());
             endDate = timeUtil.getFormattedDateAndTime(System.currentTimeMillis() +
-                    NoAnnotation.HOUR_IN_MILLISECONDS);
+                    DateUtils.HOUR_IN_MILLIS);
             startDate_mtv.setText(startDate);
             endTime_mtv.setText(endDate);
 
@@ -795,8 +746,7 @@ public class TimeBaseProfilerEditActivity extends BaseActivity implements SendDa
 
     private void isAllDaysCheckBoxChecked() {
         if (isAllCheckBoxChecked()) {
-            if (allDays_mCb.isChecked()) {
-            } else {
+            if (!allDays_mCb.isChecked()) {
                 allDays_mCb.setChecked(true);
             }
         }
@@ -814,19 +764,18 @@ public class TimeBaseProfilerEditActivity extends BaseActivity implements SendDa
 
     public String removeDays(String string, String lookFor) {
         allDays_mCb.setChecked(false);
-        String outDays = "";
+        StringBuilder outDays = new StringBuilder();
         String[] array = string.split(",");
 
 
         for (String item : array) {
             if (!item.matches(lookFor)) {
-                outDays = outDays + "," + item;
+                outDays.append(",").append(item);
             }
-
         }
-//        String replace = outDays.substring(outDays.indexOf(","));
-        outDays = outDays.startsWith(",") ? outDays.substring(1) : outDays;
-        return outDays;
+        outDays = new StringBuilder(outDays.toString().startsWith(",") ?
+                outDays.substring(1) : outDays.toString());
+        return outDays.toString();
     }
 
     public boolean isAllCheckBoxChecked() {
@@ -838,8 +787,10 @@ public class TimeBaseProfilerEditActivity extends BaseActivity implements SendDa
     }
 
     public boolean isOneCheckBoxChecked() {
-        return sa_mCb.isChecked() || su_mCb.isChecked() || mo_mCb.isChecked()
-                || tu_mCb.isChecked() ||
+        return sa_mCb.isChecked() ||
+                su_mCb.isChecked() ||
+                mo_mCb.isChecked() ||
+                tu_mCb.isChecked() ||
                 we_mCb.isChecked() ||
                 th_mCb.isChecked() ||
                 fr_mCb.isChecked();

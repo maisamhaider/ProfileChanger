@@ -45,7 +45,7 @@ public class OpenProfileActivity extends BaseActivity {
     EditText title_mEt;
     Button saveProfile_mBtn, delete_mBtn;
     MyDatabase database;
-    TextView geoType_tv;
+    TextView ringType_tv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +70,7 @@ public class OpenProfileActivity extends BaseActivity {
         saveProfile_mBtn = findViewById(R.id.saveProfile_mBtn);
         delete_mBtn = findViewById(R.id.delete_mBtn);
 
-        geoType_tv = findViewById(R.id.geoType_tv);
+        ringType_tv = findViewById(R.id.ringType_tv);
 
         seekBars();
         switches();
@@ -89,7 +89,7 @@ public class OpenProfileActivity extends BaseActivity {
             // for new profile every thing will be default
             saveProfile_mBtn.setText(getResources().getString(R.string.save));
             title_mEt.setText(getResources().getString(R.string.un_titled));
-            geoType_tv.setText(R.string.ringing);
+            ringType_tv.setText(R.string.ringing);
             ringtone_sb.setProgress(50);
             media_sb.setProgress(50);
             notification_sb.setProgress(50);
@@ -107,13 +107,13 @@ public class OpenProfileActivity extends BaseActivity {
             title_mEt.setText(profileTitle);
 
             if (ringerMode.matches(MyAnnotations.RINGER_MODE_NORMAL)) {
-                geoType_tv.setText(R.string.ringing);
+                ringType_tv.setText(R.string.ringing);
 
             } else if (ringerMode.matches(MyAnnotations.RINGER_MODE_SILENT)) {
-                geoType_tv.setText(R.string.silent);
+                ringType_tv.setText(R.string.silent);
 
             } else if (ringerMode.matches(MyAnnotations.RINGER_MODE_VIBRATE)) {
-                geoType_tv.setText(R.string.vibrate);
+                ringType_tv.setText(R.string.vibrate);
             }
 
             ringtone_sb.setProgress(Integer.parseInt(ringtoneLevel));
@@ -127,7 +127,7 @@ public class OpenProfileActivity extends BaseActivity {
 
         }
 
-        String type = geoType_tv.getText().toString();
+        String type = ringType_tv.getText().toString();
 
         if (type.matches("Ringing")) {
             ringerMode = MyAnnotations.RINGER_MODE_NORMAL;
@@ -351,7 +351,7 @@ public class OpenProfileActivity extends BaseActivity {
                     system_sb.setProgress(50);
                 }
                 ringerMode = MyAnnotations.RINGER_MODE_NORMAL;
-                geoType_tv.setText(R.string.ringing);
+                ringType_tv.setText(R.string.ringing);
                 geoFencePopupMenu.dismiss();
             }
         });
@@ -363,7 +363,7 @@ public class OpenProfileActivity extends BaseActivity {
                 system_sb.setProgress(0);
 
                 ringerMode = MyAnnotations.RINGER_MODE_SILENT;
-                geoType_tv.setText(R.string.silent);
+                ringType_tv.setText(R.string.silent);
                 geoFencePopupMenu.dismiss();
             }
         });
@@ -375,7 +375,7 @@ public class OpenProfileActivity extends BaseActivity {
                 system_sb.setProgress(0);
 
                 ringerMode = MyAnnotations.RINGER_MODE_VIBRATE;
-                geoType_tv.setText(R.string.vibrate);
+                ringType_tv.setText(R.string.vibrate);
                 geoFencePopupMenu.dismiss();
 
             }

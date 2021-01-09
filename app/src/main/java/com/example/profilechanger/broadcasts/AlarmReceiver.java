@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.os.Build;
+import android.text.format.DateUtils;
 import android.widget.SeekBar;
 
 import com.example.profilechanger.annotations.MyAnnotations;
@@ -53,7 +54,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         long triggerTime = intent.getLongExtra(MyAnnotations.TRIGGER_TIME, 0);
         notificationHelper.sendHighPriorityNotification(title, "Profile is triggered");
         seekBar = new SeekBar(mContext);
-         if (id - 10000 > -1) {
+        if (id - 10000 > -1) {
             //mean this is end profile
             if (repeat) {
                 if (isToday(String.valueOf(id - 10000))) {
@@ -87,17 +88,21 @@ public class AlarmReceiver extends BroadcastReceiver {
             time_profile_start_id = cursor.getString(10);
             String isRepeat = cursor.getString(8);
 
+            String endTime = cursor.getString(5);
+            long triggerTime;
             if (isRepeat.matches(MyAnnotations.ON)) {
-                String endTime = cursor.getString(5);
-                long triggerTime = timeUtil.getMillisFromFormattedDate(
-                        timeUtil.getCurrentFormattedDate() + " "
-                                + endTime,
+                triggerTime = timeUtil.getMillisFromFormattedDate(endTime,
+                        MyAnnotations.DEFAULT_TIME_FORMAT);
+            } else {
+                triggerTime = timeUtil.getMillisFromFormattedDate(endTime,
                         MyAnnotations.DEFAULT_FORMAT);
-                String d = timeUtil.getFormattedDateAndTime(triggerTime);
-
-                alarmClass.setOneAlarm(title, triggerTime,
-                        Integer.parseInt(id) + 10000, true);
             }
+
+            String d = timeUtil.getFormattedDateAndTime(triggerTime);
+
+            alarmClass.setOneAlarm(title, triggerTime,
+                    Integer.parseInt(id) + 10000, true);
+
         }
 
 
@@ -115,16 +120,28 @@ public class AlarmReceiver extends BroadcastReceiver {
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (mNotificationManager.isNotificationPolicyAccessGranted()) {
-                    actions.setRingerMode(ringerMode);
-                    actions.setVolume(AudioManager.STREAM_RING, ringerLevel);
+
+                    if (ringerMode.matches(MyAnnotations.RINGER_MODE_SILENT)) {
+                        actions.setRingerMode(ringerMode);
+                        actions.setVolume(AudioManager.STREAM_MUSIC, mediaLevel);
+                        actions.setVolume(AudioManager.STREAM_NOTIFICATION, notificationLevel);
+                        actions.setVolume(AudioManager.STREAM_SYSTEM, systemLevel);
+                    } else
+                        actions.setVolume(AudioManager.STREAM_RING, ringerLevel);
                     actions.setVolume(AudioManager.STREAM_MUSIC, mediaLevel);
                     actions.setVolume(AudioManager.STREAM_NOTIFICATION, notificationLevel);
                     actions.setVolume(AudioManager.STREAM_SYSTEM, systemLevel);
                 }
 
             } else {
-                actions.setRingerMode(ringerMode);
-                actions.setVolume(AudioManager.STREAM_RING, ringerLevel);
+
+                if (ringerMode.matches(MyAnnotations.RINGER_MODE_SILENT)) {
+                    actions.setRingerMode(ringerMode);
+                    actions.setVolume(AudioManager.STREAM_MUSIC, mediaLevel);
+                    actions.setVolume(AudioManager.STREAM_NOTIFICATION, notificationLevel);
+                    actions.setVolume(AudioManager.STREAM_SYSTEM, systemLevel);
+                } else
+                    actions.setVolume(AudioManager.STREAM_RING, ringerLevel);
                 actions.setVolume(AudioManager.STREAM_MUSIC, mediaLevel);
                 actions.setVolume(AudioManager.STREAM_NOTIFICATION, notificationLevel);
                 actions.setVolume(AudioManager.STREAM_SYSTEM, systemLevel);
@@ -174,7 +191,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
                     long triggerTime1 =
                             timeUtil.getMilliDateAndTime(triggerTime +
-                                    NoAnnotation.HOUR_IN_MILLISECONDS * 24);
+                                    DateUtils.HOUR_IN_MILLIS * 24);
 
 
                     String wq = timeUtil.getFormattedDateAndTime(triggerTime1);
@@ -182,6 +199,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                             Integer.parseInt(id) + 1000, true);
                 }
             }
+
         }
 
         Cursor startCursor = database.retrieveProfile(time_profile_end_id);
@@ -198,7 +216,7 @@ public class AlarmReceiver extends BroadcastReceiver {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (mNotificationManager.isNotificationPolicyAccessGranted()) {
                     actions.setRingerMode(ringerMode);
-                    actions.setVolume( AudioManager.STREAM_RING, ringerLevel);
+                    actions.setVolume(AudioManager.STREAM_RING, ringerLevel);
                     actions.setVolume(AudioManager.STREAM_MUSIC, mediaLevel);
                     actions.setVolume(AudioManager.STREAM_NOTIFICATION, notificationLevel);
                     actions.setVolume(AudioManager.STREAM_SYSTEM, systemLevel);
