@@ -71,7 +71,6 @@ public class AlarmReceiver extends BroadcastReceiver {
                 if (isToday(String.valueOf(id - 1000))) {
                     startProfile(String.valueOf(id - 1000));
                 }
-
             } else {
 
                 startProfile(String.valueOf(id - 1000));
@@ -82,25 +81,26 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     public void startProfile(String id) {
         MyDatabase database = new MyDatabase(mContext);
-        actions = new SoundProfileActions(mContext);
-        Cursor cursor = database.retrieveTimeTable(id);
-        while (cursor.moveToNext()) {
-            time_profile_start_id = cursor.getString(10);
-            String isRepeat = cursor.getString(8);
+            actions = new SoundProfileActions(mContext);
+            Cursor cursor = database.retrieveTimeTable(id);
+            while (cursor.moveToNext()) {
+                time_profile_start_id = cursor.getString(10);
+                String isRepeat = cursor.getString(8);
 
-            String endTime = cursor.getString(5);
-            long triggerTime;
-            if (isRepeat.matches(MyAnnotations.ON)) {
-                triggerTime = timeUtil.getMillisFromFormattedDate(endTime,
-                        MyAnnotations.DEFAULT_TIME_FORMAT);
-            } else {
-                triggerTime = timeUtil.getMillisFromFormattedDate(endTime,
-                        MyAnnotations.DEFAULT_FORMAT);
-            }
+                String endTime = cursor.getString(5);
+                long triggerTime;
+                if (isRepeat.matches(MyAnnotations.ON)) {
+                    triggerTime = timeUtil.getMillisFromFormattedDate(
+                            timeUtil.getCurrentFormattedDate()+" "+endTime,
+                            MyAnnotations.DEFAULT_FORMAT);
+                } else {
+                    triggerTime = timeUtil.getMillisFromFormattedDate(endTime,
+                            MyAnnotations.DEFAULT_FORMAT);
+                }
 
-            String d = timeUtil.getFormattedDateAndTime(triggerTime);
+                String d = timeUtil.getFormattedDateAndTime(triggerTime);
 
-            alarmClass.setOneAlarm(title, triggerTime,
+                alarmClass.setOneAlarm(title, triggerTime,
                     Integer.parseInt(id) + 10000, true);
 
         }

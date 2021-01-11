@@ -28,8 +28,7 @@ public class Permissions {
     public Permissions(Context context) {
         this.context = context;
     }
-
-
+    
     public boolean permission() {
         int locationPermission = ContextCompat.checkSelfPermission(context,
                 Manifest.permission.ACCESS_FINE_LOCATION);

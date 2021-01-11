@@ -247,12 +247,6 @@ public class TimeBaseProfilerEditActivity extends BaseActivity implements SendDa
                                 MyAnnotations.DEFAULT_FORMAT);
                         alarmClass.setOneAlarm(profilerTitle, triggerTime1,
                                 Integer.parseInt(id) + 1000, false);
-
-                        long triggerTime2 = timeUtil.getMillisFromFormattedDate(endDate,
-                                MyAnnotations.DEFAULT_FORMAT);
-
-                        alarmClass.setOneAlarm(profilerTitle, triggerTime2,
-                                Integer.parseInt(id) + 10000, false);
                         finish();
                     }
 
