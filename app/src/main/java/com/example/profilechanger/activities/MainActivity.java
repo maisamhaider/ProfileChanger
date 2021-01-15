@@ -1,6 +1,7 @@
 package com.example.profilechanger.activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
@@ -32,8 +33,11 @@ import com.example.profilechanger.annotations.PermissionCodes;
 import com.example.profilechanger.database.MyDatabase;
 
 import com.example.profilechanger.permissions.Permissions;
+import com.example.profilechanger.services.Service1;
 import com.example.profilechanger.sharedpreferences.MyPreferences;
 import com.google.android.material.tabs.TabLayout;
+
+import static com.example.profilechanger.annotations.PermissionCodes.DRAW_OVER_OTHER_APP_PERMISSION;
 
 public class MainActivity extends BaseActivity {
 
@@ -43,6 +47,8 @@ public class MainActivity extends BaseActivity {
     MyDatabase database;
     ViewPager viewPager;
     AlertDialog dialog;
+    boolean click = false;
+    View include;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +62,7 @@ public class MainActivity extends BaseActivity {
                         , getSupportFragmentManager(), 1);
         viewPager = findViewById(R.id.mainViewPager);
         TabLayout tabLayout = findViewById(R.id.mainTabLayout);
+        include = findViewById(R.id.include);
 
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
@@ -63,28 +70,6 @@ public class MainActivity extends BaseActivity {
         View people_pad = findViewById(R.id.menu_view);
         mNotificationManager = (NotificationManager)
                 getSystemService(Context.NOTIFICATION_SERVICE);
-
-//        permissions.permission();
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            if (!Settings.System.canWrite(this)) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle(getString(R.string.permission))
-                        .setMessage(getString(R.string.write_settings_alert_text))
-                        .setPositiveButton(getString(R.string.allow),
-                                (dialog, which) -> {
-                                    permissions.openAndroidPermissionsMenu(MainActivity.this);
-                                    dialog.dismiss();
-                                }).setNegativeButton(R.string.decline,
-                        (dialog, which) -> finish());
-                dialog = builder.create();
-                dialog.show();
-            } else {
-                if (!mNotificationManager.isNotificationPolicyAccessGranted()) {
-
-                    permissions.doNoDisturbPermissionDialog();
-                }
-            }
-        }
 
 
         if (!preferences.getBoolean(MyAnnotations.PRE_PROFILES_LOADED, false)) {
@@ -105,16 +90,24 @@ public class MainActivity extends BaseActivity {
                     this, R.drawable.shape_1_dark));
 
         }
-
         ImageView addNewProfile_mIv = findViewById(R.id.addNewProfile_mIv);
 
-        addNewProfile_mIv.setOnClickListener(v -> Load_withAds(MainActivity.this, new ProfilesActivity()));
-
+        addNewProfile_mIv.setOnClickListener(v ->
+        {
+            if (!click) {
+                click = true;
+                Load_withAds(MainActivity.this, new ProfilesActivity());
+            }
+        });
 
         findViewById(R.id.settingsIv).setOnClickListener(v -> {
-            MotionLayout motionLayout = findViewById(R.id.motionLayout);
-            motionLayout.transitionToEnd();
-            Load_withAds(MainActivity.this, new SettingsActivity());
+            if (!click) {
+                click = true;
+                MotionLayout motionLayout = findViewById(R.id.motionLayout);
+                motionLayout.transitionToEnd();
+                Load_withAds(MainActivity.this, new SettingsActivity());
+            }
+
         });
         findViewById(R.id.rateUsIv).setOnClickListener(v -> {
             Toast.makeText(MainActivity.this, "rateUsIv", Toast.LENGTH_SHORT).show();
@@ -127,44 +120,15 @@ public class MainActivity extends BaseActivity {
         findViewById(R.id.infoIv).setOnClickListener(v -> dialog());
         findViewById(R.id.helpIv).setOnClickListener(v ->
                 Toast.makeText(MainActivity.this, "Help", Toast.LENGTH_SHORT).show());
-    }
 
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-
-        if (requestCode == PermissionCodes.REQ_CODE &&
-                grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (!mNotificationManager.isNotificationPolicyAccessGranted()) {
-                    this.permissions.doNoDisturbPermissionDialog();
-                }
-            }
-
-        } else if (requestCode == PermissionCodes.REQ_CODE &&
-                grantResults[0] == PackageManager.PERMISSION_DENIED) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (!mNotificationManager.isNotificationPolicyAccessGranted()) {
-                    this.permissions.doNoDisturbPermissionDialog();
-                }
-
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(new Intent(MainActivity.this, Service1.class));
+        } else {
+            startService(new Intent(MainActivity.this, Service1.class));
         }
     }
 
-//    private void openPermissionsMenu() {
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-////            if (Settings.ACTION_MANAGE_WRITE_SETTINGS == )
-//            Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
-//            intent.setData(Uri.parse("package:" + getPackageName()));
-//            startActivity(intent);
-//        }
-//    }
 
     public void insertPreDefinedProfiles() {
         database.insertProfile(getResources().getString(R.string.general),
@@ -201,7 +165,49 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        click = false;
 
+        if (!permissions.locationPer()) {
+
+            startActivity(new Intent(MainActivity.this, PermissionActivity.class));
+        }
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            if (!Settings.System.canWrite(this)) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle(getString(R.string.permission))
+                        .setCancelable(false)
+                        .setMessage(getString(R.string.write_settings_alert_text))
+                        .setPositiveButton(getString(R.string.allow),
+                                (dialog, which) -> {
+                                    permissions.openAndroidPermissionsMenu(MainActivity.this);
+                                    dialog.dismiss();
+                                }).setNegativeButton(R.string.decline,
+                        (dialog, which) ->
+                                MainActivity.this.finishAffinity());
+
+                dialog = builder.create();
+                dialog.show();
+            } else if (!mNotificationManager.isNotificationPolicyAccessGranted()) {
+                permissions.doNoDisturbPermissionDialog();
+
+            } else if (!Settings.canDrawOverlays(this)) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle(getString(R.string.permission))
+                        .setCancelable(false)
+                        .setMessage(getString(R.string.write_settings_alert_text))
+                        .setPositiveButton(getString(R.string.allow),
+                                (dialog, which) -> {
+                                    permissions.overlayAppPermission();
+                                    dialog.dismiss();
+                                }).setNegativeButton(R.string.decline,
+                        (dialog, which) ->
+                                MainActivity.this.finishAffinity());
+
+                dialog = builder.create();
+                dialog.show();
+
+            }
+        }
     }
 
     @Override

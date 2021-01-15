@@ -35,21 +35,13 @@ ProfilesActivity extends BaseActivity {
         recyclerView = findViewById(R.id.profiles_rv);
 
         ImageView profileBack_iv = findViewById(R.id.profileBack_iv);
-        profileBack_iv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        profileBack_iv.setOnClickListener(v -> finish());
         ImageView addNewProfile_mBtn = findViewById(R.id.addNewProfile_mBtn);
-        addNewProfile_mBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ProfilesActivity.this,
-                        OpenProfileActivity.class);
-                intent.putExtra(MyAnnotations.PROFILE_NEW, true);
-                startActivity(intent);
-            }
+        addNewProfile_mBtn.setOnClickListener(v -> {
+            Intent intent = new Intent(ProfilesActivity.this,
+                    OpenProfileActivity.class);
+            intent.putExtra(MyAnnotations.PROFILE_NEW, true);
+            startActivity(intent);
         });
         boolean isFirstTime = preferences.getBoolean(MyAnnotations.PRE_PROFILES_LOADED, false);
         if (!isFirstTime) {

@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -27,6 +28,7 @@ public class NotificationSoundsAdapter extends
     private final Context context;
     private final ArrayList<String> names;
     ArrayList<String> paths;
+    ArrayList<String> selectNames;
     private MediaPlayer mediaPlayer;
     private final SendDataWithKey setPath;
 
@@ -38,6 +40,7 @@ public class NotificationSoundsAdapter extends
         this.names = names;
         this.paths = paths;
         this.setPath = setPath;
+        selectNames = new ArrayList<>();
         sharedPreferences = new MyPreferences(context);
 
     }
@@ -61,7 +64,7 @@ public class NotificationSoundsAdapter extends
                         paths.get(0))));
 
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
+ /*       holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -73,13 +76,38 @@ public class NotificationSoundsAdapter extends
                     } else
                         mediaPlayer.start();
                 }
-                holder.notification_sound_select_cb.setChecked(true);
+                selectNames.clear();
+                selectNames.add(names.get(position));
+                for (int i = 0; i < names.size(); i++) {
+                    holder.notification_sound_select_cb.setChecked
+                            (names.get(i).matches(selectNames.get(0)));
+                }
                 setPath.data("", paths.get(position), names.get(position));
                 notifyDataSetChanged();
 
             }
+        });*/
+        holder.notification_sound_select_cb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mediaPlayer = MediaPlayer.create(context, Uri.parse(paths.get(position)));
+                if (mediaPlayer != null) {
+                    if (mediaPlayer.isPlaying()) {
+                        mediaPlayer.stop();
+                        mediaPlayer.release();
+                    } else
+                        mediaPlayer.start();
+                }
+                selectNames.clear();
+                selectNames.add(names.get(position));
+                for (int i = 0; i < names.size(); i++) {
+                    holder.notification_sound_select_cb.setChecked
+                            (names.get(i).matches(selectNames.get(0)));
+                }
+                setPath.data("", paths.get(position), names.get(position));
+            notifyDataSetChanged();
+            }
         });
-
 
     }
 
@@ -92,7 +120,7 @@ public class NotificationSoundsAdapter extends
     public class NotificationSoundViewHolder extends RecyclerView.ViewHolder {
 
         CheckBox notification_sound_select_cb;
-         LinearLayout notificationItemLL;
+        LinearLayout notificationItemLL;
 
         public NotificationSoundViewHolder(@NonNull View itemView) {
             super(itemView);

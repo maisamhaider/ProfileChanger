@@ -19,10 +19,10 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/appCompatImageView3"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-
+            android:id="@+id/backIv"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:padding="10dp"
             android:layout_marginStart="30dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -50,6 +50,8 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:hint="@string/un_titled"
+        android:maxLines="1"
+        android:maxLength="10"
         android:textColor="?attr/textBlueWhite"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -103,10 +105,10 @@
                         android:layout_marginTop="10dp"
                         android:layout_marginBottom="10dp"
                         android:ellipsize="end"
-                        android:paddingStart="2dp"
-                        android:paddingEnd="2dp"
                         android:textColor="?attr/textWhiteGray"
                         app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/appCompatImageView"
+                        app:layout_constraintHorizontal_bias="0.01"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
@@ -115,6 +117,7 @@
                         android:layout_width="25dp"
                         android:layout_height="0dp"
                         android:background="@color/colorPrimaryVariantLight"
+                        android:padding="5dp"
                         android:scaleType="centerInside"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -139,7 +142,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:max="100"
-                 android:progressDrawable="@drawable/seekbar_progress"
+                android:progressDrawable="@drawable/seekbar_progress"
                 android:splitTrack="false"
                 android:thumb="@drawable/tumb" />
 

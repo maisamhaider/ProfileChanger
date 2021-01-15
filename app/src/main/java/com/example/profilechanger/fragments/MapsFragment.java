@@ -7,7 +7,6 @@ import androidx.appcompat.widget.SearchView;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,7 +15,6 @@ import android.Manifest;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -39,7 +37,6 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.PopupWindow;
@@ -47,7 +44,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.profilechanger.R;
-import com.example.profilechanger.activities.MainActivity;
 import com.example.profilechanger.adapters.ProfilesAdapter;
 import com.example.profilechanger.annotations.MyAnnotations;
 import com.example.profilechanger.annotations.NoAnnotation;
@@ -58,7 +54,6 @@ import com.example.profilechanger.models.ProfilesModel;
 import com.example.profilechanger.permissions.Permissions;
 import com.example.profilechanger.sharedpreferences.MyPreferences;
 import com.example.profilechanger.utils.BooleansUtils;
-import com.example.profilechanger.utils.PopUpWindow;
 import com.example.profilechanger.utils.SoundProfileActions;
 import com.example.profilechanger.utils.TimeUtil;
 import com.example.profilechanger.utils.Utils;
@@ -73,8 +68,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.io.IOException;
@@ -86,7 +79,6 @@ import java.util.Objects;
 public class MapsFragment extends Fragment implements LocationListener, SendDataWithKey {
     private GeofencingClient geoClient;
     private GoogleMap map;
-    private LocationManager locationManager;
     private Permissions permissions;
     private MyPreferences preferences;
     private MyDatabase myDatabase;
@@ -104,9 +96,8 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
     SearchView search_sv;
     TextView circle_tv, geoFenceType_tv, expirationTime_tv, onExitProfile_tv, onEnterProfile_tv;
     TextInputEditText input_et;
-    ImageView meters_iv;
-    private float geofenceCircle = NoAnnotation.WALK;
-    String geofenceType = MyAnnotations.ENTER;
+    private float geoFenceCircle = NoAnnotation.WALK;
+    String geoFenceType = MyAnnotations.ENTER;
     String geoExpireTime = String.valueOf(DateUtils.HOUR_IN_MILLIS);
     String profileStartId = MyAnnotations.N_A;
     String profileEndId = MyAnnotations.N_A;
@@ -115,12 +106,14 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
 
     Utils utils;
 
-    LinearLayout onEntered_ll;
-    LinearLayout onExit_ll;
-    View help_map_layout;
+    CardView onInter_cv;
+    TextView onInter_tv;
+    CardView onExit_cv;
+    TextView onExit_tv;
+    //    View help_map_layout;
     View view;
-    String id = "0";
-    boolean isUpdate = false;
+    //    String id = "0";
+//    boolean isUpdate = false;
     private final OnMapReadyCallback callback = new OnMapReadyCallback() {
 
         /**
@@ -137,16 +130,9 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
 
             map = googleMap;
             enableUserCurrentLocation();
-            locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+            LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
             if (ActivityCompat.checkSelfPermission(Objects.requireNonNull(context),
                     Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
                 permissions.permission();
                 return;
             }
@@ -166,26 +152,20 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
                     setFromDbToGeoFenceAgain();
                 }
             }
-            map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
-                @Override
-                public void onMapLongClick(LatLng latLng) {
-                    if (getGeoFenceLimit() < geoFencesLimit) {
-                        addGeoProfilerDialog(latLng);
-                    } else {
-                        Toast.makeText(context, "Limit is reached", Toast.LENGTH_SHORT).show();
-                    }
+            map.setOnMapLongClickListener(latLng -> {
+                if (getGeoFenceLimit() < geoFencesLimit) {
+                    addGeoProfilerDialog(latLng);
+                } else {
+                    Toast.makeText(context, "Limit is reached", Toast.LENGTH_SHORT).show();
                 }
             });
 
-            map.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
-                @Override
-                public boolean onMyLocationButtonClick() {
-                    if (!isLocationEnabled(context)) {
-                        showDialog("Location", "To move on your current location " +
-                                "you have to ON the device location.");
-                    }
-                    return false;
+            map.setOnMyLocationButtonClickListener(() -> {
+                if (!isLocationEnabled(context)) {
+                    showDialog("Location", "To move on your current location " +
+                            "you have to ON the device location.");
                 }
+                return false;
             });
         }
     };
@@ -202,9 +182,12 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
         search_sv = view.findViewById(R.id.search_sv);
         context = getContext();
 
-        preferences = new MyPreferences(context);
+        if (context != null) {
+            preferences = new MyPreferences(context);
+            actions = new SoundProfileActions(context);
+
+        }
         permissions = new Permissions(context);
-        actions = new SoundProfileActions(context);
         booleansUtils = new BooleansUtils(context);
         geoClient = LocationServices.getGeofencingClient(context);
         geoFence = new GeoFence(context);
@@ -213,23 +196,19 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
         notificationManager = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
         myPreferences = new MyPreferences(context);
-        // set listeners
 
-        //set value
         timeUtils = new TimeUtil();
-        // check time if its 12am then change the time and renew the limit of geofences
+        // check time if its 12am then change the time and renew the limit of geo Fences
         if (checkGeoFenceChangeDate()) {
             geoFencesLimitTv.setText(String.valueOf(geoFencesLimit));
         } else {
             geoFencesLimitTv.setText(String.valueOf(geoFencesLimit - getGeoFenceLimit()));
         }
 
-
         search_sv.setQueryHint("address");
         search_sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String location) {
-
                 if (booleansUtils.isWifiEnable()) {
                     List<Address> addressList = new ArrayList<>();
 
@@ -237,27 +216,21 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
                         Geocoder geocoder = new Geocoder(context);
                         try {
                             addressList = geocoder.getFromLocationName(location, 1);
-
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-
                         if (addressList != null) {
                             if (!addressList.isEmpty()) {
                                 Address address = addressList.get(0);
-
-                                LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                                //                map.addMarker(new MarkerOptions()
-                                //                .position(latLng).title(location));
+                                LatLng latLng = new LatLng(address.getLatitude(),
+                                        address.getLongitude());
                                 map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
 
                             } else {
                                 Toast.makeText(geoFence, getString(R.string.not_found)
                                         , Toast.LENGTH_SHORT).show();
                             }
-
                         }
-
                     } else {
                         Toast.makeText(context, getString(R.string.pleas_enter_title),
                                 Toast.LENGTH_SHORT).show();
@@ -274,10 +247,7 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
                 return false;
             }
         });
-
-
         return view;
-
     }
 
     @Override
@@ -294,9 +264,8 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
         }
     }
 
-
     // add geo fence
-    private void addGeofence(int id, String title, LatLng latLng, float radius,
+    private void geoFenceFun(int id, String title, LatLng latLng, float radius,
                              String transitionType, String expirationTime) {
         Geofence geofence = geoFence.getGeoFence(String.valueOf(id)
                 , latLng, radius, transitionType, expirationTime);
@@ -305,37 +274,19 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
         PendingIntent pendingIntent = geoFence.getPendingIntent(id);
         if (ActivityCompat.checkSelfPermission(Objects.requireNonNull(context),
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             permissions.permission();
             return;
         }
         geoClient.addGeofences(geofencingRequest, pendingIntent)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        addMarkAndMoveCamera(latLng, title);
-                        addCircleOfGeofence(latLng, geofenceCircle);
-                        myPreferences.addLong(MyAnnotations.GEO_FENCE_LIMIT,
-                                myPreferences.getLong(MyAnnotations.GEO_FENCE_LIMIT, 0)
-                                        + 1);
-                        geoFencesLimitTv.setText(String.valueOf(geoFencesLimit - getGeoFenceLimit()));
-
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(context, geoFence.getErrorMessage(e),
-                        Toast.LENGTH_SHORT).show();
-            }
-        });
-
-
+                .addOnSuccessListener(aVoid -> {
+                    addMarkAndMoveCamera(latLng, title);
+                    addCircleOfGeofence(latLng, geoFenceCircle);
+                    myPreferences.addLong(MyAnnotations.GEO_FENCE_LIMIT,
+                            myPreferences.getLong(MyAnnotations.GEO_FENCE_LIMIT, 0)
+                                    + 1);
+                    geoFencesLimitTv.setText(String.valueOf(geoFencesLimit - getGeoFenceLimit()));
+                }).addOnFailureListener(e -> Toast.makeText(context, geoFence.getErrorMessage(e),
+                Toast.LENGTH_SHORT).show());
     }
 
     private void addMarkAndMoveCamera(LatLng latLng, String title) {
@@ -356,25 +307,17 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
 
     }
 
+
     private void moveToCurrentLocation(LatLng latLng) {
-        //                map.addMarker(new MarkerOptions().position(latLng).title(location));
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
     }
 
     private void enableUserCurrentLocation() {
-
         if (ActivityCompat.checkSelfPermission(context,
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(context,
                 Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             permissions.permission();
             return;
         }
@@ -384,7 +327,6 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
     // is location on or off
     public boolean isLocationEnabled(Context context) {
         int locationMode = 0;
-        String locationProviders;
         try {
             locationMode = Settings.Secure.getInt(context.getContentResolver(),
                     Settings.Secure.LOCATION_MODE);
@@ -397,18 +339,10 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
     public void showDialog(String title, String message) {
         AlertDialog.Builder adb = new androidx.appcompat.app.AlertDialog.Builder(context)
                 .setTitle(title).setMessage(message).setCancelable(true);
-        adb.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                context.startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                dialog.dismiss();
-            }
-        }).setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
+        adb.setPositiveButton(R.string.ok, (dialog, which) -> {
+            context.startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+            dialog.dismiss();
+        }).setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
         androidx.appcompat.app.AlertDialog dialog = adb.create();
         dialog.show();
     }
@@ -437,22 +371,14 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
         AlertDialog.Builder builder = new AlertDialog.Builder(context)
                 .setTitle("Alert").setMessage("If you want to recover all old" +
                         " selected areas it will reduce the limit of marks")
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        //if user want to add all geo_fences again
-                        setFromDbOnBootComplete();
-                        myPreferences.setBoolean(MyAnnotations.BOOT_COMPLETED, false);
-                        geoFencesLimitTv.setText(String.valueOf(geoFencesLimit - getGeoFenceLimit()));
+                .setPositiveButton(R.string.ok, (dialog, which) -> {
+                    //if user want to add all geo_fences again
+                    setFromDbOnBootComplete();
+                    myPreferences.setBoolean(MyAnnotations.BOOT_COMPLETED, false);
+                    geoFencesLimitTv.setText(String.valueOf(geoFencesLimit - getGeoFenceLimit()));
 
-                        dialog.dismiss();
-                    }
-                }).setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+                    dialog.dismiss();
+                }).setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
         AlertDialog dialog = builder.create();
         dialog.show();
 
@@ -467,11 +393,10 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
             String longitude = cursor.getString(3);
             String radius = cursor.getString(4);
             String expireFormatted = cursor.getString(6);
-            String expireTime = cursor.getString(7);
             String state = cursor.getString(8);
 
             long now = System.currentTimeMillis();
-            if (isLocationEnabled(getContext())) {
+            if (isLocationEnabled(context)) {
                 if (state.matches(MyAnnotations.UN_DONE)) {
                     if (now < Long.parseLong(expireFormatted)) {
                         LatLng location = new LatLng(Double.parseDouble(latitude),
@@ -512,19 +437,19 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
             long now = timeUtils.getNowMillis();
 
 
-            if (isLocationEnabled(getContext())) {
+            if (isLocationEnabled(context)) {
                 if (state.matches(MyAnnotations.UN_DONE)) {
                     if (now < Long.parseLong(expireFormatted)) {
                         if (howManyAdded < geoFencesLimit) {
                             //insert as new because we have limits of 100 geofences.
                             long insert = myDatabase.insert(title, latitude, longitude, radius,
-                                    geofenceType, expireFormatted, expireTime, state, date,
+                                    geoFenceType, expireFormatted, expireTime, state, date,
                                     enterProfilerId, exitProfileId);
 
                             if (insert != -1) {
                                 LatLng latLng = new LatLng(Double.parseDouble(latitude),
                                         Double.parseDouble(longitude));
-                                addGeofence((int) insert, title, latLng, Float.parseFloat(radius),
+                                geoFenceFun((int) insert, title, latLng, Float.parseFloat(radius),
                                         type, expireTime);
                                 howManyAdded++;
                             } else {
@@ -557,8 +482,8 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
 
 
     public void addGeoProfilerDialog(LatLng latLng) {
-        View view = getActivity().getLayoutInflater()
-                .inflate(R.layout.custom_input_dialog_layout, null);
+        View view = LayoutInflater.from(context).inflate(R.layout.custom_input_dialog_layout,
+                null);
         AlertDialog.Builder builder = new AlertDialog.Builder(context)
                 .setView(view).setCancelable(true);
         CardView circleSize_cv = view.findViewById(R.id.circleSize_cv);
@@ -567,18 +492,23 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
         AlertDialog dialog = builder.create();
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.show();
-
         input_et = view.findViewById(R.id.input_et);
         TextView dialogTitle_tv = view.findViewById(R.id.dialogTitle_tv);
         dialogTitle_tv.setText(getResources().getString(R.string.location_profiler));
+        input_et.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        input_et.setSingleLine(true);
 
         CardView geoType_cl = view.findViewById(R.id.geoType_cl);
         geoFenceType_tv = view.findViewById(R.id.geoFenceType_tv);
 
-        onEntered_ll = view.findViewById(R.id.onEntered_ll);
+        onInter_cv = view.findViewById(R.id.onInter_cv);
+        ConstraintLayout onEntered_cl = view.findViewById(R.id.onEntered_cl);
+        ConstraintLayout onExit_cl = view.findViewById(R.id.onExit_cl);
+        onInter_tv = view.findViewById(R.id.materialTextView2);
         onEnterProfile_tv = view.findViewById(R.id.onEnterProfile_tv);
 
-        onExit_ll = view.findViewById(R.id.onExit_ll);
+        onExit_cv = view.findViewById(R.id.onExit_cv);
+        onExit_tv = view.findViewById(R.id.materialTextView3);
         onExitProfile_tv = view.findViewById(R.id.onExitProfile_tv);
 
         CardView timePicker_cv = view.findViewById(R.id.timePicker_cv);
@@ -587,106 +517,78 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
         TextView negative_tv = view.findViewById(R.id.negative_tv);
         TextView positive_tv = view.findViewById(R.id.positive_tv);
 
-        circleSize_cv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PopupWindow popUpWindow = circleSizePopupMenu();
-                popUpWindow.showAsDropDown(circleSize_cv, 0, 0);
+        circleSize_cv.setOnClickListener(v -> {
+            PopupWindow popUpWindow = circleSizePopupMenu();
+            popUpWindow.showAsDropDown(circleSize_cv, 0, 0);
 
-            }
         });
-        geoType_cl.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PopupWindow popUpWindow = geoFencePopupMenu();
-                popUpWindow.showAsDropDown(geoType_cl, 0, 0);
+        geoType_cl.setOnClickListener(v -> {
+            PopupWindow popUpWindow = geoFencePopupMenu();
+            popUpWindow.showAsDropDown(geoType_cl, 0, 0);
 
-            }
         });
 
-        timePicker_cv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PopupWindow popUpWindow = geoExpireTimePopUp();
-                popUpWindow.showAsDropDown(timePicker_cv, 0, 0);
+        timePicker_cv.setOnClickListener(v -> {
+            PopupWindow popUpWindow = geoExpireTimePopUp();
+            popUpWindow.showAsDropDown(timePicker_cv, 0, 0);
 
-            }
         });
-        onEntered_ll.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                profileDialog(MyAnnotations.START_PROFILE_ID);
-            }
-        });
-        onExit_ll.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                profileDialog(MyAnnotations.END_PROFILE_ID);
-            }
-        });
+        onEntered_cl.setOnClickListener(v -> profileDialog(MyAnnotations.START_PROFILE_ID));
+        onExit_cl.setOnClickListener(v -> profileDialog(MyAnnotations.END_PROFILE_ID));
 
 
-        positive_tv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String date = timeUtils.getCurrentFormattedDate()
-                        + " " +
-                        timeUtils.getCurrentFormattedTime();
-                String title = input_et.getText().toString();
-                long expirationEnd = System.currentTimeMillis() + Long.parseLong(geoExpireTime);
+        positive_tv.setOnClickListener(v -> {
+            String date = timeUtils.getCurrentFormattedDate()
+                    + " " +
+                    timeUtils.getCurrentFormattedTime();
+            String title = input_et.getText().toString();
+            geoFenceType = geoFenceType_tv.getText().toString();
+            long expirationEnd = System.currentTimeMillis() + Long.parseLong(geoExpireTime);
 
 
-                if (!ifOneFieldEmpty()) {
-                    if (isLocationEnabled(getContext())) {
+            if (!ifOneFieldEmpty()) {
+                if (isLocationEnabled(context)) {
 
-                        long insert = myDatabase.insert(title, String.valueOf(latLng.latitude)
-                                , String.valueOf(latLng.longitude), String.valueOf(geofenceCircle),
-                                geofenceType, String.valueOf(expirationEnd), geoExpireTime,
-                                MyAnnotations.UN_DONE, date, profileStartId, profileEndId);
+                    long insert = myDatabase.insert(title, String.valueOf(latLng.latitude)
+                            , String.valueOf(latLng.longitude), String.valueOf(geoFenceCircle),
+                            geoFenceType, String.valueOf(expirationEnd), geoExpireTime,
+                            MyAnnotations.UN_DONE, date, profileStartId, profileEndId);
 
-                        if (insert != -1) {
-                            addGeofence((int) insert, title, latLng, geofenceCircle,
-                                    geofenceType, geoExpireTime);
-                            dialog.dismiss();
-                        } else {
-                            Toast.makeText(getContext(),
-                                    getString(R.string.Profiler_not_inserted),
-                                    Toast.LENGTH_SHORT).show();
-                        }
+                    if (insert != -1) {
+                        geoFenceFun((int) insert, title, latLng, geoFenceCircle,
+                                geoFenceType, geoExpireTime);
+                        dialog.dismiss();
                     } else {
-                        //ask to enable location if location is OFF
-                        showDialog(getString(R.string.location),
-                                getString(R.string.you_need_to_allow_location));
-
+                        Toast.makeText(getContext(),
+                                getString(R.string.Profiler_not_inserted),
+                                Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(getContext(), getString(R.string.please_fill_all_fields),
-                            Toast.LENGTH_SHORT).show();
+                    //ask to enable location if location is OFF
+                    showDialog(getString(R.string.location),
+                            getString(R.string.you_need_to_allow_location));
+
                 }
-
-
+            } else {
+                Toast.makeText(getContext(), getString(R.string.please_fill_all_fields),
+                        Toast.LENGTH_SHORT).show();
             }
+
+
         });
 
-        negative_tv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
-
+        negative_tv.setOnClickListener(v -> dialog.dismiss());
 
     }
 
     public boolean ifOneFieldEmpty() {
-        if (geofenceType.matches(MyAnnotations.ENTER)) {
+        if (geoFenceType.matches(MyAnnotations.ENTER)) {
             return input_et.getText().toString().isEmpty() ||
                     circle_tv.getText().toString().isEmpty() ||
                     geoFenceType_tv.getText().toString().isEmpty() ||
                     onEnterProfile_tv.getText().toString().isEmpty() ||
                     expirationTime_tv.getText().toString().isEmpty();
-        } else if (geofenceType.matches(MyAnnotations.EXIT)) {
+        } else if (geoFenceType.matches(MyAnnotations.EXIT)) {
             return input_et.getText().toString().isEmpty() ||
                     circle_tv.getText().toString().isEmpty() ||
                     geoFenceType_tv.getText().toString().isEmpty() ||
@@ -755,33 +657,6 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14));
     }
 
-    public void doNoDisturbPermissionDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(Objects.requireNonNull(context))
-                .setTitle("Do not disturb").setMessage(MyAnnotations.DO_NOT_DISTURB_MESSAGE)
-                .setPositiveButton("Allow", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            if (!notificationManager.isNotificationPolicyAccessGranted()) {
-                                // Check if the notification policy access has been granted for the app.
-                                Intent intent = new
-                                        Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
-                                startActivity(intent);
-                            }
-
-                        }
-                    }
-                }).setNegativeButton("Decline", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-        AlertDialog dialog = builder.create();
-        dialog.show();
-    }
-
-
     private PopupWindow circleSizePopupMenu() {
         PopupWindow circleSizePopupMenu = new PopupWindow(context);
         LayoutInflater inflater = (LayoutInflater)
@@ -793,6 +668,7 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
         ConstraintLayout bus_cl = view.findViewById(R.id.byBus_cl);
         ConstraintLayout car_cl = view.findViewById(R.id.byCar_cl);
 
+
         circleSizePopupMenu.setFocusable(true);
         circleSizePopupMenu.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
         circleSizePopupMenu.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
@@ -801,48 +677,30 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
         circleSizePopupMenu.setWindowLayoutMode(ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
 
-        walk_cl.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                circle_tv.setText(MyAnnotations.BY_WALK);
-                geofenceCircle = NoAnnotation.WALK;
-//                meters_iv.setImageDrawable(ResourcesCompat.getDrawable(getResources(),
-//                        R.drawable.ic_launcher_background, null));
-                circleSizePopupMenu.dismiss();
-            }
-        });
-        cycle_cl.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                circle_tv.setText(MyAnnotations.BY_CYCLE);
-                geofenceCircle = NoAnnotation.CYCLE;
-//                meters_iv.setImageDrawable(ResourcesCompat.getDrawable(getResources(),
-//                        R.drawable.ic_launcher_background, null));
-                circleSizePopupMenu.dismiss();
+        walk_cl.setOnClickListener(v -> {
+            circle_tv.setText(MyAnnotations.BY_WALK);
+            geoFenceCircle = NoAnnotation.WALK;
 
-            }
+            circleSizePopupMenu.dismiss();
         });
-        bus_cl.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                circle_tv.setText(MyAnnotations.BY_BUS);
-                geofenceCircle = NoAnnotation.BUS;
-//                meters_iv.setImageDrawable(ResourcesCompat.getDrawable(getResources(),
-//                        R.drawable.ic_launcher_background, null));
-                circleSizePopupMenu.dismiss();
+        cycle_cl.setOnClickListener(v -> {
+            circle_tv.setText(MyAnnotations.BY_CYCLE);
+            geoFenceCircle = NoAnnotation.CYCLE;
 
-            }
+            circleSizePopupMenu.dismiss();
+
         });
-        car_cl.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                circle_tv.setText(MyAnnotations.BY_CAR);
-                geofenceCircle = NoAnnotation.CAR;
-//                meters_iv.setImageDrawable(ResourcesCompat.getDrawable(getResources(),
-//                        R.drawable.ic_launcher_background, null));
-                circleSizePopupMenu.dismiss();
+        bus_cl.setOnClickListener(v -> {
+            circle_tv.setText(MyAnnotations.BY_BUS);
+            geoFenceCircle = NoAnnotation.BUS;
+            circleSizePopupMenu.dismiss();
 
-            }
+        });
+        car_cl.setOnClickListener(v -> {
+            circle_tv.setText(MyAnnotations.BY_CAR);
+            geoFenceCircle = NoAnnotation.CAR;
+            circleSizePopupMenu.dismiss();
+
         });
         return circleSizePopupMenu;
     }
@@ -873,7 +731,6 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
 //        return ringingPopupWindow;
 //    }
 
-
     private PopupWindow geoFencePopupMenu() {
         PopupWindow geoFencePopupMenu = new PopupWindow(context);
         LayoutInflater inflater = (LayoutInflater)
@@ -899,33 +756,32 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
         numberPicker.setDisplayedValues(type);
         setNumberPickerTextColor(numberPicker);
         numberPicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
-        numberPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
-            @Override
-            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                int s = picker.getValue();
-                if (s == 1) {
-                    onEntered_ll.setVisibility(View.VISIBLE);
-                    onExit_ll.setVisibility(View.GONE);
-                    geofenceType = MyAnnotations.ENTER;
-                    geoFenceType_tv.setText(MyAnnotations.ENTER);
+        numberPicker.setOnValueChangedListener((picker, oldVal, newVal) -> {
+            int s = picker.getValue();
+            if (s == 1) {
+                onInter_cv.setVisibility(View.VISIBLE);
+                onInter_tv.setVisibility(View.VISIBLE);
+                onExit_cv.setVisibility(View.GONE);
+                onExit_tv.setVisibility(View.GONE);
 
-                } else if (s == 2) {
-                    onEntered_ll.setVisibility(View.GONE);
-                    onExit_ll.setVisibility(View.VISIBLE);
-                    geofenceType = MyAnnotations.EXIT;
-                    geoFenceType_tv.setText(MyAnnotations.EXIT);
-
-                } else {
-                    onEntered_ll.setVisibility(View.VISIBLE);
-                    onExit_ll.setVisibility(View.VISIBLE);
-                    geofenceType = MyAnnotations.BOTH;
-                    geoFenceType_tv.setText(MyAnnotations.BOTH);
-
-                }
+                geoFenceType = MyAnnotations.ENTER;
+                geoFenceType_tv.setText(MyAnnotations.ENTER);
+            } else if (s == 2) {
+                onInter_cv.setVisibility(View.GONE);
+                onInter_tv.setVisibility(View.GONE);
+                onExit_cv.setVisibility(View.VISIBLE);
+                onExit_tv.setVisibility(View.VISIBLE);
+                geoFenceType = MyAnnotations.EXIT;
+                geoFenceType_tv.setText(MyAnnotations.EXIT);
+            } else {
+                onInter_cv.setVisibility(View.VISIBLE);
+                onInter_tv.setVisibility(View.VISIBLE);
+                onExit_cv.setVisibility(View.VISIBLE);
+                onExit_tv.setVisibility(View.VISIBLE);
+                geoFenceType = MyAnnotations.BOTH;
+                geoFenceType_tv.setText(MyAnnotations.BOTH);
             }
         });
-
-
         return geoFencePopupMenu;
     }
 
@@ -952,8 +808,6 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
             }
 
         }
-
-
         geoFencePopupMenu.setFocusable(true);
         geoFencePopupMenu.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
         geoFencePopupMenu.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
@@ -967,33 +821,25 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
         numberPicker.setDisplayedValues(values);
         setNumberPickerTextColor(numberPicker);
         numberPicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
-        numberPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
-            @Override
-            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                int s = picker.getValue();
-                geoExpireTime = String.valueOf(picker.getValue() *
-                        DateUtils.HOUR_IN_MILLIS);
-                if (s == 1) {
-                    expirationTime_tv.setText(s + " hr");
+        numberPicker.setOnValueChangedListener((picker, oldVal, newVal) -> {
+            int s = picker.getValue();
+            geoExpireTime = String.valueOf(picker.getValue() *
+                    DateUtils.HOUR_IN_MILLIS);
+            if (s == 1) {
+                expirationTime_tv.setText(s + " hr");
 
-                } else {
-                    expirationTime_tv.setText(s + " hrs");
-                }
+            } else {
+                expirationTime_tv.setText(s + " hrs");
             }
         });
-
         geoExpireTime = String.valueOf(numberPicker.getValue() *
                 DateUtils.HOUR_IN_MILLIS);
-
-
         return geoFencePopupMenu;
     }
-
 
     public void setNumberPickerTextColor(NumberPicker numberPicker) {
         //change color of of number picker
         int color = R.attr.textWhiteGray;
-
         final int count = numberPicker.getChildCount();
         for (int i = 0; i < count; i++) {
             View child = numberPicker.getChildAt(i);
@@ -1043,27 +889,24 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
                 true, true);
         recyclerView.setAdapter(profilesAdapter);
         profilesAdapter.notifyDataSetChanged();
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext())
+        AlertDialog.Builder builder = new AlertDialog.Builder(context)
                 .setView(view).setCancelable(true);
         profilesAdapter.setSendDataWithKey(this, profile);
         dialog = builder.create();
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.show();
-
-
     }
-
 
     @Override
     public void onResume() {
         super.onResume();
         context = getContext();
+
     }
 
     @Override
     public void data(String key, String data, String title) {
         if (key.matches(MyAnnotations.START_PROFILE_ID)) {
-
             profileStartId = data;
             onEnterProfile_tv.setText(title);
 
@@ -1077,7 +920,5 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
         }
     }
 
-
-    //variables
 
 }

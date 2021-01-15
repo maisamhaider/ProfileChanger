@@ -56,28 +56,25 @@ public class SoundProfileActions {
 
     public void setRingerMode(String whatToSet) {
         //For Normal mode
-        if (whatToSet.matches(MyAnnotations.RINGER_MODE_NORMAL)) {
+        if (whatToSet.equals(MyAnnotations.RINGER_MODE_NORMAL)) {
             am.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
 
         } else
             //For Silent mode
-            if (whatToSet.matches(MyAnnotations.RINGER_MODE_SILENT)) {
+            if (whatToSet.equals(MyAnnotations.RINGER_MODE_SILENT)) {
 
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//                    am.adjustVolume(AudioManager.ADJUST_MUTE, 0);
-//
-//                }
                 am.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+
+//                am.setRingerMode(AudioManager.RINGER_MODE_SILENT);
             } else
                 //For Vibrate mode
                 am.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
 
     }
 
-    public void setVolume( int stream, int volume) {
-
-        am.setStreamVolume(stream, (int) ((int)volume*(0.15f)), AudioManager.FLAG_SHOW_UI);
-
+    public void setVolume(int stream, int volume) {
+        am.setStreamVolume(stream, (int) ((int) volume * (0.15f)),
+                AudioManager.FLAG_SHOW_UI);
     }
 
     public boolean getDialingPadTone() {

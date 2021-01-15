@@ -2,7 +2,6 @@ package com.example.profilechanger.utils;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.text.format.DateFormat;
 
 import com.example.profilechanger.annotations.MyAnnotations;
 
@@ -24,19 +23,13 @@ public class TimeUtil {
     public long getFromNow(long millis) {
         Calendar calendar = Calendar.getInstance();
         long nowMillis = calendar.getTimeInMillis();
-//        SimpleDateFormat format1 = new SimpleDateFormat("dd:MM:yyyy h:mm:a");;
-//        String date1 =format1.format(calendar.getTime());
         calendar.setTimeInMillis(nowMillis + millis);
-//        SimpleDateFormat format = new SimpleDateFormat("dd:MM:yyyy h:mm:a");
-//        String date = format.format(calendar.getTime());
         return calendar.getTimeInMillis();
     }
-
     public long getNowMillis() {
         Calendar calendar = Calendar.getInstance();
         return calendar.getTimeInMillis();
     }
-
     public long getMillisFromFormattedDate(String date, String format) {
 
         Date outDate = new Date();
@@ -44,7 +37,7 @@ public class TimeUtil {
                 new SimpleDateFormat(format);
         try {
             outDate = dateFormat.parse(date);
-            String d =  dateFormat.format(outDate.getTime());
+            String d = dateFormat.format(outDate.getTime());
 
         } catch (Exception e) {
             e.getStackTrace();
@@ -70,7 +63,7 @@ public class TimeUtil {
 
     public String getCurrentFormattedTime() {
         Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat format = new SimpleDateFormat("h:mm a");
+        SimpleDateFormat format = new SimpleDateFormat(MyAnnotations.DEFAULT_TIME_FORMAT);
 
         return format.format(calendar.getTime());
     }
@@ -78,15 +71,16 @@ public class TimeUtil {
     public String getCurrentFormattedTimePlusHours(int hour) {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.HOUR_OF_DAY, hour);
-        SimpleDateFormat format = new SimpleDateFormat("h:mm a");
+        SimpleDateFormat format = new SimpleDateFormat(MyAnnotations.DEFAULT_TIME_FORMAT);
 
         String d = format.format(calendar.getTime());
         return format.format(calendar.getTime());
     }
+
     public String getTimePlusHours(int hour) {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, hour);
-        SimpleDateFormat format = new SimpleDateFormat("h:mm a");
+        SimpleDateFormat format = new SimpleDateFormat(MyAnnotations.DEFAULT_TIME_FORMAT);
 
         String d = format.format(calendar.getTime());
         return format.format(calendar.getTime());
@@ -94,7 +88,7 @@ public class TimeUtil {
 
     public String getCurrentFormattedDate() {
         Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat format = new SimpleDateFormat("dd:MM:yyyy");
+        SimpleDateFormat format = new SimpleDateFormat(MyAnnotations.DEFAULT_DATE_FORMAT);
 
         return format.format(calendar.getTime());
     }
@@ -102,7 +96,7 @@ public class TimeUtil {
     public String getCurrentFormattedDatePlusHour(int day) {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DAY_OF_MONTH, day);
-        SimpleDateFormat format = new SimpleDateFormat("dd:MM:yyyy");
+        SimpleDateFormat format = new SimpleDateFormat(MyAnnotations.DEFAULT_DATE_FORMAT);
 
         return format.format(calendar.getTime());
     }
@@ -110,7 +104,7 @@ public class TimeUtil {
     public long getMilliDateAndTime(long millis) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(millis);
-        SimpleDateFormat format = new SimpleDateFormat("dd:MM:yyyy h:mm a");
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy h:mm a");
 
         format.setCalendar(calendar);
 
@@ -121,7 +115,7 @@ public class TimeUtil {
     public String getFormattedDateAndTime(long millis) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(millis);
-        SimpleDateFormat format = new SimpleDateFormat("dd:MM:yyyy h:mm a");
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy h:mm a");
 
         return format.format(calendar.getTime());
     }
@@ -129,7 +123,7 @@ public class TimeUtil {
     public String getFormattedTimeJust(long millis) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(millis);
-        SimpleDateFormat format = new SimpleDateFormat("h:mm a");
+        SimpleDateFormat format = new SimpleDateFormat(MyAnnotations.DEFAULT_TIME_FORMAT);
 
         return format.format(calendar.getTime());
     }
@@ -137,7 +131,7 @@ public class TimeUtil {
     public String getFormattedDate(long millis) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(millis);
-        SimpleDateFormat format = new SimpleDateFormat("dd:MM:yyyy");
+        SimpleDateFormat format = new SimpleDateFormat(MyAnnotations.DEFAULT_DATE_FORMAT);
 
         return format.format(calendar.getTime());
     }
@@ -145,7 +139,7 @@ public class TimeUtil {
     public String getTomorrowDate() {
         Calendar calendar = new GregorianCalendar();
         calendar.add(Calendar.DAY_OF_YEAR, 1);
-        SimpleDateFormat format = new SimpleDateFormat("dd:MM:yyyy");
+        SimpleDateFormat format = new SimpleDateFormat(MyAnnotations.DEFAULT_DATE_FORMAT);
         Date date = calendar.getTime();
         return format.format(date.getTime());
     }

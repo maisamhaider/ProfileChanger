@@ -3,16 +3,21 @@ package com.example.profilechanger.activities;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethod;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -72,15 +77,43 @@ public class OpenProfileActivity extends BaseActivity {
 
         ringType_tv = findViewById(R.id.ringType_tv);
 
+        title_mEt.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        title_mEt.setSingleLine(true);
+        title_mEt.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                if (count == 10) {
+                    Toast.makeText(OpenProfileActivity.this, "Limit reached",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
         seekBars();
         switches();
 
 
+        findViewById(R.id.backIv).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
         geoType_cv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 PopupWindow popupWindow = geoFencePopupMenu();
-                popupWindow.showAsDropDown(geoType_cv,0,0);
+                popupWindow.showAsDropDown(geoType_cv, 0, 0);
             }
         });
 
@@ -90,6 +123,7 @@ public class OpenProfileActivity extends BaseActivity {
             saveProfile_mBtn.setText(getResources().getString(R.string.save));
             title_mEt.setText(getResources().getString(R.string.un_titled));
             ringType_tv.setText(R.string.ringing);
+            delete_mBtn.setText(R.string.cancel);
             ringtone_sb.setProgress(50);
             media_sb.setProgress(50);
             notification_sb.setProgress(50);
@@ -102,7 +136,7 @@ public class OpenProfileActivity extends BaseActivity {
         } else {
             // for existed profile every thing will be user defined
             saveProfile_mBtn.setText(getResources().getString(R.string.update));
-
+            delete_mBtn.setText(R.string.delete);
             loadProfileFromDb(id);
             title_mEt.setText(profileTitle);
 
@@ -166,28 +200,64 @@ public class OpenProfileActivity extends BaseActivity {
         saveProfile_mBtn.setOnClickListener(v -> {
             profileTitle = title_mEt.getText().toString();
             vibrate_mSwitch.setChecked(!ringerMode.matches(MyAnnotations.RINGER_MODE_SILENT));
-            if (isNew) {
-                //check if silent then vibration must be off
-                database.insertProfile(profileTitle, ringerMode, ringtoneLevel,
-                        mediaLevel, notificationLevel, systemLevel, vibrate, touchSound,
-                        dialPadSound);
+            if (title_mEt.getText().length() != 0) {
+                if (isNew) {
+                    //check if silent then vibration must be off
+                    database.insertProfile(profileTitle, ringerMode, ringtoneLevel,
+                            mediaLevel, notificationLevel, systemLevel, vibrate, touchSound,
+                            dialPadSound);
+                } else {
+                    database.updateProfile(id, profileTitle, ringerMode, ringtoneLevel,
+                            mediaLevel, notificationLevel, systemLevel, vibrate, touchSound
+                            , dialPadSound);
+                }
+                finish();
             } else {
-                database.updateProfile(id, profileTitle, ringerMode, ringtoneLevel,
-                        mediaLevel, notificationLevel, systemLevel, vibrate, touchSound
-                        , dialPadSound);
+                Toast.makeText(this, "Title must be entered", Toast.LENGTH_SHORT).show();
             }
-            finish();
         });
         delete_mBtn.setOnClickListener(v -> {
 
-            if (!isProfileEnabled1(id) || !isProfileEnabled2(id)) {
-                database.deleteProfile(id);
-                finish();
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            if (isNew) {
+                builder.setTitle(getString(R.string.permission))
+                        .setCancelable(false)
+                        .setMessage(getString(R.string.are_you_sure_you_want_to_back))
+                        .setPositiveButton(getString(R.string.yes),
+                                (dialog, which) -> {
+                                    dialog.dismiss();
+                                    finish();
+                                })
+                        .setNegativeButton(R.string.no,
+                                (dialog, which) ->
+                                        dialog.dismiss());
 
+                AlertDialog dialog = builder.create();
+                dialog.show();
             } else {
-                Toast.makeText(this, "This profile is set with profiler",
-                        Toast.LENGTH_SHORT).show();
+                builder.setTitle(getString(R.string.permission))
+                        .setCancelable(false)
+                        .setMessage(getString(R.string.are_you_sure_you_want_to_delete))
+                        .setPositiveButton(getString(R.string.delete),
+                                (dialog, which) -> {
+                                    if (!isProfileEnabled1(id) || !isProfileEnabled2(id)) {
+                                        database.deleteProfile(id);
+                                        finish();
+
+                                    } else {
+                                        Toast.makeText(this, "This profile is set with profiler",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                    dialog.dismiss();
+                                })
+                        .setNegativeButton(R.string.cancel,
+                                (dialog, which) ->
+                                        dialog.dismiss());
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
             }
+
 
         });
 
@@ -248,10 +318,13 @@ public class OpenProfileActivity extends BaseActivity {
                     ringerMode = MyAnnotations.RINGER_MODE_VIBRATE;
                     notification_sb.setProgress(0);
                     system_sb.setProgress(0);
+                    ringType_tv.setText(R.string.vibrate);
                 } else {
                     ringerMode = MyAnnotations.RINGER_MODE_NORMAL;
-                    notification_sb.setProgress(40);
-                    system_sb.setProgress(40);
+                    ringType_tv.setText(R.string.ringing);
+
+//                    notification_sb.setProgress(40);
+//                    system_sb.setProgress(40);
                 }
             }
 

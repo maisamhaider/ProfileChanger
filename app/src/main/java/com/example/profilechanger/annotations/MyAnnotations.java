@@ -34,7 +34,7 @@ public @interface MyAnnotations {
     String START_PROFILE_ID = "START_PROFILE_ID";
     String END_PROFILE_ID = "END_PROFILE_ID";
 
-    String DEFAULT_DATE_FORMAT = "dd:MM:yyyy";
+    String DEFAULT_DATE_FORMAT = "dd/MM/yyyy";
     String DEFAULT_TIME_FORMAT = "h:mm a";
     String DEFAULT_FORMAT = DEFAULT_DATE_FORMAT +" "+ DEFAULT_TIME_FORMAT;
 

@@ -17,8 +17,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.profilechanger.R;
-import com.example.profilechanger.activities.HistoryActivity;
-import com.example.profilechanger.adapters.HistoryAdapter;
 import com.example.profilechanger.database.MyDatabase;
 import com.example.profilechanger.interfaces.LongClickListener;
 import com.example.profilechanger.interfaces.SelectAll;
@@ -34,7 +32,7 @@ public class UndoneFragment extends Fragment implements SelectAll, LongClickList
     RecyclerView recyclerView;
     View view;
     MyDatabase myDatabase;
-    HistoryAdapter adapter;
+//    HistoryAdapter adapter;
     boolean isAll = false;
     CheckBox checkBox;
     TextView ss_tv;
@@ -62,63 +60,63 @@ public class UndoneFragment extends Fragment implements SelectAll, LongClickList
         view = inflater.inflate(R.layout.fragment_undone, container, false);
 //        AdView adView = view.findViewById(R.id.adView);
 //        adView(adView);
-        noData_tv = view.findViewById(R.id.noData_tv);
-        myDatabase = new MyDatabase(getActivity());
-        checkBox = view.findViewById(R.id.checkBox);
-        ss_tv = view.findViewById(R.id.selectDeSelect_tv);
-        TextView textView = view.findViewById(R.id.delete_tv);
-        ArrayList<HistoryModel> list = ((HistoryActivity) getActivity()).getHistory(false);
-        loadData(list);
-        textView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog(getActivity());
-            }
-        });
-        checkBox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SelectAll selectAll = adapter.getSelectAll();
-                if (isAll) {
-                    selectAll.selected(false);
-                    isAll = false;
-                    ss_tv.setText("Select all");
-
-
-                } else {
-                    selectAll.selected(true);
-                    isAll = true;
-                    ss_tv.setText("De_Select all");
-
-                }
-            }
-        });
+//        noData_tv = view.findViewById(R.id.noData_tv);
+//        myDatabase = new MyDatabase(getActivity());
+//        checkBox = view.findViewById(R.id.checkBox);
+//        ss_tv = view.findViewById(R.id.selectDeSelect_tv);
+//        TextView textView = view.findViewById(R.id.delete_tv);
+////        ArrayList<HistoryModel> list = ((HistoryActivity) getActivity()).getHistory(false);
+////        loadData(list);
+//        textView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                alertDialog(getActivity());
+//            }
+//        });
+//        checkBox.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+////                SelectAll selectAll = adapter.getSelectAll();
+//                if (isAll) {
+//                    selectAll.selected(false);
+//                    isAll = false;
+//                    ss_tv.setText("Select all");
+//
+//
+//                } else {
+//                    selectAll.selected(true);
+//                    isAll = true;
+//                    ss_tv.setText("De_Select all");
+//
+//                }
+//            }
+//        });
         return view;
     }
 
-    public void loadData(ArrayList<HistoryModel> list) {
-        if (myDatabase == null) {
-            myDatabase = new MyDatabase(getActivity());
-        }
-        recyclerView = view.findViewById(R.id.recyclerView);
-
-        LinearLayoutManager lm = new LinearLayoutManager(getActivity());
-        lm.setOrientation(LinearLayoutManager.VERTICAL);
-        if (list.isEmpty()) {
-            noData_tv.setVisibility(View.VISIBLE);
-            checkBox.setVisibility(View.GONE);
-            ss_tv.setVisibility(View.GONE);
-            recyclerView.setVisibility(View.GONE);
-        } else {
-            adapter = new HistoryAdapter(getActivity(), list, myDatabase, this,
-                    this, false);
-
-            recyclerView.setVisibility(View.VISIBLE);
-            recyclerView.setLayoutManager(lm);
-            recyclerView.setAdapter(adapter);
-            adapter.notifyDataSetChanged();
-        }
-    }
+//    public void loadData(ArrayList<HistoryModel> list) {
+//        if (myDatabase == null) {
+//            myDatabase = new MyDatabase(getActivity());
+//        }
+//        recyclerView = view.findViewById(R.id.recyclerView);
+//
+//        LinearLayoutManager lm = new LinearLayoutManager(getActivity());
+//        lm.setOrientation(LinearLayoutManager.VERTICAL);
+//        if (list.isEmpty()) {
+//            noData_tv.setVisibility(View.VISIBLE);
+//            checkBox.setVisibility(View.GONE);
+//            ss_tv.setVisibility(View.GONE);
+//            recyclerView.setVisibility(View.GONE);
+//        } else {
+//            adapter = new HistoryAdapter(getActivity(), list, myDatabase, this,
+//                    this, false);
+//
+//            recyclerView.setVisibility(View.VISIBLE);
+//            recyclerView.setLayoutManager(lm);
+//            recyclerView.setAdapter(adapter);
+//            adapter.notifyDataSetChanged();
+//        }
+//    }
 
     @Override
     public void onResume() {
@@ -159,37 +157,37 @@ public class UndoneFragment extends Fragment implements SelectAll, LongClickList
 //        });
 //    }
 
-    public void alertDialog(Context context) {
-        View view = getLayoutInflater().inflate(R.layout.delete_dialog_layout, null, false);
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        TextView no_ll = view.findViewById(R.id.no_tv);
-        TextView yes_ll = view.findViewById(R.id.yes_tv);
-        builder.setView(view).setCancelable(true);
-        AlertDialog dialog = builder.create();
-        if (adapter.getSendingList().isEmpty()) {
-            Toast.makeText(context, "No item selected", Toast.LENGTH_SHORT).show();
-        } else {
-            dialog.show();
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-            no_ll.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    dialog.dismiss();
-                }
-            });
-            yes_ll.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    adapter.deleteData();
-                    ArrayList<HistoryModel> list = new ArrayList<>();
-                    list = ((HistoryActivity)
-                            getActivity()).getHistory(false);
-                    loadData(list);
-                    dialog.dismiss();
-                }
-            });
-        }
-    }
+//    public void alertDialog(Context context) {
+//        View view = getLayoutInflater().inflate(R.layout.delete_dialog_layout, null, false);
+//        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+//        TextView no_ll = view.findViewById(R.id.no_tv);
+//        TextView yes_ll = view.findViewById(R.id.yes_tv);
+//        builder.setView(view).setCancelable(true);
+//        AlertDialog dialog = builder.create();
+//        if (adapter.getSendingList().isEmpty()) {
+//            Toast.makeText(context, "No item selected", Toast.LENGTH_SHORT).show();
+//        } else {
+//            dialog.show();
+//            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+//            no_ll.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    dialog.dismiss();
+//                }
+//            });
+//            yes_ll.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    adapter.deleteData();
+//                    ArrayList<HistoryModel> list = new ArrayList<>();
+//                    list = ((HistoryActivity)
+//                            getActivity()).getHistory(false);
+//                    loadData(list);
+//                    dialog.dismiss();
+//                }
+//            });
+//        }
+//    }
 
     @Override
     public void onLongClicked(boolean clicked) {

@@ -5,9 +5,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.Build;
 
 import com.example.profilechanger.annotations.MyAnnotations;
 import com.example.profilechanger.database.MyDatabase;
+import com.example.profilechanger.services.Service1;
 import com.example.profilechanger.sharedpreferences.MyPreferences;
 import com.example.profilechanger.utils.AlarmClass;
 import com.example.profilechanger.utils.TimeUtil;
@@ -21,7 +23,13 @@ public class BootCompletedReceiver extends BroadcastReceiver {
         this.context = context;
         MyPreferences preferences = new MyPreferences(context);
         preferences.setBoolean(MyAnnotations.BOOT_COMPLETED, true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            context.startForegroundService(new Intent(context, Service1.class));
+        }else{
+            context.startService(new Intent(context, Service1.class));
+        }
         registerAlarms(context);
+
     }
 
     public void registerAlarms(Context context) {
@@ -44,27 +52,23 @@ public class BootCompletedReceiver extends BroadcastReceiver {
                     //set start Alarm
                     long triggerTime1 = timeUtil.getMillisFromFormattedDate(startDate,
                             MyAnnotations.DEFAULT_FORMAT);
-
                     alarmClass.setOneAlarm(profilerTitle, triggerTime1,
                             Integer.parseInt(id) + 1000,false);
-                    //set end Alarm
+                    /*//set end Alarm
                     long triggerTime2 = timeUtil.getMillisFromFormattedDate(endDate,
-                            MyAnnotations.DEFAULT_FORMAT);
+                            MyAnnotations.DEFAULT_FORMAT);*/
 
-                    alarmClass.setOneAlarm(profilerTitle, triggerTime2,
-                            Integer.parseInt(id) + 10000,false);
 
                 } else {
-                    long triggerTime1 = timeUtil.getMillisFromFormattedDate(startDate,
-                            MyAnnotations.DEFAULT_TIME_FORMAT);
+                    long triggerTime1 = timeUtil.getMillisFromFormattedDate(
+                            timeUtil.getCurrentFormattedDate() + " "
+                                    +startDate,
+                            MyAnnotations.DEFAULT_FORMAT);
                     alarmClass.setOneAlarm(profilerTitle, triggerTime1,
-                            Integer.parseInt(id) + 1000,true);
-
-
+                            Integer.parseInt(id) + 1000, true);
 
                 }
             }
         }
-
     }
 }

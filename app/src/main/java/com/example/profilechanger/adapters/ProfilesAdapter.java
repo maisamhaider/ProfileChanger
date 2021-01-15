@@ -88,28 +88,16 @@ public class ProfilesAdapter extends RecyclerView.Adapter<ProfilesAdapter.Profil
 
     @Override
     public void onBindViewHolder(@NonNull ProfileItemHolder holder, int position) {
-        profilesModel = profilesModelArrayList.get(position);
         String title = profilesModelArrayList.get(position).getPROFILE_TITLE();
         String id = profilesModelArrayList.get(position).getId();
         holder.profileName_tv.setText(title);
-        if (!dialog) {
-            if (p.getBoolean(MyAnnotations.IS_LIGHT_THEME, false)) {
-                holder.cv.setCardBackgroundColor(ContextCompat.getColor(context,
-                        R.color.white));
-                holder.profileName_tv.setTextColor(ContextCompat.getColor(context,
-                        R.color.colorTextOne));
-            } else {
-                holder.cv.setCardBackgroundColor(ContextCompat.getColor(context,
-                        R.color.colorPrimaryVariantLight));
-                holder.profileName_tv.setTextColor(ContextCompat.getColor(context,
-                        R.color.white));
-            }
-        }
+
         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 if (!isProfilerNeed) {
-                    pos = profilesModelArrayList.get(position).getId();
+                    profilesModel = profilesModelArrayList.get(position);
+                    pos = profilesModel.getId();
                     PopupWindow popupWindow = popUpWindow.popupWindowUpDel(5);
                     popupWindow.showAsDropDown(v, Gravity.END, 0);
                 }
@@ -121,7 +109,7 @@ public class ProfilesAdapter extends RecyclerView.Adapter<ProfilesAdapter.Profil
             public void onClick(View v) {
                 if (isProfilerNeed) {
                     pos = profilesModelArrayList.get(position).getId();
-
+                    pos = profilesModelArrayList.get(position).getId();
                     sendDataWithKey.data(profile, pos, title);
                 } else {
                     pos = profilesModelArrayList.get(position).getId();
@@ -152,12 +140,7 @@ public class ProfilesAdapter extends RecyclerView.Adapter<ProfilesAdapter.Profil
                                             dialog.dismiss();
                                         }
                                     }).setNegativeButton(R.string.decline,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            });
+                            (dialog, which) -> dialog.dismiss());
                     AlertDialog dialog = builder.create();
                     dialog.show();
 
@@ -172,19 +155,11 @@ public class ProfilesAdapter extends RecyclerView.Adapter<ProfilesAdapter.Profil
                         builder.setTitle(context.getString(R.string.permission))
                                 .setMessage(context.getString(R.string.do_not_disturb_permission_text))
                                 .setPositiveButton(context.getString(R.string.allow),
-                                        new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                permissions.doNoDisturbPermissionDialog();
-                                                dialog.dismiss();
-                                            }
+                                        (dialog, which) -> {
+                                            permissions.doNoDisturbPermissionDialog();
+                                            dialog.dismiss();
                                         }).setNegativeButton(R.string.decline,
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                    }
-                                });
+                                (dialog, which) -> dialog.dismiss());
                         AlertDialog dialog = builder.create();
                         dialog.show();
                     }
@@ -197,14 +172,15 @@ public class ProfilesAdapter extends RecyclerView.Adapter<ProfilesAdapter.Profil
             editIntent(pos);
         } else if (button.matches(MyAnnotations.delete)) {
 
-            if (!isProfileEnabled1(pos) || !isProfileEnabled2(pos)) {
+            if (isProfileEnabled1(pos) || isProfileEnabled2(pos)) {
+
+                Toast.makeText(context, "This profile is set with profiler",
+                        Toast.LENGTH_SHORT).show();
+            } else {
                 myDatabase.deleteProfile(pos);
                 profilesModelArrayList.remove(profilesModel);
                 notifyDataSetChanged();
 
-            } else {
-                Toast.makeText(context, "This profile is set with profiler",
-                        Toast.LENGTH_SHORT).show();
             }
         }
 

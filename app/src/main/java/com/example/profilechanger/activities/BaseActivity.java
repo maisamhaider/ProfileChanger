@@ -68,15 +68,11 @@ public class BaseActivity extends AppCompatActivity {
 
     }
 
-    public void loadFragment(Fragment fragment) {
-        FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction ft = fm.beginTransaction();
-        ft.addToBackStack(null);
-        ft.replace(R.id.fragmentsContainer, fragment).commit();
-    }
+
 
     public void intent(Activity activity) {
-        startActivity(new Intent(this, activity.getClass()));
+        startActivity(new Intent(this,
+                activity.getClass()));
     }
 
     public void Load_withAds(Context context, Activity activity) {

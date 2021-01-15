@@ -16,15 +16,16 @@ public class AlarmClass extends ContextWrapper {
         super(base);
     }
 
-    public void setOneAlarm(String title, long reminderTime, int position,boolean isRepeat) {
-        PendingIntent  pendingIntent=null;
-        AlarmManager alarmManager=null;
+    public void setOneAlarm(String title, long reminderTime, int position, boolean isRepeat) {
+        PendingIntent pendingIntent = null;
+        AlarmManager alarmManager = null;
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         Intent myIntent = new Intent(this, AlarmReceiver.class);
+        myIntent.setAction("android.intent.action.NOTIFY");
         myIntent.putExtra(MyAnnotations.PROFILER_TITLE, title);
         myIntent.putExtra(MyAnnotations.PROFILER_POSITION, position);
-         myIntent.putExtra(MyAnnotations.IS_REPEAT, isRepeat);
-         myIntent.putExtra(MyAnnotations.TRIGGER_TIME, reminderTime);
+        myIntent.putExtra(MyAnnotations.IS_REPEAT, isRepeat);
+        myIntent.putExtra(MyAnnotations.TRIGGER_TIME, reminderTime);
 
         pendingIntent = PendingIntent.getBroadcast(this, position, myIntent,
                 0);

@@ -28,7 +28,28 @@ public class Permissions {
     public Permissions(Context context) {
         this.context = context;
     }
-    
+
+    public boolean locationPer() {
+        int locationPermission = ContextCompat.checkSelfPermission(context,
+                Manifest.permission.ACCESS_FINE_LOCATION);
+        int courseLocationPermission = ContextCompat.checkSelfPermission(context,
+                Manifest.permission.ACCESS_COARSE_LOCATION);
+        int bLocationPermission = ContextCompat.checkSelfPermission(context,
+                Manifest.permission.ACCESS_BACKGROUND_LOCATION);
+
+        boolean QAndAbove = locationPermission == PackageManager.PERMISSION_GRANTED
+                && courseLocationPermission == PackageManager.PERMISSION_GRANTED
+                && bLocationPermission == PackageManager.PERMISSION_GRANTED;
+
+        boolean belowQ = locationPermission == PackageManager.PERMISSION_GRANTED
+                && courseLocationPermission == PackageManager.PERMISSION_GRANTED;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            return QAndAbove;
+        } else
+            return belowQ;
+    }
+
     public boolean permission() {
         int locationPermission = ContextCompat.checkSelfPermission(context,
                 Manifest.permission.ACCESS_FINE_LOCATION);
@@ -47,13 +68,11 @@ public class Permissions {
 
         String[] manifestPermissionArray = new String[]{
                 Manifest.permission.ACCESS_FINE_LOCATION
-                , Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.MODIFY_AUDIO_SETTINGS,};
+                , Manifest.permission.ACCESS_COARSE_LOCATION};
 
         String[] QArray = new String[]{
                 Manifest.permission.ACCESS_FINE_LOCATION
                 , Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.MODIFY_AUDIO_SETTINGS,
                 Manifest.permission.ACCESS_BACKGROUND_LOCATION};
 
 
@@ -105,7 +124,7 @@ public class Permissions {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
             intent.setData(Uri.parse("package:" + context.getPackageName()));
-            context.startActivity(intent);
+            context.startActivityForResult(intent, PermissionCodes.MANGE_SETTINGS);
         } else {
             ActivityCompat.requestPermissions(context,
                     new String[]{Manifest.permission.WRITE_SETTINGS},
@@ -117,18 +136,35 @@ public class Permissions {
         NotificationManager mNotificationManager = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
         AlertDialog.Builder builder = new AlertDialog.Builder(Objects.requireNonNull(context))
-                .setTitle(R.string.do_not_disturb).setMessage(R.string.do_not_disturb_permission_text)
+                .setCancelable(false)
+                .setTitle(R.string.do_not_disturb)
+                .setMessage(R.string.do_not_disturb_permission_text)
                 .setPositiveButton(R.string.allow, (dialog, which) -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         if (!mNotificationManager.isNotificationPolicyAccessGranted()) {
                             // Check if the notification policy access has been granted for the app.
-                            Intent intent = new Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
-                            ((Activity) context).startActivityForResult(intent, PermissionCodes.DO_NOT_DISTURB);
+                            Intent intent =
+                                    new Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
+                            ((Activity) context).startActivityForResult(intent,
+                                    PermissionCodes.DO_NOT_DISTURB);
                         }
-
                     }
-                }).setNegativeButton(R.string.decline, (dialog, which) ->  dialog.dismiss());
+                }).setNegativeButton(R.string.decline, (dialog, which) -> {
+
+                    dialog.dismiss();
+                });
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    public void overlayAppPermission() {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                !Settings.canDrawOverlays(context)) {
+            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    Uri.parse("package:" + context.getPackageName()));
+            ((Activity) context).startActivityForResult(intent,
+                    PermissionCodes.DRAW_OVER_OTHER_APP_PERMISSION);
+        }
     }
 }

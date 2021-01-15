@@ -18,6 +18,7 @@ import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
@@ -95,6 +96,8 @@ public class TimeBaseProfilerEditActivity extends BaseActivity implements SendDa
         Button delete_mBtn = findViewById(R.id.delete_mBtn);
         ConstraintLayout startDate_cl, endDate_cl, startProfile_cl, endProfile_cl;
 
+        timeBaseProfiler_mEt.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        timeBaseProfiler_mEt.setSingleLine(true);
 
         startDate_cl = findViewById(R.id.startDate_cl);
         endDate_cl = findViewById(R.id.endDate_cl);
@@ -257,8 +260,10 @@ public class TimeBaseProfilerEditActivity extends BaseActivity implements SendDa
 
                     if (isUpdate1 != -1) {
                         //set start Alarm
-                        long triggerTime1 = timeUtil.getMillisFromFormattedDate(startTime,
-                                MyAnnotations.DEFAULT_TIME_FORMAT);
+                        long triggerTime1 = timeUtil.getMillisFromFormattedDate(
+                                timeUtil.getCurrentFormattedDate() + " "
+                                        +startTime,
+                                MyAnnotations.DEFAULT_FORMAT);
                         alarmClass.setOneAlarm(profilerTitle, triggerTime1,
                                 Integer.parseInt(id) + 1000, true);
 
@@ -279,7 +284,7 @@ public class TimeBaseProfilerEditActivity extends BaseActivity implements SendDa
                                 date, repeat, days, profileStartId, profileEndId);
                         if (isInsert != -1) {
                             Toast.makeText(TimeBaseProfilerEditActivity.this,
-                                    "insert", Toast.LENGTH_SHORT).show();
+                                    "Inserted", Toast.LENGTH_SHORT).show();
 
                             //set start Alarm
                             long triggerTime1 = timeUtil.getMillisFromFormattedDate(startDate,
@@ -290,7 +295,7 @@ public class TimeBaseProfilerEditActivity extends BaseActivity implements SendDa
                             finish();
                         } else {
                             Toast.makeText(TimeBaseProfilerEditActivity.this,
-                                    "not insert", Toast.LENGTH_SHORT).show();
+                                    "not inserted", Toast.LENGTH_SHORT).show();
                         }
 
                     } else {
@@ -301,11 +306,14 @@ public class TimeBaseProfilerEditActivity extends BaseActivity implements SendDa
 
                             alarmClass = new AlarmClass(TimeBaseProfilerEditActivity.this);
                             Toast.makeText(TimeBaseProfilerEditActivity.this,
-                                    "insert", Toast.LENGTH_SHORT).show();
+                                    "Inserted", Toast.LENGTH_SHORT).show();
 
                             //set start Alarm
-                            long triggerTime1 = timeUtil.getMillisFromFormattedDate(startTime,
-                                    MyAnnotations.DEFAULT_TIME_FORMAT);
+                            long triggerTime1 = timeUtil.getMillisFromFormattedDate(
+                                    timeUtil.getCurrentFormattedDate() + " "
+                                            +startTime,
+                                    MyAnnotations.DEFAULT_FORMAT);
+                            String d = timeUtil.getFormattedDateAndTime(triggerTime1);
 
                             alarmClass.setOneAlarm(profilerTitle, triggerTime1,
                                     (int) isInsert + 1000, true);
@@ -314,7 +322,7 @@ public class TimeBaseProfilerEditActivity extends BaseActivity implements SendDa
                             finish();
                         } else {
                             Toast.makeText(TimeBaseProfilerEditActivity.this,
-                                    "not insert", Toast.LENGTH_SHORT).show();
+                                    "not Inserted", Toast.LENGTH_SHORT).show();
                         }
                     }
                 }

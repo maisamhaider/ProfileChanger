@@ -1,0 +1,464 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.TimeBaseProfilerEditActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout3"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@drawable/header_2"
+        app:layout_constraintBottom_toTopOf="@+id/guideline7"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/prrBack_iv"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:padding="10dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.02"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_back" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/materialTextView8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/profiler"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.14" />
+
+
+    <ScrollView
+        android:id="@+id/scrollView6"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="5dp"
+        app:layout_constraintBottom_toTopOf="@+id/save_mBtn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline7">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardView3"
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:layout_margin="16dp"
+                android:maxWidth="150dp"
+                android:maxHeight="150dp"
+                app:cardBackgroundColor="?attr/blueWhite"
+                app:cardCornerRadius="20dp"
+                app:layout_constraintEnd_toStartOf="@+id/guideline6"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/timeBaseProfiler_mEt">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/startDate_cl"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:background="?android:attr/selectableItemBackground">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/textView2"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:padding="10dp"
+                        android:text="@string/start_time"
+                        android:textColor="?attr/textWhiteGray"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/startDate_mtv"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:ellipsize="marquee"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:textColor="?attr/textWhiteGray"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.0"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.cardview.widget.CardView>
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/timeBaseProfiler_mEt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="@string/un_titled"
+                android:maxHeight="50dp"
+                android:maxLength="20"
+                android:maxLines="1"
+                android:gravity="center"
+                android:textColor="?attr/textWhiteGray"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardView4"
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:layout_margin="16dp"
+                android:maxWidth="150dp"
+                android:maxHeight="150dp"
+                app:cardBackgroundColor="?attr/blueWhite"
+                app:cardCornerRadius="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/guideline6"
+                app:layout_constraintTop_toBottomOf="@+id/timeBaseProfiler_mEt">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/startProfile_cl"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="?android:attr/selectableItemBackground">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/textView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:maxHeight="100dp"
+                        android:padding="10dp"
+                        android:text="@string/start_profile"
+                        android:textColor="?attr/textWhiteGray"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/startProfiler_mtv"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:gravity="center"
+                        android:ellipsize="marquee"
+                        android:hint="@string/N_A"
+                        android:padding="10dp"
+                        android:textColor="?attr/textWhiteGray"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardView2"
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:layout_margin="16dp"
+                android:maxWidth="150dp"
+                android:maxHeight="150dp"
+                app:cardBackgroundColor="?attr/blueWhite"
+                app:cardCornerRadius="20dp"
+                app:layout_constraintEnd_toStartOf="@+id/guideline6"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cardView3">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/endDate_cl"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="?android:attr/selectableItemBackground">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/textView3"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:padding="10dp"
+                        android:text="@string/end_time"
+                        android:textColor="?attr/textWhiteGray"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/endTime_mtv"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:ellipsize="marquee"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:textColor="?attr/textWhiteGray"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/textView3" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:layout_margin="16dp"
+                android:maxWidth="150dp"
+                android:maxHeight="150dp"
+                app:cardBackgroundColor="?attr/blueWhite"
+                app:cardCornerRadius="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/guideline6"
+                app:layout_constraintTop_toBottomOf="@+id/cardView4">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/endProfile_cl"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="?android:attr/selectableItemBackground">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/textView4"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:maxHeight="100dp"
+                        android:padding="10dp"
+                        android:text="@string/end_profile"
+                        android:textColor="?attr/textWhiteGray"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/endProfiler_mtv"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:ellipsize="marquee"
+                        android:gravity="center"
+                        android:hint="@string/N_A"
+                        android:padding="10dp"
+                        android:textColor="?attr/textWhiteGray"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/textView4" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.cardview.widget.CardView>
+
+
+            <LinearLayout
+                android:id="@+id/linearLayout5"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:background="?attr/blueWhite"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cardView2">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/materialTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:padding="10dp"
+                    android:text="@string/repeat"
+                    android:textColor="?attr/textWhiteGray"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/cardView2" />
+
+                <HorizontalScrollView
+                    android:id="@+id/horizontalScrollView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:overScrollMode="never"
+                    android:scrollbars="none"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="1.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/cardView2"
+                    app:layout_constraintVertical_bias="0.0">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/blueWhite"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.checkbox.MaterialCheckBox
+                            android:id="@+id/sa_mCb"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:padding="10dp"
+                            android:text="@string/sat"
+                            android:textColor="?attr/textWhiteGray" />
+
+                        <com.google.android.material.checkbox.MaterialCheckBox
+                            android:id="@+id/su_mCb"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:padding="10dp"
+                            android:text="@string/sun"
+                            android:textColor="?attr/textWhiteGray" />
+
+                        <com.google.android.material.checkbox.MaterialCheckBox
+                            android:id="@+id/mo_mCb"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:padding="10dp"
+                            android:text="@string/mon"
+                            android:textColor="?attr/textWhiteGray" />
+
+                        <com.google.android.material.checkbox.MaterialCheckBox
+                            android:id="@+id/tu_mCb"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:padding="10dp"
+                            android:text="@string/tue"
+                            android:textColor="?attr/textWhiteGray" />
+
+                        <com.google.android.material.checkbox.MaterialCheckBox
+                            android:id="@+id/we_mCb"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:padding="10dp"
+                            android:text="@string/wed"
+                            android:textColor="?attr/textWhiteGray" />
+
+                        <com.google.android.material.checkbox.MaterialCheckBox
+                            android:id="@+id/th_mCb"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:padding="10dp"
+                            android:text="@string/thu"
+                            android:textColor="?attr/textWhiteGray" />
+
+                        <com.google.android.material.checkbox.MaterialCheckBox
+                            android:id="@+id/fr_mCb"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:padding="10dp"
+                            android:text="@string/fri"
+                            android:textColor="?attr/textWhiteGray" />
+
+                        <com.google.android.material.checkbox.MaterialCheckBox
+                            android:id="@+id/allDays_mCb"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:padding="10dp"
+                            android:text="@string/all_days"
+                            android:textColor="?attr/textWhiteGray" />
+                    </LinearLayout>
+                </HorizontalScrollView>
+            </LinearLayout>
+
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/materialTextView7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:text="@string/created_date"
+                android:textColor="?attr/textWhiteGray"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout5" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/date_mTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="10dp"
+                android:textColor="?attr/textWhiteGray"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/materialTextView7" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.5" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/delete_mBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:background="@drawable/ripple_blue_curved_bg"
+        android:text="@string/delete"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/save_mBtn"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/save_mBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:background="@drawable/ripple_blue_curved_bg"
+        android:text="@string/save"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/delete_mBtn" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -9,15 +9,17 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
 import com.example.profilechanger.R;
-import com.example.profilechanger.fragments.DoneFragment;
-import com.example.profilechanger.fragments.UndoneFragment;
+import com.example.profilechanger.fragments.BackgroundFrag;
+import com.example.profilechanger.fragments.LocationBaseProfilerFragment;
+import com.example.profilechanger.fragments.TimeBaseProfilerFragment;
 
 
-public class HistoryFragmentsAdapter extends FragmentPagerAdapter {
-    int[] titles = new int[]{R.string.un_done,R.string.done};
+public class PermissionsFragmentsAdapter extends FragmentPagerAdapter {
+    int[] titles = new int[]{R.string.location_permission/*, R.string.manage_settings
+            , R.string.do_not_disturb*/};
     Context context;
 
-    public HistoryFragmentsAdapter(Context context, @NonNull FragmentManager fm, int behavior) {
+    public PermissionsFragmentsAdapter(Context context, @NonNull FragmentManager fm, int behavior) {
         super(fm, behavior);
         this.context = context;
     }
@@ -25,14 +27,8 @@ public class HistoryFragmentsAdapter extends FragmentPagerAdapter {
     @NonNull
     @Override
     public Fragment getItem(int position) {
-        switch (position)
-        {
-            case 0:
-                return UndoneFragment.newInstance();
-            case 1:
-                return DoneFragment.newInstance();
-        }
-        return null;
+
+        return BackgroundFrag.newInstance();
     }
 
     @Override

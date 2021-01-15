@@ -13,7 +13,7 @@
     <string name="interstitial">ca-app-pub-3940256099942544/1033173712</string>
     //original
     <string name="app_id">ca-app-pub-3940256099942544~3347511713</string>
-    
+
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
     <string name="ringtone">Ringtone</string>
@@ -83,7 +83,9 @@
     <string name="not_found">Not Found</string>
     <string name="place_name">Place name</string>
     <string name="permission">Permission</string>
-    <string name="write_settings_alert_text">Without mange settings permission application main
+    <string name="write_settings_alert_text">Without <b>manage settings permission</b> application main
+        features do not work.</string>
+    <string name="do_not_disturb_permission_text">Without <b>do not disturb</b> permission application main
         features do not work.</string>
     <string name="decline">Decline</string>
     <string name="allow">Allow</string>
@@ -94,7 +96,8 @@
     <string name="latitude">Latitude:</string>
     <string name="state">State</string>
     <string name="longitude">Longitude</string>
-    <string name="are_you_sure_you_want_to_delete_the_selected_item">Are you sure you want to delete the selected item ?</string>
+    <string name="are_you_sure_you_want_to_delete_the_selected_item">Are you sure you want to delete
+        the selected item ?</string>
     <string name="time_base">Time Base</string>
     <string name="location_base">Location Base</string>
     <string name="help">Help</string>
@@ -131,9 +134,23 @@
         selected area on map.We insure you that the user personal data or information is not
         collected by the company nor does the application host users data </string>
     <string name="permissions_explanation">1. Location permission needed to check if user is entered
-        and exit or not.\n\n2. Do Not Disturb permission is required to change ringing mode and
-        enable do not disturb mode.\n\n3. Manage System settings is required to enable/disable touch,
+        and exit or not.\n\n 2. Do Not Disturb permission is required to change ringing mode and
+        enable do not disturb mode.\n\n 3. Manage System settings is required to enable/disable touch,
         dial pad and vibrate </string>
     <string name="by_accepting">By accepting you are agree to our <u><b>Terms and Conditions</b></u></string>
     <string name="terms_and_conditions">Terms And Conditions</string>
+    <string name="do_not_disturb">Do not disturb</string>
+    <string name="ok">OK</string>
+    <string name="use_your_location">Use your location</string>
+    <string name="background_location_text1">To see maps for automatically tracked activities.\n
+        allow Profile Changer to use your location all of the time.</string>
+    <string name="background_location_text2">Profile Changer will use location  in background to detect the user entrance and exit to/from geofence circle.</string>
+    <string name="no_thanks">No thanks</string>
+    <string name="turn_on">Turn on</string>
+    <string name="location_permission">Location permission</string>
+    <string name="manage_settings">Manage settings</string>
+    <string name="next">Next</string>
+    <string name="are_you_sure_you_want_to_delete">Are you sure you want to delete?</string>
+    <string name="are_you_sure_you_want_to_back">Are you sure you want to back?</string>
+
 </resources>

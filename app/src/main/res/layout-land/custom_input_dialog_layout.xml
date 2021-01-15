@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/dialogBg"
+    app:cardCornerRadius="10dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/dialogBg">
+
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/dialogTitle_tv"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@drawable/header_2"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="18dp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ScrollView
+            android:id="@+id/scrollView3"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:background="?attr/dialogBg"
+            android:paddingBottom="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dialogTitle_tv">
+
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/dialogBg">
+
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/input_et"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:hint="@string/un_titled"
+                    android:maxLength="25"
+                    android:maxLines="1"
+                    android:textColor="?attr/textBlueWhite"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/textView19"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/circle_size"
+                    android:textColor="?attr/textWhiteGray"
+                    app:layout_constraintEnd_toEndOf="@+id/circleSize_cv"
+                    app:layout_constraintStart_toStartOf="@+id/circleSize_cv"
+                    app:layout_constraintTop_toBottomOf="@+id/input_et" />
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/circleSize_cv"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
+                    app:cardBackgroundColor="?attr/dialogBg"
+                    app:cardCornerRadius="8dp"
+                    app:layout_constraintEnd_toStartOf="@+id/guideline9"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintHorizontal_chainStyle="spread_inside"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/textView19">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/circle_tv"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:ellipsize="end"
+                            android:gravity="center"
+                            android:hint="@string/walk"
+                            android:textColor="?attr/textWhiteGray"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/appCompatImageView"
+                            app:layout_constraintHorizontal_bias="0.5"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/appCompatImageView"
+                            android:layout_width="25dp"
+                            android:layout_height="0dp"
+                            android:background="@color/colorPrimaryVariantLight"
+                            android:scaleType="centerInside"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:srcCompat="@drawable/ic_down_arrow" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.cardview.widget.CardView>
+
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/geoType_cl"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
+                    app:cardBackgroundColor="?attr/dialogBg"
+                    app:cardCornerRadius="8dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="@+id/guideline9"
+                    app:layout_constraintTop_toBottomOf="@+id/textView2">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/geoFenceType_tv"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:ellipsize="end"
+                            android:gravity="center"
+                            android:text="@string/enter"
+                            android:textColor="?attr/textWhiteGray"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/appCompatImageView2"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/appCompatImageView2"
+                            android:layout_width="25dp"
+                            android:layout_height="0dp"
+                            android:background="@color/colorPrimaryVariantLight"
+                            android:scaleType="centerInside"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:srcCompat="@drawable/ic_down_arrow" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.cardview.widget.CardView>
+
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/textView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/geofence_type"
+                    android:textColor="?attr/textWhiteGray"
+                    app:layout_constraintEnd_toEndOf="@+id/geoType_cl"
+                    app:layout_constraintStart_toStartOf="@+id/geoType_cl"
+                    app:layout_constraintTop_toBottomOf="@+id/input_et" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/materialTextView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:text="@string/on_entered"
+                    android:textColor="?attr/textWhiteGray"
+                    android:textSize="14dp"
+                    app:layout_constraintEnd_toEndOf="@+id/onInter_cv"
+                    app:layout_constraintStart_toStartOf="@+id/onInter_cv"
+                    app:layout_constraintTop_toBottomOf="@+id/timePicker_cv" />
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/onInter_cv"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="5dp"
+                    app:cardBackgroundColor="?attr/dialogBg"
+                    app:cardCornerRadius="8dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/guideline9"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/materialTextView2">
+
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/onEntered_cl"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/onEnterProfile_tv"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="2dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginEnd="32dp"
+                            android:layout_marginBottom="10dp"
+                            android:ellipsize="marquee"
+                            android:gravity="center"
+                            android:hint="@string/N_A"
+                            android:singleLine="true"
+                            android:textColor="?attr/textWhiteGray"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintHorizontal_bias="0.5"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <View
+                        android:id="@+id/view3"
+                        android:layout_width="30dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="end"
+                        android:background="@color/colorPrimaryVariantLight"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+                </androidx.cardview.widget.CardView>
+
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/materialTextView3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:text="@string/on_exit"
+                    android:textColor="?attr/textWhiteGray"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="@+id/onExit_cv"
+                    app:layout_constraintStart_toStartOf="@+id/onExit_cv"
+                    app:layout_constraintTop_toBottomOf="@+id/geoType_cl" />
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/onExit_cv"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:minWidth="120dp"
+                    android:visibility="gone"
+                    app:cardBackgroundColor="?attr/dialogBg"
+                    app:cardCornerRadius="8dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_chainStyle="spread_inside"
+                    app:layout_constraintStart_toStartOf="@+id/guideline9"
+                    app:layout_constraintTop_toBottomOf="@+id/materialTextView3">
+
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/onExit_cl"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/onExitProfile_tv"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="2dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginEnd="32dp"
+                            android:layout_marginBottom="10dp"
+                            android:ellipsize="marquee"
+                            android:gravity="center"
+                            android:hint="@string/N_A"
+                            android:singleLine="true"
+                            android:textColor="?attr/textWhiteGray"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <View
+                        android:id="@+id/view2"
+                        android:layout_width="30dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="end"
+                        android:background="@color/colorPrimaryVariantLight" />
+
+                </androidx.cardview.widget.CardView>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/textView11"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="24dp"
+                    android:text="@string/expiration_time"
+                    android:textColor="?attr/textWhiteGray"
+                    app:layout_constraintEnd_toEndOf="@+id/timePicker_cv"
+                    app:layout_constraintStart_toStartOf="@+id/timePicker_cv"
+                    app:layout_constraintTop_toBottomOf="@+id/geoType_cl" />
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/timePicker_cv"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
+                    app:cardBackgroundColor="?attr/dialogBg"
+                    app:cardCornerRadius="8dp"
+                    app:layout_constraintEnd_toStartOf="@+id/guideline9"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/textView11">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/expirationTime_tv"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="2dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginEnd="2dp"
+                            android:layout_marginBottom="10dp"
+                            android:ellipsize="marquee"
+                            android:gravity="center"
+                            android:text="@string/hr1"
+                            android:singleLine="true"
+                            android:textColor="?attr/textWhiteGray"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/appCompatImageView5"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/appCompatImageView5"
+                            android:layout_width="30dp"
+                            android:layout_height="0dp"
+                            android:background="@color/colorPrimaryVariantLight"
+                            android:scaleType="centerInside"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:srcCompat="@drawable/ic_down_arrow" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.cardview.widget.CardView>
+
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline9"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.5" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </ScrollView>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/positive_tv"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:background="@drawable/ripple_positive_bg"
+            android:gravity="center"
+            android:text="@string/done"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/negative_tv"
+            app:layout_constraintTop_toTopOf="@+id/negative_tv"
+            app:layout_constraintVertical_bias="1.0" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/negative_tv"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:background="@drawable/ripple_negative_bg"
+            android:gravity="center"
+            android:text="@string/dismiss"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/positive_tv"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/scrollView3" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>

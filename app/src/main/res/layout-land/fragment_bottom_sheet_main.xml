@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/transparent"
+    app:layout_behavior="@string/bottom_sheet_behavior"
+    tools:context=".fragments.BottomSheetFragmentMain">
+
+    <View
+        android:id="@+id/view2"
+        android:layout_width="100dp"
+        android:layout_height="6dp"
+        android:layout_margin="10dp"
+        android:background="?attr/dialogBg"
+        app:layout_constraintBottom_toTopOf="@+id/constraintLayout2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.8" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+
+        <LinearLayout
+            android:id="@+id/linearLayout8"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/textViewRing"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:text="@string/ringtone"
+                android:textColor="?attr/textWhiteGray"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@+id/ring"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/music" />
+
+            <SeekBar
+                android:id="@+id/ring"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:progressDrawable="@drawable/seekbar_progress"
+                android:splitTrack="false"
+                android:thumb="@drawable/tumb"
+                app:layout_constraintBottom_toTopOf="@+id/textViewSystem"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textViewRing" />
+
+            <TextView
+                android:textColor="?attr/textWhiteGray"
+                android:textStyle="bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:text="@string/media" />
+
+            <SeekBar
+                android:id="@+id/music"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:progressDrawable="@drawable/seekbar_progress"
+                android:splitTrack="false"
+                android:thumb="@drawable/tumb"
+                app:layout_constraintBottom_toTopOf="@+id/textViewRing"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textViewMusic" />
+
+            <TextView
+                android:textColor="?attr/textWhiteGray"
+                android:textStyle="bold"
+                android:id="@+id/textViewSystem"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:text="@string/system"
+                app:layout_constraintBottom_toTopOf="@+id/system"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/ring" />
+
+            <SeekBar
+                android:id="@+id/system"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:progressDrawable="@drawable/seekbar_progress"
+                android:splitTrack="false"
+                android:thumb="@drawable/tumb"
+                app:layout_constraintBottom_toTopOf="@+id/textViewVoice"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textViewSystem" />
+
+            <TextView
+                android:textColor="?attr/textWhiteGray"
+                android:textStyle="bold"
+                android:id="@+id/textViewNoti"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:text="@string/notification"
+                app:layout_constraintBottom_toTopOf="@+id/system"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/ring" />
+
+            <SeekBar
+                android:id="@+id/notification"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:progressDrawable="@drawable/seekbar_progress"
+                android:splitTrack="false"
+                android:thumb="@drawable/tumb"
+                app:layout_constraintBottom_toTopOf="@+id/textViewVoice"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textViewSystem" />
+
+            <Button
+                android:id="@+id/silent_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <!--        <com.google.android.gms.ads.AdView-->
+        <!--            android:id="@+id/adView"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            app:adSize="BANNER"-->
+        <!--            app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--            app:layout_constraintEnd_toEndOf="parent"-->
+        <!--             app:adUnitId="@string/banner"-->
+        <!--            app:layout_constraintStart_toStartOf="parent" />-->
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

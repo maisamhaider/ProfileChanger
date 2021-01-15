@@ -34,17 +34,14 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     private String time_profile_start_id;
     private String time_profile_end_id;
-    private AlarmClass alarmClass;
     String title;
     private TimeUtil timeUtil;
     NotificationManager mNotificationManager;
-    SeekBar seekBar;
 
     @Override
     public void onReceive(Context context, Intent intent) {
         mContext = context;
         notificationHelper = new NotificationHelper(context);
-        alarmClass = new AlarmClass(context);
         timeUtil = new TimeUtil(context);
         mNotificationManager = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -52,8 +49,6 @@ public class AlarmReceiver extends BroadcastReceiver {
         int id = intent.getIntExtra(MyAnnotations.PROFILER_POSITION, 0);
         boolean repeat = intent.getBooleanExtra(MyAnnotations.IS_REPEAT, false);
         long triggerTime = intent.getLongExtra(MyAnnotations.TRIGGER_TIME, 0);
-        notificationHelper.sendHighPriorityNotification(title, "Profile is triggered");
-        seekBar = new SeekBar(mContext);
         if (id - 10000 > -1) {
             //mean this is end profile
             if (repeat) {
@@ -81,33 +76,37 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     public void startProfile(String id) {
         MyDatabase database = new MyDatabase(mContext);
-            actions = new SoundProfileActions(mContext);
-            Cursor cursor = database.retrieveTimeTable(id);
-            while (cursor.moveToNext()) {
-                time_profile_start_id = cursor.getString(10);
-                String isRepeat = cursor.getString(8);
-
-                String endTime = cursor.getString(5);
-                long triggerTime;
-                if (isRepeat.matches(MyAnnotations.ON)) {
-                    triggerTime = timeUtil.getMillisFromFormattedDate(
-                            timeUtil.getCurrentFormattedDate()+" "+endTime,
-                            MyAnnotations.DEFAULT_FORMAT);
-                } else {
-                    triggerTime = timeUtil.getMillisFromFormattedDate(endTime,
-                            MyAnnotations.DEFAULT_FORMAT);
-                }
-
-                String d = timeUtil.getFormattedDateAndTime(triggerTime);
+        actions = new SoundProfileActions(mContext);
+        Cursor cursor = database.retrieveTimeTable(id);
+        while (cursor.moveToNext()) {
+            time_profile_start_id = cursor.getString(10);
+            String isRepeat = cursor.getString(8);
+            AlarmClass alarmClass = new AlarmClass(mContext);
+            String endTime = cursor.getString(5);
+            long triggerTime;
+            if (isRepeat.matches(MyAnnotations.ON)) {
+                triggerTime = timeUtil.getMillisFromFormattedDate(
+                        timeUtil.getCurrentFormattedDate() + " " + endTime,
+                        MyAnnotations.DEFAULT_FORMAT);
 
                 alarmClass.setOneAlarm(title, triggerTime,
-                    Integer.parseInt(id) + 10000, true);
+                        Integer.parseInt(id) + 10000, true);
+            } else {
+                triggerTime = timeUtil.getMillisFromFormattedDate(endTime,
+                        MyAnnotations.DEFAULT_FORMAT);
+                alarmClass.setOneAlarm(title, triggerTime,
+                        Integer.parseInt(id) + 10000, false);
+            }
+
+            String d = timeUtil.getFormattedDateAndTime(triggerTime);
+
 
         }
 
 
         Cursor startCursor = database.retrieveProfile(time_profile_start_id);
         while (startCursor.moveToNext()) {
+            String PROFILE_TITLE = startCursor.getString(1);
             String ringerMode = startCursor.getString(2);
             int ringerLevel = Integer.parseInt(startCursor.getString(3));
             int mediaLevel = Integer.parseInt(startCursor.getString(4));
@@ -116,35 +115,38 @@ public class AlarmReceiver extends BroadcastReceiver {
             String vibrate = startCursor.getString(7);
             String touchSound = startCursor.getString(8);
             String dialPedSound = startCursor.getString(9);
-
+            notificationHelper.sendHighPriorityNotification(title, "Profile is triggered."
+                    + PROFILE_TITLE + " is enabled");
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (mNotificationManager.isNotificationPolicyAccessGranted()) {
 
-                    if (ringerMode.matches(MyAnnotations.RINGER_MODE_SILENT)) {
+                    if (ringerMode.equals(MyAnnotations.RINGER_MODE_SILENT)) {
                         actions.setRingerMode(ringerMode);
+                        actions.setVolume(AudioManager.STREAM_MUSIC, mediaLevel);
+                        /*actions.setVolume(AudioManager.STREAM_NOTIFICATION, notificationLevel);
+                        actions.setVolume(AudioManager.STREAM_SYSTEM, systemLevel);*/
+                    } else {
+                        actions.setVolume(AudioManager.STREAM_RING, ringerLevel);
                         actions.setVolume(AudioManager.STREAM_MUSIC, mediaLevel);
                         actions.setVolume(AudioManager.STREAM_NOTIFICATION, notificationLevel);
                         actions.setVolume(AudioManager.STREAM_SYSTEM, systemLevel);
-                    } else
-                        actions.setVolume(AudioManager.STREAM_RING, ringerLevel);
-                    actions.setVolume(AudioManager.STREAM_MUSIC, mediaLevel);
-                    actions.setVolume(AudioManager.STREAM_NOTIFICATION, notificationLevel);
-                    actions.setVolume(AudioManager.STREAM_SYSTEM, systemLevel);
+                    }
                 }
 
             } else {
 
-                if (ringerMode.matches(MyAnnotations.RINGER_MODE_SILENT)) {
+                if (ringerMode.equals(MyAnnotations.RINGER_MODE_SILENT)) {
                     actions.setRingerMode(ringerMode);
+                    actions.setVolume(AudioManager.STREAM_MUSIC, mediaLevel);
+                 /*   actions.setVolume(AudioManager.STREAM_NOTIFICATION, notificationLevel);
+                    actions.setVolume(AudioManager.STREAM_SYSTEM, systemLevel);*/
+                } else {
+                    actions.setVolume(AudioManager.STREAM_RING, ringerLevel);
                     actions.setVolume(AudioManager.STREAM_MUSIC, mediaLevel);
                     actions.setVolume(AudioManager.STREAM_NOTIFICATION, notificationLevel);
                     actions.setVolume(AudioManager.STREAM_SYSTEM, systemLevel);
-                } else
-                    actions.setVolume(AudioManager.STREAM_RING, ringerLevel);
-                actions.setVolume(AudioManager.STREAM_MUSIC, mediaLevel);
-                actions.setVolume(AudioManager.STREAM_NOTIFICATION, notificationLevel);
-                actions.setVolume(AudioManager.STREAM_SYSTEM, systemLevel);
+                }
             }
             if (ringerMode.matches(MyAnnotations.RINGER_MODE_SILENT)) {
                 actions.setVibration(0);
@@ -168,6 +170,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                 actions.setDialingPadTone(0);
             }
         }
+
 
     }
 
@@ -193,6 +196,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                             timeUtil.getMilliDateAndTime(triggerTime +
                                     DateUtils.HOUR_IN_MILLIS * 24);
 
+                    AlarmClass alarmClass = new AlarmClass(mContext);
 
                     String wq = timeUtil.getFormattedDateAndTime(triggerTime1);
                     alarmClass.setOneAlarm(title, triggerTime1,
@@ -204,6 +208,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         Cursor startCursor = database.retrieveProfile(time_profile_end_id);
         while (startCursor.moveToNext()) {
+            String PROFILE_TITLE = startCursor.getString(1);
             String ringerMode = startCursor.getString(2);
             int ringerLevel = Integer.parseInt(startCursor.getString(3));
             int mediaLevel = Integer.parseInt(startCursor.getString(4));
@@ -212,23 +217,39 @@ public class AlarmReceiver extends BroadcastReceiver {
             String vibrate = startCursor.getString(7);
             String touchSound = startCursor.getString(8);
             String dialPedSound = startCursor.getString(9);
-
+            notificationHelper.sendHighPriorityNotification(title, "Profile is triggered."
+                    + PROFILE_TITLE + " is enabled");
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (mNotificationManager.isNotificationPolicyAccessGranted()) {
+
+                    if (ringerMode.equals(MyAnnotations.RINGER_MODE_SILENT)) {
+                        actions.setRingerMode(ringerMode);
+                        actions.setVolume(AudioManager.STREAM_MUSIC, mediaLevel);
+                        /*actions.setVolume(AudioManager.STREAM_NOTIFICATION, notificationLevel);
+                        actions.setVolume(AudioManager.STREAM_SYSTEM, systemLevel);*/
+                    } else {
+                        actions.setVolume(AudioManager.STREAM_RING, ringerLevel);
+                        actions.setVolume(AudioManager.STREAM_MUSIC, mediaLevel);
+                        actions.setVolume(AudioManager.STREAM_NOTIFICATION, notificationLevel);
+                        actions.setVolume(AudioManager.STREAM_SYSTEM, systemLevel);
+                    }
+                }
+
+            } else {
+
+                if (ringerMode.equals(MyAnnotations.RINGER_MODE_SILENT)) {
                     actions.setRingerMode(ringerMode);
+                    actions.setVolume(AudioManager.STREAM_MUSIC, mediaLevel);
+                  /*  actions.setVolume(AudioManager.STREAM_NOTIFICATION, notificationLevel);
+                    actions.setVolume(AudioManager.STREAM_SYSTEM, systemLevel);*/
+                } else {
                     actions.setVolume(AudioManager.STREAM_RING, ringerLevel);
                     actions.setVolume(AudioManager.STREAM_MUSIC, mediaLevel);
                     actions.setVolume(AudioManager.STREAM_NOTIFICATION, notificationLevel);
                     actions.setVolume(AudioManager.STREAM_SYSTEM, systemLevel);
                 }
-
-            } else {
-                actions.setRingerMode(ringerMode);
-                actions.setVolume(AudioManager.STREAM_RING, ringerLevel);
-                actions.setVolume(AudioManager.STREAM_MUSIC, mediaLevel);
-                actions.setVolume(AudioManager.STREAM_NOTIFICATION, notificationLevel);
-                actions.setVolume(AudioManager.STREAM_SYSTEM, systemLevel);
             }
+
             if (ringerMode.matches(MyAnnotations.RINGER_MODE_SILENT)) {
                 actions.setVibration(0);
 

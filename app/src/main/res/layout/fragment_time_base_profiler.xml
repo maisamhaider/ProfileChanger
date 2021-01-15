@@ -16,7 +16,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 
-    <com.google.android.material.imageview.ShapeableImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/addNew_mBtn"
         android:layout_width="100dp"
         android:layout_height="100dp"

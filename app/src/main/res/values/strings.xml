@@ -82,7 +82,7 @@
     <string name="not_found">Not Found</string>
     <string name="place_name">Place name</string>
     <string name="permission">Permission</string>
-    <string name="write_settings_alert_text">Without mange settings permission application main
+    <string name="write_settings_alert_text">Without <b>manage settings permission</b> application main
         features do not work.</string>
     <string name="do_not_disturb_permission_text">Without <b>do not disturb</b> permission application main
         features do not work.</string>
@@ -139,5 +139,20 @@
     <string name="by_accepting">By accepting you are agree to our <u><b>Terms and Conditions</b></u></string>
     <string name="terms_and_conditions">Terms And Conditions</string>
     <string name="do_not_disturb">Do not disturb</string>
+    <string name="ok">OK</string>
+    <string name="use_your_location">Use your location</string>
+    <string name="background_location_text1">To see maps for automatically tracked activities.\n
+        allow Profile Changer to use your location all of the time.</string>
+    <string name="background_location_text2">Profile Changer will use location  in background to detect the user entrance and exit to/from geofence circle.</string>
+    <string name="no_thanks">No thanks</string>
+    <string name="turn_on">Turn on</string>
+    <string name="location_permission">Location permission</string>
+    <string name="manage_settings">Manage settings</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="next">Next</string>
+    <string name="are_you_sure_you_want_to_delete">Are you sure you want to delete?</string>
+    <string name="are_you_sure_you_want_to_back">Are you sure you want to back?</string>
+    <string name="hr1">1hr</string>
 
 </resources>

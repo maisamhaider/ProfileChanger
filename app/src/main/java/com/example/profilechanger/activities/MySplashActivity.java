@@ -1,25 +1,20 @@
 package com.example.profilechanger.activities;
 
+import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
-import androidx.viewpager.widget.ViewPager;
 
 import com.example.profilechanger.R;
 import com.example.profilechanger.annotations.MyAnnotations;
@@ -90,14 +85,8 @@ public class MySplashActivity extends AppCompatActivity {
 
     public void loadFun() {
 
-
         if (isTermAccepted) {
 
-//            splash.setVisibility(View.GONE);
-//            termAndCondition.setVisibility(View.GONE);
-//            if (helpFirstTime) {
-//                help_main_layout.setVisibility(View.VISIBLE);
-//             } else
             startActivity(new Intent(MySplashActivity.this, MainActivity.class));
 
 
@@ -105,33 +94,22 @@ public class MySplashActivity extends AppCompatActivity {
             splash.setVisibility(View.GONE);
             termAndCondition.setVisibility(View.VISIBLE);
 
-            accept.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (termAndCondition_Cb.isChecked()) {
-                        preferences.setBoolean(MyAnnotations.IS_TERMS_CONDITION, true);
-                        termAndCondition.setVisibility(View.GONE);
+            accept.setOnClickListener(v -> {
+                if (termAndCondition_Cb.isChecked()) {
+                    preferences.setBoolean(MyAnnotations.IS_TERMS_CONDITION, true);
+                    termAndCondition.setVisibility(View.GONE);
 //                        help_main_layout.setVisibility(View.VISIBLE);
 //                        helpScreen();
-                        startActivity(new Intent(MySplashActivity.this, MainActivity.class));
+                    startActivity(new Intent(MySplashActivity.this, MainActivity.class));
 
-                    } else {
-                        Toast.makeText(MySplashActivity.this,
-                                "Please check the terms and conditions box",
-                                Toast.LENGTH_SHORT).show();
-                    }
+                } else {
+                    Toast.makeText(MySplashActivity.this,
+                            "Please check the terms and conditions box",
+                            Toast.LENGTH_SHORT).show();
                 }
             });
-            decline.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    finishAffinity();
-                }
-            });
-
-
+            decline.setOnClickListener(v -> finishAffinity());
         }
-
     }
 
     public void Load_withAds() {
@@ -141,11 +119,10 @@ public class MySplashActivity extends AppCompatActivity {
                 if (mInterstitialAd != null && mInterstitialAd.isLoaded()) {
                     mInterstitialAd.show();
                 } else {
-
                     loadFun();
-                    loadInterstitial();
                 }
 
+                Context context;
                 mInterstitialAd.setAdListener(
                         new AdListener() {
                             @Override
@@ -159,13 +136,11 @@ public class MySplashActivity extends AppCompatActivity {
                             @Override
                             public void onAdClosed() {
                                 loadFun();
-                                loadInterstitial();
                             }
                         });
             }, 3000);
         } catch (Exception e) {
             e.printStackTrace();
-            Toast.makeText(this, "Exception " + e.getMessage(), Toast.LENGTH_SHORT).show();
             loadFun();
         }
     }
@@ -177,6 +152,7 @@ public class MySplashActivity extends AppCompatActivity {
             AdRequest adRequest = new AdRequest.Builder().build();
             mInterstitialAd.loadAd(adRequest);
         }
+
     }
 
 //    public void helpScreen() {
