@@ -33,17 +33,6 @@ public class GeoFence extends ContextWrapper {
                                 String expirationTime) {
 
         if (transitionType.matches(MyAnnotations.ENTER)) {
-//             if (expirationTime.matches(MyAnnotations.NEVER))
-//             {
-//                 return new Geofence.Builder()
-//                         .setCircularRegion(latLng.latitude, latLng.longitude, radius)
-//                         .setRequestId(id)
-//                         .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
-//                         .setLoiteringDelay(5000)
-//                         .setExpirationDuration(Long.parseLong(expirationTime))
-//                         .build();
-//             }
-//             else
                  return new Geofence.Builder()
                     .setCircularRegion(latLng.latitude, latLng.longitude, radius)
                     .setRequestId(id)
@@ -53,18 +42,6 @@ public class GeoFence extends ContextWrapper {
                     .build();
 
         } else if (transitionType.matches(MyAnnotations.EXIT)) {
-//            if (expirationTime.matches(MyAnnotations.NEVER))
-//            {
-//
-//                return new Geofence.Builder()
-//                        .setCircularRegion(latLng.latitude, latLng.longitude, radius)
-//                        .setRequestId(id)
-//                        .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_EXIT)
-//                        .setLoiteringDelay(5000)
-//                        .setExpirationDuration(Geofence.NEVER_EXPIRE)
-//                        .build();
-//            }
-//            else
                 return new Geofence.Builder()
                         .setCircularRegion(latLng.latitude, latLng.longitude, radius)
                         .setRequestId(id)
@@ -74,19 +51,6 @@ public class GeoFence extends ContextWrapper {
                         .build();
 
         }
-//        else if (transitionType.matches(MyAnnotations.BOTH)){
-
-//            if (expirationTime.matches(MyAnnotations.NEVER))
-//            {
-//                return new Geofence.Builder()
-//                        .setCircularRegion(latLng.latitude, latLng.longitude, radius)
-//                        .setRequestId(id)
-//                        .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER
-//                                | Geofence.GEOFENCE_TRANSITION_EXIT)
-//                        .setLoiteringDelay(5000)
-//                        .setExpirationDuration(Geofence.NEVER_EXPIRE)
-//                        .build();
-//            }
             else
 
                 return new Geofence.Builder()

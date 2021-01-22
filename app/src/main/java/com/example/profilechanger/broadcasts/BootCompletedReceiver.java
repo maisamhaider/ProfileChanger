@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Build;
 
+import com.example.profilechanger.activities.MainActivity;
 import com.example.profilechanger.annotations.MyAnnotations;
 import com.example.profilechanger.database.MyDatabase;
 import com.example.profilechanger.services.Service1;
@@ -23,11 +24,19 @@ public class BootCompletedReceiver extends BroadcastReceiver {
         this.context = context;
         MyPreferences preferences = new MyPreferences(context);
         preferences.setBoolean(MyAnnotations.BOOT_COMPLETED, true);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            context.startForegroundService(new Intent(context, Service1.class));
-        }else{
-            context.startService(new Intent(context, Service1.class));
+
+        String model = Build.MODEL;
+        String manufacturer = Build.MANUFACTURER;
+
+        if (manufacturer.toLowerCase().matches("huawei")
+                && model.toLowerCase().matches("stk-l21")) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(new Intent(context, Service1.class));
+            } else {
+                context.startService(new Intent(context, Service1.class));
+            }
         }
+
         registerAlarms(context);
 
     }
@@ -42,10 +51,8 @@ public class BootCompletedReceiver extends BroadcastReceiver {
             String id = cursor.getString(1);
             String profilerTitle = cursor.getString(1);
             String startDate = cursor.getString(4);
-            String endDate = cursor.getString(5);
             String state = cursor.getString(6);
             String repeat = cursor.getString(8);
-
 
             if (state.matches(MyAnnotations.UN_DONE)) {
                 if (repeat.matches(MyAnnotations.OFF)) {
@@ -53,16 +60,13 @@ public class BootCompletedReceiver extends BroadcastReceiver {
                     long triggerTime1 = timeUtil.getMillisFromFormattedDate(startDate,
                             MyAnnotations.DEFAULT_FORMAT);
                     alarmClass.setOneAlarm(profilerTitle, triggerTime1,
-                            Integer.parseInt(id) + 1000,false);
-                    /*//set end Alarm
-                    long triggerTime2 = timeUtil.getMillisFromFormattedDate(endDate,
-                            MyAnnotations.DEFAULT_FORMAT);*/
+                            Integer.parseInt(id) + 1000, false);
 
 
                 } else {
                     long triggerTime1 = timeUtil.getMillisFromFormattedDate(
                             timeUtil.getCurrentFormattedDate() + " "
-                                    +startDate,
+                                    + startDate,
                             MyAnnotations.DEFAULT_FORMAT);
                     alarmClass.setOneAlarm(profilerTitle, triggerTime1,
                             Integer.parseInt(id) + 1000, true);

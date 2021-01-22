@@ -29,6 +29,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
+
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/mainHeaderIv"
                 android:layout_width="match_parent"
@@ -36,10 +37,10 @@
                 android:scaleType="fitXY"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/materialTextView4"
@@ -89,10 +90,12 @@
                 android:id="@+id/addNewProfile_mIv"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
+                android:background="?android:attr/selectableItemBackground"
                 app:layout_constraintBottom_toTopOf="@+id/mainTabLayout"
                 app:layout_constraintEnd_toStartOf="@+id/guideline3"
                 app:layout_constraintStart_toStartOf="@+id/guideline2"
                 app:layout_constraintTop_toBottomOf="@+id/materialTextView4"
+                app:layout_constraintVertical_bias="0.7"
                 app:srcCompat="@drawable/ic_add_porile" />
 
 
@@ -126,6 +129,7 @@
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:scaleType="fitXY"
+        android:background="?android:attr/selectableItemBackground"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_next_arrow" />

@@ -31,7 +31,7 @@ public class GeoFenceReceiver extends BroadcastReceiver {
     private static String TAG = "GeoFenceReceiver";
     NotificationHelper notificationHelper;
     private Context context;
-    SoundProfileActions soundProfileActions;
+    SoundProfileActions actions;
     MyDatabase db;
     NotificationManager mNotificationManager;
     SeekBar seekBar;
@@ -50,15 +50,15 @@ public class GeoFenceReceiver extends BroadcastReceiver {
 
 
         List<Geofence> geofenceList = geofencingEvent.getTriggeringGeofences();
-        for (Geofence geofence : geofenceList) {
+    /*    for (Geofence geofence : geofenceList) {
             Log.i(TAG, geofence.getRequestId());
-        }
-        soundProfileActions = new SoundProfileActions(context);
+        }*/
+        actions = new SoundProfileActions(context);
         db = new MyDatabase(context);
         Cursor cursor = db.retrieveLocation(geofenceList.get(0).getRequestId());
         String type = "null";
         while (cursor.moveToNext()) {
-            type = cursor.getString(6);
+            type = cursor.getString(5);
         }
 
         int transitionType = geofencingEvent.getGeofenceTransition();
@@ -114,96 +114,90 @@ public class GeoFenceReceiver extends BroadcastReceiver {
     }
 
     public void setVibrate(int zeroOne) {
-        soundProfileActions.setVibration(zeroOne);
+        actions.setVibration(zeroOne);
     }
 
     public void setTouchSound(int zeroOne) {
-        soundProfileActions.setTouchSound(zeroOne);
+        actions.setTouchSound(zeroOne);
     }
 
     public void setDialPadSound(int zeroOne) {
-        soundProfileActions.setDialingPadTone(zeroOne);
+        actions.setDialingPadTone(zeroOne);
     }
 
     public void setVolume(int type, int level) {
-        soundProfileActions.setVolume(type, level);
+        actions.setVolume(type, level);
     }
 
     public void enter(boolean isBoth, String id) {
         Cursor cursor = db.retrieveLocation(id);
         if (cursor.moveToNext()) {
             String title = cursor.getString(1);
-            String state = cursor.getString(8);
-            String date = cursor.getString(9);
             String enterProfileId = cursor.getString(10);
-            String endProfileId = cursor.getString(11);
 
+            Cursor startCursor = db.retrieveProfile(enterProfileId);
 
-            String profileId;
-            String PROFILE_TITLE;
-            String ringerMode = MyAnnotations.RINGER_MODE_NORMAL;
-            int ringerLevel = 0;
-            int mediaLevel = 0;
-            int notiLevel = 0;
-            int systemLevel = 0;
-            String vibrate = MyAnnotations.OFF;
-            String touchSound = MyAnnotations.OFF;
-            String dialPadSound = MyAnnotations.OFF;
+            while (startCursor.moveToNext()) {
+                String PROFILE_TITLE = startCursor.getString(1);
+                String ringerMode = startCursor.getString(2);
+                int ringerLevel = Integer.parseInt(startCursor.getString(3));
+                int mediaLevel = Integer.parseInt(startCursor.getString(4));
+                int notificationLevel = Integer.parseInt(startCursor.getString(5));
+                int systemLevel = Integer.parseInt(startCursor.getString(6));
+                String vibrate = startCursor.getString(7);
+                String touchSound = startCursor.getString(8);
+                String dialPedSound = startCursor.getString(9);
+                notificationHelper.sendHighPriorityNotification(title, "Profile is triggered."
+                        + PROFILE_TITLE + " is enabled");
 
-            //get profile data
-            Cursor cursor1 = db.retrieveLocation(enterProfileId);
-            if (cursor1.moveToNext()) {
-                ringerMode = cursor1.getString(2);
-                ringerLevel = Integer.parseInt(cursor1.getString(3));
-                mediaLevel = Integer.parseInt(cursor1.getString(4));
-                notiLevel = Integer.parseInt(cursor1.getString(5));
-                systemLevel = Integer.parseInt(cursor1.getString(6));
-                vibrate = cursor1.getString(7);
-                touchSound = cursor1.getString(8);
-                dialPadSound = cursor1.getString(9);
-            }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (mNotificationManager.isNotificationPolicyAccessGranted()) {
 
-            //set actions
-            audio(ringerMode, soundProfileActions);
-            if (ringerMode.matches(MyAnnotations.RINGER_MODE_SILENT)) {
-                setVibrate(0);
-            } else {
-                if (vibrate.matches(MyAnnotations.ON)) {
-                    setVibrate(1);
+                        if (ringerMode.equals(MyAnnotations.RINGER_MODE_SILENT)) {
+                            actions.setRingerMode(ringerMode);
+                            actions.setVolume(AudioManager.STREAM_MUSIC, mediaLevel);
+                        } else {
+                            actions.setVolume(AudioManager.STREAM_RING, ringerLevel);
+                            actions.setVolume(AudioManager.STREAM_MUSIC, mediaLevel);
+                            actions.setVolume(AudioManager.STREAM_NOTIFICATION, notificationLevel);
+                            actions.setVolume(AudioManager.STREAM_SYSTEM, systemLevel);
+                        }
+                    }
+
                 } else {
-                    setVibrate(0);
+
+                    if (ringerMode.equals(MyAnnotations.RINGER_MODE_SILENT)) {
+                        actions.setRingerMode(ringerMode);
+                        actions.setVolume(AudioManager.STREAM_MUSIC, mediaLevel);
+
+                    } else {
+                        actions.setVolume(AudioManager.STREAM_RING, ringerLevel);
+                        actions.setVolume(AudioManager.STREAM_MUSIC, mediaLevel);
+                        actions.setVolume(AudioManager.STREAM_NOTIFICATION, notificationLevel);
+                        actions.setVolume(AudioManager.STREAM_SYSTEM, systemLevel);
+                    }
                 }
-            }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (mNotificationManager.isNotificationPolicyAccessGranted()) {
-                    setVolume(AudioManager.STREAM_RING, ringerLevel);
-                    setVolume(AudioManager.STREAM_MUSIC, mediaLevel);
-                    setVolume(AudioManager.STREAM_NOTIFICATION, notiLevel);
-                    setVolume(AudioManager.STREAM_SYSTEM, systemLevel);
+                if (ringerMode.matches(MyAnnotations.RINGER_MODE_SILENT)) {
+                    actions.setVibration(0);
+
+                } else {
+                    if (vibrate.matches(MyAnnotations.ON)) {
+                        actions.setVibration(1);
+                    } else {
+                        actions.setVibration(0);
+                    }
                 }
 
-
-            } else {
-                setVolume(AudioManager.STREAM_RING, ringerLevel);
-                setVolume(AudioManager.STREAM_MUSIC, mediaLevel);
-                setVolume(AudioManager.STREAM_NOTIFICATION, notiLevel);
-                setVolume(AudioManager.STREAM_SYSTEM, systemLevel);
-            }
-
-
-            if (touchSound.matches(MyAnnotations.ON)) {
-                setTouchSound(1);
-
-            } else {
-                setTouchSound(0);
-
-            }
-            if (dialPadSound.matches(MyAnnotations.ON)) {
-                setDialPadSound(1);
-
-            } else {
-                setDialPadSound(0);
-
+                if (touchSound.matches(MyAnnotations.ON)) {
+                    actions.setTouchSound(1);
+                } else {
+                    actions.setTouchSound(0);
+                }
+                if (dialPedSound.matches(MyAnnotations.ON)) {
+                    actions.setDialingPadTone(1);
+                } else {
+                    actions.setDialingPadTone(0);
+                }
             }
 
             if (!isBoth) {
@@ -211,7 +205,6 @@ public class GeoFenceReceiver extends BroadcastReceiver {
                 db.update(id, MyAnnotations.DONE);
             }
 
-            notificationHelper.sendHighPriorityNotification(title, "is Triggered on enter");
 
 
         }
@@ -226,74 +219,76 @@ public class GeoFenceReceiver extends BroadcastReceiver {
             String title = cursor.getString(1);
             String endProfileId = cursor.getString(11);
 
-            String ringerMode = MyAnnotations.RINGER_MODE_NORMAL;
-            int ringerLevel = 0;
-            int mediaLevel = 0;
-            int notiLevel = 0;
-            int systemLevel = 0;
-            String vibrate = MyAnnotations.OFF;
-            String touchSound = MyAnnotations.OFF;
-            String dialPadSound = MyAnnotations.OFF;
-
             //get profile data
-            Cursor cursor1 = db.retrieveLocation(endProfileId);
-            if (cursor1.moveToNext()) {
-                ringerMode = cursor1.getString(2);
-                ringerLevel = Integer.parseInt(cursor1.getString(3));
-                mediaLevel = Integer.parseInt(cursor1.getString(4));
-                notiLevel = Integer.parseInt(cursor1.getString(5));
-                systemLevel = Integer.parseInt(cursor1.getString(6));
-                vibrate = cursor1.getString(7);
-                touchSound = cursor1.getString(8);
-                dialPadSound = cursor1.getString(9);
-            }
+            Cursor startCursor = db.retrieveProfile(endProfileId);
+            while (startCursor.moveToNext()) {
+                String PROFILE_TITLE = startCursor.getString(1);
+                String ringerMode = startCursor.getString(2);
+                int ringerLevel = Integer.parseInt(startCursor.getString(3));
+                int mediaLevel = Integer.parseInt(startCursor.getString(4));
+                int notificationLevel = Integer.parseInt(startCursor.getString(5));
+                int systemLevel = Integer.parseInt(startCursor.getString(6));
+                String vibrate = startCursor.getString(7);
+                String touchSound = startCursor.getString(8);
+                String dialPedSound = startCursor.getString(9);
+                notificationHelper.sendHighPriorityNotification(title, "Profile is triggered."
+                        + PROFILE_TITLE + " is enabled");
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (mNotificationManager.isNotificationPolicyAccessGranted()) {
 
-            //set actions
-            if (ringerMode.matches(MyAnnotations.RINGER_MODE_SILENT)) {
-                setVibrate(0);
-            } else {
-                if (vibrate.matches(MyAnnotations.ON)) {
-                    setVibrate(1);
+                        if (ringerMode.equals(MyAnnotations.RINGER_MODE_SILENT)) {
+                            actions.setRingerMode(ringerMode);
+                            actions.setVolume(AudioManager.STREAM_MUSIC, mediaLevel);
+
+                        } else {
+                            actions.setVolume(AudioManager.STREAM_RING, ringerLevel);
+                            actions.setVolume(AudioManager.STREAM_MUSIC, mediaLevel);
+                            actions.setVolume(AudioManager.STREAM_NOTIFICATION, notificationLevel);
+                            actions.setVolume(AudioManager.STREAM_SYSTEM, systemLevel);
+                        }
+                    }
+
                 } else {
-                    setVibrate(0);
+
+                    if (ringerMode.equals(MyAnnotations.RINGER_MODE_SILENT)) {
+                        actions.setRingerMode(ringerMode);
+                        actions.setVolume(AudioManager.STREAM_MUSIC, mediaLevel);
+                    } else {
+                        actions.setVolume(AudioManager.STREAM_RING, ringerLevel);
+                        actions.setVolume(AudioManager.STREAM_MUSIC, mediaLevel);
+                        actions.setVolume(AudioManager.STREAM_NOTIFICATION, notificationLevel);
+                        actions.setVolume(AudioManager.STREAM_SYSTEM, systemLevel);
+                    }
                 }
-            }
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (mNotificationManager.isNotificationPolicyAccessGranted()) {
-                    setVolume(AudioManager.STREAM_RING, ringerLevel);
-                    setVolume(AudioManager.STREAM_MUSIC, mediaLevel);
-                    setVolume(AudioManager.STREAM_NOTIFICATION, notiLevel);
-                    setVolume(AudioManager.STREAM_SYSTEM, systemLevel);
-                    audio(ringerMode, soundProfileActions);
+                if (ringerMode.matches(MyAnnotations.RINGER_MODE_SILENT)) {
+                    actions.setVibration(0);
+
+                } else {
+                    if (vibrate.matches(MyAnnotations.ON)) {
+                        actions.setVibration(1);
+                    } else {
+                        actions.setVibration(0);
+                    }
                 }
 
-            } else {
-                setVolume(AudioManager.STREAM_RING, ringerLevel);
-                setVolume(AudioManager.STREAM_MUSIC, mediaLevel);
-                setVolume(AudioManager.STREAM_NOTIFICATION, notiLevel);
-                setVolume(AudioManager.STREAM_SYSTEM, systemLevel);
-            }
+                if (touchSound.matches(MyAnnotations.ON)) {
+                    actions.setTouchSound(1);
+                } else {
+                    actions.setTouchSound(0);
+                }
 
-            if (touchSound.matches(MyAnnotations.ON)) {
-                setTouchSound(1);
+                if (dialPedSound.matches(MyAnnotations.ON)) {
+                    actions.setDialingPadTone(1);
+                } else {
+                    actions.setDialingPadTone(0);
+                }
 
-            } else {
-                setTouchSound(0);
-
-            }
-            if (dialPadSound.matches(MyAnnotations.ON)) {
-                setDialPadSound(1);
-
-            } else {
-                setDialPadSound(0);
 
             }
 
             removeGeoFence(id);
             db.update(id, MyAnnotations.DONE);
-            notificationHelper.sendHighPriorityNotification(title, "is Triggered on exit");
-
 
         }
     }

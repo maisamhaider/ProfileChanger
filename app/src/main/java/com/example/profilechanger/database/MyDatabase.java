@@ -9,9 +9,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import androidx.annotation.Nullable;
 
-import com.example.profilechanger.annotations.MyAnnotations;
-
-
 public class MyDatabase extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "GEO_FENCE_DB";
@@ -44,6 +41,22 @@ public class MyDatabase extends SQLiteOpenHelper {
     private static final String TIME_DAYS = "TIME_DAYS";
     private static final String TIME_PROFILE_START = "TIME_PROFILE_START";
     private static final String TIME_PROFILE_END = "TIME_PROFILE_END";
+    private static final String TIME_START_STATE = "TIME_START_STATE";
+    private static final String TIME_END_STATE = "TIME_END_STATE";
+    private static final String TIME_S_SUNDAY = "TIME_S_SUNDAY";
+    private static final String TIME_S_MONDAY = "TIME_S_MONDAY";
+    private static final String TIME_S_TUESDAY = "TIME_S_TUESDAY";
+    private static final String TIME_S_WEDNESDAY = "TIME_S_WEDNESDAY";
+    private static final String TIME_S_THURSDAY = "TIME_S_THURSDAY";
+    private static final String TIME_S_FRIDAY = "TIME_S_FRIDAY";
+    private static final String TIME_S_SATURDAY = "TIME_S_SATURDAY";
+    private static final String TIME_E_SUNDAY = "TIME_E_SUNDAY";
+    private static final String TIME_E_MONDAY = "TIME_E_MONDAY";
+    private static final String TIME_E_TUESDAY = "TIME_E_TUESDAY";
+    private static final String TIME_E_WEDNESDAY = "TIME_E_WEDNESDAY";
+    private static final String TIME_E_THURSDAY = "TIME_E_THURSDAY";
+    private static final String TIME_E_FRIDAY = "TIME_E_FRIDAY";
+    private static final String TIME_E_SATURDAY = "TIME_E_SATURDAY";
 
 
     private static final String PROFILE_TABLE = "PROFILE_TABLE";
@@ -96,7 +109,25 @@ public class MyDatabase extends SQLiteOpenHelper {
                 ",TIME_REPEAT TEXT" +
                 ",TIME_DAYS TEXT" +
                 ",TIME_PROFILE_START TEXT" +
-                ",TIME_PROFILE_END TEXT)");
+                ",TIME_PROFILE_END TEXT" +
+                ",TIME_START_STATE TEXT" +
+                ",TIME_END_STATE TEXT" +
+                ",TIME_S_SUNDAY TEXT" +
+                ",TIME_S_MONDAY TEXT" +
+                ",TIME_S_TUESDAY TEXT" +
+                ",TIME_S_WEDNESDAY TEXT" +
+                ",TIME_S_THURSDAY TEXT" +
+                ",TIME_S_FRIDAY TEXT" +
+                ",TIME_S_SATURDAY TEXT" +
+                ",TIME_E_SUNDAY TEXT" +
+                ",TIME_E_MONDAY TEXT" +
+                ",TIME_E_TUESDAY TEXT" +
+                ",TIME_E_WEDNESDAY TEXT" +
+                ",TIME_E_THURSDAY TEXT" +
+                ",TIME_E_FRIDAY TEXT" +
+                ",TIME_E_SATURDAY TEXT" +
+                ")");
+
 
         db.execSQL("create table " + PROFILE_TABLE + "(PROFILE_P_KEY INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "PROFILE_TITLE TEXT" +
@@ -219,7 +250,10 @@ public class MyDatabase extends SQLiteOpenHelper {
     public long insertTimeTable(String time_title, String profileTitleStart, String profileTitleEnd,
                                 String startTime, String endTime, String state, String date,
                                 String repeat, String days, String start_profile_id,
-                                String end_profile_id) {
+                                String end_profile_id, String startState, String endState
+            , String sSu, String sMo, String sTu, String sWe, String sTh, String sFr, String sSa,
+                                String eSu, String eMo, String eTu, String eWe, String eTh,
+                                String eFr, String eSa) {
         SQLiteDatabase database = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(TIME_TITLE, time_title);
@@ -233,6 +267,22 @@ public class MyDatabase extends SQLiteOpenHelper {
         values.put(TIME_DAYS, days);
         values.put(TIME_PROFILE_START, start_profile_id);
         values.put(TIME_PROFILE_END, end_profile_id);
+        values.put(TIME_START_STATE, startState);
+        values.put(TIME_END_STATE, endState);
+        values.put(TIME_S_SUNDAY, sSu);
+        values.put(TIME_S_MONDAY, sMo);
+        values.put(TIME_S_TUESDAY, sTu);
+        values.put(TIME_S_WEDNESDAY, sWe);
+        values.put(TIME_S_THURSDAY, sTh);
+        values.put(TIME_S_FRIDAY, sFr);
+        values.put(TIME_S_SATURDAY, sSa);
+        values.put(TIME_E_SUNDAY, eSu);
+        values.put(TIME_E_MONDAY, eMo);
+        values.put(TIME_E_TUESDAY, eTu);
+        values.put(TIME_E_WEDNESDAY, eWe);
+        values.put(TIME_E_THURSDAY, eTh);
+        values.put(TIME_E_FRIDAY, eFr);
+        values.put(TIME_E_SATURDAY, eSa);
 
         return database.insert(TIME_TABLE, null, values);
     }
@@ -240,7 +290,10 @@ public class MyDatabase extends SQLiteOpenHelper {
     public long updateTimeTable(String id, String time_title, String profileTitleStart,
                                 String profileTitleEnd, String startTime, String endTime,
                                 String state, String date, String repeat, String days,
-                                String start_profile_id, String end_profile_id) {
+                                String start_profile_id, String end_profile_id, String startState,
+                                String endState, String sSu, String sMo, String sTu, String sWe,
+                                String sTh, String sFr, String sSa, String eSu, String eMo,
+                                String eTu, String eWe, String eTh, String eFr, String eSa) {
         SQLiteDatabase database = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(TIME_TITLE, time_title);
@@ -254,17 +307,79 @@ public class MyDatabase extends SQLiteOpenHelper {
         values.put(TIME_DAYS, days);
         values.put(TIME_PROFILE_START, start_profile_id);
         values.put(TIME_PROFILE_END, end_profile_id);
+        values.put(TIME_START_STATE, startState);
+        values.put(TIME_END_STATE, endState);
+        values.put(TIME_S_SUNDAY, sSu);
+        values.put(TIME_S_MONDAY, sMo);
+        values.put(TIME_S_TUESDAY, sTu);
+        values.put(TIME_S_WEDNESDAY, sWe);
+        values.put(TIME_S_THURSDAY, sTh);
+        values.put(TIME_S_FRIDAY, sFr);
+        values.put(TIME_S_SATURDAY, sSa);
+        values.put(TIME_E_SUNDAY, eSu);
+        values.put(TIME_E_MONDAY, eMo);
+        values.put(TIME_E_TUESDAY, eTu);
+        values.put(TIME_E_WEDNESDAY, eWe);
+        values.put(TIME_E_THURSDAY, eTh);
+        values.put(TIME_E_FRIDAY, eFr);
+        values.put(TIME_E_SATURDAY, eSa);
+        return database.update(TIME_TABLE, values, MyDatabase.TIME_ID + "=?",
+                new String[]{id});
+
+    }
+
+    public long updateStartStates(String id, String su, String mo, String tu, String we, String th,
+                                  String fr, String sa) {
+        SQLiteDatabase database = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(TIME_S_SUNDAY, su);
+        values.put(TIME_S_MONDAY, mo);
+        values.put(TIME_S_TUESDAY, tu);
+        values.put(TIME_S_WEDNESDAY, we);
+        values.put(TIME_S_THURSDAY, th);
+        values.put(TIME_S_FRIDAY, fr);
+        values.put(TIME_S_SATURDAY, sa);
 
         return database.update(TIME_TABLE, values, MyDatabase.TIME_ID + "=?",
                 new String[]{id});
 
     }
 
+    public long updateEndStates(String id, String su, String mo, String tu, String we, String th,
+                                String fr, String sa) {
+        SQLiteDatabase database = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(TIME_E_SUNDAY, su);
+        values.put(TIME_E_MONDAY, mo);
+        values.put(TIME_E_TUESDAY, tu);
+        values.put(TIME_E_WEDNESDAY, we);
+        values.put(TIME_E_THURSDAY, th);
+        values.put(TIME_E_FRIDAY, fr);
+        values.put(TIME_E_SATURDAY, sa);
+        return database.update(TIME_TABLE, values, MyDatabase.TIME_ID + "=?",
+                new String[]{id});
+    }
+
+    public int updateStartState(String id, String stats) {
+        SQLiteDatabase database = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(TIME_START_STATE, stats);
+        return database.update(TIME_TABLE, values, MyDatabase.TIME_ID + "=?",
+                new String[]{id});
+    }
+
+    public int updateEndState(String id, String stats) {
+        SQLiteDatabase database = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(TIME_END_STATE, stats);
+        return database.update(TIME_TABLE, values, MyDatabase.TIME_ID + "=?",
+                new String[]{id});
+    }
+
     public Cursor retrieveTimeTable(String id) {
         SQLiteDatabase databaseWritable = getWritableDatabase();
         String selectQuery = "SELECT  * FROM " + TIME_TABLE + " WHERE TIME_ID  LIKE '" + id + "'";
         return databaseWritable.rawQuery(selectQuery, null);
-
     }
 
     public Cursor retrieveTimeTable() {
@@ -276,7 +391,7 @@ public class MyDatabase extends SQLiteOpenHelper {
     public void deleteTimeTable(String id) {
         SQLiteDatabase database = getWritableDatabase();
         int delete = database.delete(TIME_TABLE, MyDatabase.TIME_ID + "=?",
-                new String[]{id});
+            new String[]{id});
     }
 
     public void deleteTimeTable() {
@@ -328,7 +443,6 @@ public class MyDatabase extends SQLiteOpenHelper {
         SQLiteDatabase databaseWritable = getWritableDatabase();
         return databaseWritable.rawQuery("SELECT * FROM " + PROFILE_TABLE +
                 " WHERE PROFILE_P_KEY LIKE '" + id + "'", null);
-
     }
 
     public Cursor retrieveProfile() {

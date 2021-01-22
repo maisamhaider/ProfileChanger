@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/profileHeader_cl"
@@ -136,6 +134,7 @@
                 android:id="@+id/dayTheme_mRb"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="start|center"
                 android:layoutDirection="rtl"
                 android:text="@string/day"
                 android:textColor="?attr/textWhiteGray" />
@@ -155,6 +154,7 @@
             <!--                android:text="@string/auto_change"-->
             <!--                android:layoutDirection="rtl"-->
             <!--                android:textColor="?attr/textWhiteGray" />-->
+
         </RadioGroup>
 
         <View
@@ -170,14 +170,15 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.13" />
+
     <com.google.android.gms.ads.AdView
         android:id="@+id/adView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:adSize="BANNER"
+        app:adUnitId="@string/banner"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:adUnitId="@string/banner"
         app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

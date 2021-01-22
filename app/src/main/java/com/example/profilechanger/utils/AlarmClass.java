@@ -5,21 +5,23 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
+import android.os.Build;
+import android.os.PowerManager;
+import android.view.View;
+import android.widget.Toast;
 
+import com.example.profilechanger.R;
 import com.example.profilechanger.annotations.MyAnnotations;
 import com.example.profilechanger.broadcasts.AlarmReceiver;
 
 public class AlarmClass extends ContextWrapper {
 
 
-    public AlarmClass(Context base) {
-        super(base);
-    }
+    public AlarmClass(Context base) {super(base);}
 
     public void setOneAlarm(String title, long reminderTime, int position, boolean isRepeat) {
-        PendingIntent pendingIntent = null;
-        AlarmManager alarmManager = null;
-        alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         Intent myIntent = new Intent(this, AlarmReceiver.class);
         myIntent.setAction("android.intent.action.NOTIFY");
         myIntent.putExtra(MyAnnotations.PROFILER_TITLE, title);
@@ -27,16 +29,25 @@ public class AlarmClass extends ContextWrapper {
         myIntent.putExtra(MyAnnotations.IS_REPEAT, isRepeat);
         myIntent.putExtra(MyAnnotations.TRIGGER_TIME, reminderTime);
 
-        pendingIntent = PendingIntent.getBroadcast(this, position, myIntent,
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, position, myIntent,
                 0);
 
         if (alarmManager != null) {
             alarmManager.cancel(pendingIntent);
             alarmManager.setExact(AlarmManager.RTC_WAKEUP, reminderTime, pendingIntent);
+            /*if (Build.VERSION.SDK_INT >= 23) {
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,
+                        reminderTime, pendingIntent);
+            } else if (Build.VERSION.SDK_INT >= 19) {
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP,
+                        reminderTime, pendingIntent);
+            } else {
+                alarmManager.set(AlarmManager.RTC_WAKEUP,
+                        reminderTime, pendingIntent);
+            }*/
         }
-
-
     }
+
 //    public void alarmEditFun(String title,long reminderTime,int position)
 //    {
 //        AlarmManager  alarmManager = (AlarmManager) getSystemService( ALARM_SERVICE );
@@ -53,26 +64,26 @@ public class AlarmClass extends ContextWrapper {
 //        }
 //    }
 
-//    public void repeatingAlarm(String title, long reminderTime, int position, long intervalTime) {
-//
-//
-//        Intent myIntent1 = new Intent(this, AlarmReceiver.class);
-//        myIntent1.putExtra(MyAnnotations.PROFILER_TITLE, title);
-//        myIntent1.putExtra(MyAnnotations.IS_REPEAT, true);
-//        myIntent1.putExtra(MyAnnotations.PROFILER_POSITION, position);
-//        myIntent1.putExtra(MyAnnotations.TRIGGER_TIME, reminderTime);
-//
-//
-//        PendingIntent pendingIntent1 = PendingIntent.getBroadcast(this, position,
-//                myIntent1, 0);
-//        AlarmManager alarmManager1 = (AlarmManager) getSystemService(ALARM_SERVICE);
-//
-//        if (alarmManager1 != null) {
-//            alarmManager1.cancel(pendingIntent1);
-//            alarmManager1.setRepeating(AlarmManager.RTC_WAKEUP, reminderTime,
-//                    AlarmManager.INTERVAL_DAY, pendingIntent1);
-//        }
-//    }
+    public void repeatingAlarm(String title, long reminderTime, int position, long intervalTime) {
+
+
+        Intent myIntent1 = new Intent(this, AlarmReceiver.class);
+        myIntent1.putExtra(MyAnnotations.PROFILER_TITLE, title);
+        myIntent1.putExtra(MyAnnotations.IS_REPEAT, true);
+        myIntent1.putExtra(MyAnnotations.PROFILER_POSITION, position);
+        myIntent1.putExtra(MyAnnotations.TRIGGER_TIME, reminderTime);
+
+
+        PendingIntent pendingIntent1 = PendingIntent.getBroadcast(this, position,
+                myIntent1, 0);
+        AlarmManager alarmManager1 = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+        if (alarmManager1 != null) {
+            alarmManager1.cancel(pendingIntent1);
+            alarmManager1.setRepeating(AlarmManager.RTC_WAKEUP, reminderTime,
+                    AlarmManager.INTERVAL_DAY, pendingIntent1);
+        }
+    }
 
     public void deleteRepeatAlarm(int position) {
         Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);

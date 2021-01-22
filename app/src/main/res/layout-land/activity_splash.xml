@@ -6,8 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".activities.MySplashActivity">
 
-
-
     <include
         android:id="@+id/termAndCondition"
         layout="@layout/terms_conditions"

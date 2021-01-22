@@ -285,6 +285,8 @@ public class MapsFragment extends Fragment implements LocationListener, SendData
                             myPreferences.getLong(MyAnnotations.GEO_FENCE_LIMIT, 0)
                                     + 1);
                     geoFencesLimitTv.setText(String.valueOf(geoFencesLimit - getGeoFenceLimit()));
+
+
                 }).addOnFailureListener(e -> Toast.makeText(context, geoFence.getErrorMessage(e),
                 Toast.LENGTH_SHORT).show());
     }

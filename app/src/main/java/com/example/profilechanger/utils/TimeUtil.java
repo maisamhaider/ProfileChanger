@@ -127,6 +127,13 @@ public class TimeUtil {
 
         return format.format(calendar.getTime());
     }
+    public long getCurrentTimeJust() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        SimpleDateFormat format = new SimpleDateFormat(MyAnnotations.DEFAULT_TIME_FORMAT);
+        format.setCalendar(calendar);
+        return format.getCalendar().getTimeInMillis();
+    }
 
     public String getFormattedDate(long millis) {
         Calendar calendar = Calendar.getInstance();

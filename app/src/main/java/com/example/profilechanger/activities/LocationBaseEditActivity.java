@@ -5,7 +5,9 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.os.Bundle;
+ import android.app.Activity;
+ import android.content.pm.ActivityInfo;
+ import android.os.Bundle;
 
 import com.example.profilechanger.R;
 import com.example.profilechanger.annotations.MyAnnotations;
@@ -20,6 +22,7 @@ public class LocationBaseEditActivity extends BaseActivity  implements ClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location_base_edit);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         String id = getIntent().getStringExtra(MyAnnotations.LOCATION_PROFILER_ID);
         boolean isUpdate = getIntent().getBooleanExtra(MyAnnotations.IS_UPDATE, false);

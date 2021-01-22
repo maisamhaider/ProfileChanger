@@ -3,15 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="370dp"
     app:cardBackgroundColor="?attr/dialogBg"
     app:cardCornerRadius="16dp"
     >
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-
     <TextView
         android:id="@+id/textView5"
         android:layout_width="match_parent"

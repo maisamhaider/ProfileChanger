@@ -135,7 +135,7 @@
     <string name="permissions_explanation">1. Location permission needed to check if user is entered
         and exit or not.\n\n 2. Do Not Disturb permission is required to change ringing mode and
         enable do not disturb mode.\n\n 3. Manage System settings is required to enable/disable touch,
-        dial pad and vibrate </string>
+        dial pad and vibrate.</string>
     <string name="by_accepting">By accepting you are agree to our <u><b>Terms and Conditions</b></u></string>
     <string name="terms_and_conditions">Terms And Conditions</string>
     <string name="do_not_disturb">Do not disturb</string>
@@ -154,5 +154,6 @@
     <string name="are_you_sure_you_want_to_delete">Are you sure you want to delete?</string>
     <string name="are_you_sure_you_want_to_back">Are you sure you want to back?</string>
     <string name="hr1">1hr</string>
+    <string name="huawei_text">App must not be killed by device operation system if you want to use this.otherwise alarm will not be triggered.</string>
 
 </resources>

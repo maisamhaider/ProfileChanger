@@ -2,7 +2,9 @@
 package com.example.profilechanger.activities;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -125,9 +127,27 @@ public class SettingsActivity extends BaseActivity implements SendDataWithKey {
                 }
                 recreate();
             }
+            if (preferences.getBoolean(MyAnnotations.CLICK, false)) {
+                notificationSoundsFun();
+
+            }
         });
 
-        settingsNotification_cl.setOnClickListener(v -> notificationSoundsFun());
+        settingsNotification_cl.setOnClickListener(v ->
+        {
+            int orientation = this.getResources().getConfiguration().orientation;
+            if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+                // code for portrait mode
+                preferences.setBoolean(MyAnnotations.PORTRAIT, true);
+                notificationSoundsFun();
+            } else {
+                // code for landscape mode
+                preferences.setBoolean(MyAnnotations.CLICK, true);
+                preferences.setBoolean(MyAnnotations.PORTRAIT, false);
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            }
+
+        });
 
 
         String soundName = preferences.getString(MyAnnotations.NOTIFICATION_SOUND_NAME,
@@ -169,16 +189,6 @@ public class SettingsActivity extends BaseActivity implements SendDataWithKey {
 
     }
 
-    public long get12AmMillis() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.AM, 1);
-        calendar.add(Calendar.DATE, 1);
-        return calendar.getTimeInMillis();
-    }
-
     private void notificationSoundsFun() {
 
         View view = LayoutInflater.from(this)
@@ -204,7 +214,9 @@ public class SettingsActivity extends BaseActivity implements SendDataWithKey {
         notificationSoundRecyclerView.setAdapter(notificationSoundsAdapter);
         notificationSoundsAdapter.notifyDataSetChanged();
 
-
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+        preferences.setBoolean(MyAnnotations.CLICK, false);
+     
     }
 
 

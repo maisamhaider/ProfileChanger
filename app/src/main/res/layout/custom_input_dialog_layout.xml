@@ -97,7 +97,7 @@
                             android:layout_margin="10dp"
                             android:ellipsize="end"
                             android:gravity="center"
-                            android:hint="@string/walk"
+                            android:text="@string/walk"
                             android:textColor="?attr/textWhiteGray"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toStartOf="@+id/appCompatImageView"
@@ -224,7 +224,7 @@
                             android:layout_marginBottom="10dp"
                             android:ellipsize="marquee"
                             android:gravity="center"
-                            android:hint="@string/N_A"
+                            android:text="@string/N_A"
                             android:singleLine="true"
                             android:textColor="?attr/textWhiteGray"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -235,15 +235,17 @@
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
-                    <View
+                    <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/view3"
-                        android:layout_width="30dp"
+                        android:layout_width="25dp"
                         android:layout_height="match_parent"
                         android:layout_gravity="end"
                         android:background="@color/colorPrimaryVariantLight"
+                        android:scaleType="centerInside"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/ic_down_arrow" />
                 </androidx.cardview.widget.CardView>
 
 
@@ -267,7 +269,7 @@
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="16dp"
                     android:minWidth="120dp"
-                    android:visibility="gone"
+
                     app:cardBackgroundColor="?attr/dialogBg"
                     app:cardCornerRadius="8dp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -293,7 +295,7 @@
                             android:layout_marginBottom="10dp"
                             android:ellipsize="marquee"
                             android:gravity="center"
-                            android:hint="@string/N_A"
+                            android:text="@string/N_A"
                             android:singleLine="true"
                             android:textColor="?attr/textWhiteGray"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -304,16 +306,17 @@
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
-                    <View
+                    <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/view2"
-                        android:layout_width="30dp"
-                        android:layout_height="match_parent"
+                        android:layout_width="25dp"
                         android:layout_gravity="end"
                         android:background="@color/colorPrimaryVariantLight"
                         android:scaleType="centerInside"
+                        android:layout_height="match_parent"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/ic_down_arrow" />
 
                 </androidx.cardview.widget.CardView>
 
@@ -358,7 +361,7 @@
                             android:layout_marginBottom="10dp"
                             android:ellipsize="marquee"
                             android:gravity="center"
-                            android:hint="@string/N_A"
+                            android:text="@string/N_A"
                             android:singleLine="true"
                             android:textColor="?attr/textWhiteGray"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -368,7 +371,7 @@
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/appCompatImageView5"
-                            android:layout_width="30dp"
+                            android:layout_width="25dp"
                             android:layout_height="0dp"
                             android:background="@color/colorPrimaryVariantLight"
                             android:scaleType="centerInside"

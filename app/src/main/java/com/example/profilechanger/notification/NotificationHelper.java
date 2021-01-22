@@ -66,7 +66,7 @@ public class NotificationHelper extends ContextWrapper {
                 .setContentText(body)
                 .setSound(soundUri)
                 .setSmallIcon(R.drawable.ic_main)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setStyle(new NotificationCompat.BigTextStyle()/*.setSummaryText("summary")*/
                         .setBigContentTitle(title).bigText(body))
                 .setAutoCancel(true)

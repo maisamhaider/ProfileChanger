@@ -10,8 +10,11 @@ import androidx.viewpager.widget.ViewPager;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.NotificationManager;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -19,7 +22,11 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.PowerManager;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -37,7 +44,8 @@ import com.example.profilechanger.services.Service1;
 import com.example.profilechanger.sharedpreferences.MyPreferences;
 import com.google.android.material.tabs.TabLayout;
 
-import static com.example.profilechanger.annotations.PermissionCodes.DRAW_OVER_OTHER_APP_PERMISSION;
+
+import static android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS;
 
 public class MainActivity extends BaseActivity {
 
@@ -122,13 +130,19 @@ public class MainActivity extends BaseActivity {
                 Toast.makeText(MainActivity.this, "Help", Toast.LENGTH_SHORT).show());
 
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(new Intent(MainActivity.this, Service1.class));
-        } else {
-            startService(new Intent(MainActivity.this, Service1.class));
-        }
-    }
+        String model = Build.MODEL;
+        String manufacturer = Build.MANUFACTURER;
 
+//        if (manufacturer.toLowerCase().matches("huawei")
+//                && model.toLowerCase().matches("stk-l21")) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(new Intent(MainActivity.this, Service1.class));
+            } else {
+                startService(new Intent(MainActivity.this, Service1.class));
+            }
+//        }
+
+    }
 
     public void insertPreDefinedProfiles() {
         database.insertProfile(getResources().getString(R.string.general),
@@ -206,6 +220,45 @@ public class MainActivity extends BaseActivity {
                 dialog = builder.create();
                 dialog.show();
 
+            } else {
+               /* AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("App protect").setMessage(R.string.huawei_text)
+                        .setCancelable(false)
+                        .setPositiveButton(R.string.settings,*/
+                /*(dialogInterface, i) -> {*/
+                checkOptimization();
+                               /*     preferences.setBoolean("protected", true);
+                                }).create().show();*/
+
+            }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == PermissionCodes.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS) {
+            if (resultCode != RESULT_OK) {
+                finishAffinity();
+            }
+
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void checkOptimization() {
+        String packageName = getApplicationContext().getPackageName();
+        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+        if (pm != null) {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (!pm.isIgnoringBatteryOptimizations(packageName)) {
+                    Intent intent = new Intent();
+                    intent.setAction(ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+                    intent.setData(Uri.parse("package:" + getPackageName()));
+                    startActivityForResult(intent,
+                            PermissionCodes.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+
+                }
             }
         }
     }

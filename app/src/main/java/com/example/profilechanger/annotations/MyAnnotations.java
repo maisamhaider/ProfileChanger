@@ -26,7 +26,7 @@ public @interface MyAnnotations {
     String SAT = "Sat";
     String SUN = "Sun";
     String MON = "Mon";
-    String TUS = "Tue";
+    String TUE = "Tue";
     String WED = "Wed";
     String THU = "Thu";
     String FRI = "Fri";
@@ -95,4 +95,7 @@ public @interface MyAnnotations {
     String IS_APP_FIRST_TIME = "IS_APP_FIRST_TIME";
     String IS_THEME_CHANGE = "IS_THEME_CHANGE";
     String set = "set";
+    String ID = "ID";
+    String CLICK = "CLICK";
+     String PORTRAIT = "PORTRAIT";
 }
